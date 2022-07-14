@@ -22,7 +22,7 @@
 .. |Test Status| image:: https://github.com/bckohan/django-render-static/workflows/test/badge.svg
    :target: https://github.com/bckohan/django-render-static/actions
 
-django-enum
+Enum-properties
 #######################
 
 Use Django's dynamic templates to render static files. That is, files that are collected

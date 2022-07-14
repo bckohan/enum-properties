@@ -2,7 +2,7 @@ from datetime import datetime
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent))
-import django_enum
+import enum_properties
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -23,12 +23,12 @@ import django_enum
 
 # -- Project information -----------------------------------------------------
 
-project = 'django-enum'
+project = 'enum-properties'
 copyright = f'2022-{datetime.now().year}, Brian Kohan'
 author = 'Brian Kohan'
 
 # The full version, including alpha/beta/rc tags
-release = django_enum.__version__
+release = enum_properties.__version__
 
 
 # -- General configuration ---------------------------------------------------

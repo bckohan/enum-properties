@@ -22,7 +22,7 @@ We are actively seeking additional maintainers. If you're interested, please con
 Installation
 ------------
 
-`django-enum` uses Poetry_ for environment, package and dependency management. Poetry_
+`enum-properties` uses Poetry_ for environment, package and dependency management. Poetry_
 greatly simplifies environment bootstrapping. Once it's installed.
 
 .. code-block::
@@ -32,7 +32,7 @@ greatly simplifies environment bootstrapping. Once it's installed.
 Documentation
 -------------
 
-`django-enum` documentation is generated using Sphinx_ with the readthedocs_ theme. Any
+`enum-properties` documentation is generated using Sphinx_ with the readthedocs_ theme. Any
 new feature PRs must provide updated documentation for the features added. To build the docs run:
 
 .. code-block::
@@ -44,7 +44,7 @@ new feature PRs must provide updated documentation for the features added. To bu
 Static Analysis
 ---------------
 
-`django-enum` uses Pylint_ for python linting.
+`enum-properties` uses Pylint_ for python linting.
 Header imports are also standardized using isort_. Before any PR is accepted the following must be
 run, and static analysis tools should not produce any errors or warnings. Disabling certain errors
 or warnings where justified is acceptable:
@@ -63,7 +63,7 @@ or warnings where justified is acceptable:
 Running Tests
 -------------
 
-`django-enum` is setup to use django-pytest_ to allow pytest_ to run Django unit tests.
+`enum-properties` is setup to use django-pytest_ to allow pytest_ to run Django unit tests.
 All the tests are housed in enum_properties/tests/tests.py. Before a PR is accepted, all
 tests must be passing and the code coverage must be at 100%. A small number of exempted
 error handling branches are acceptable.
