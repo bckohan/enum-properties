@@ -1,10 +1,6 @@
-from django_enum import (
-    TextChoices,
-    IntegerChoices,
-    FloatChoices,
-    p
-)
 from django.utils.translation import gettext as _
+from enum_properties.django import FloatChoices, IntegerChoices, TextChoices
+from enum_properties import p
 
 
 class TextEnum(TextChoices, p('version'), p('help'), p('aliases', symmetric=True, case_sensitive=False)):
@@ -72,9 +68,9 @@ class BigIntEnum(IntegerChoices, p('pos', symmetric=True), p('help')):
 
 
 class PrecedenceTest(
-    IntegerChoices,
     p('prop1', symmetric=True),
     p('prop2', symmetric=True),
+    IntegerChoices,
     p('prop3', symmetric=True, case_sensitive=True),
     p('prop4', symmetric=True, case_sensitive=False)
 ):

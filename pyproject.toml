@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "django-enum"
+name = "enum-properties"
 version = "0.1.0"
 description = "Full pythonic enumeration support for Django."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"
-repository = "https://github.com/bckohan/django-enum"
-homepage = "https://django-enum.readthedocs.io"
-keywords = ["django", "enum",  "defines", "field", "database"]
+repository = "https://github.com/bckohan/enum-properties"
+homepage = "https://enum-properties.readthedocs.io"
+keywords = ["enum",  "properties", "defines", "field", "django", "database"]
 classifiers = [
     "Environment :: Console",
     "Framework :: Django",
@@ -33,13 +33,14 @@ include = [
     "LICENSE",
 ]
 packages = [
-    { include = "django_enum" }
+    { include = "enum_properties" }
 ]
-exclude = ["django_enum/tests"]
+exclude = ["enum_properties/tests"]
 
 [tool.poetry.dependencies]
-python = ">=3.6,<4.0"
-Django = ">=3.2,<5.0"
+python = ">=3.7,<4.0"
+Django = { version = ">=3.2,<5.0", optional = true }
+django-filter = { version = "^22.1", optional = true }
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0"
@@ -60,7 +61,17 @@ readme-renderer = "^34.0"
 pygount = "^1.2.4"
 types-PyYAML = "^6.0"
 coverage = "^6.2"
+django-filter = "^22.1"
+beautifulsoup4 = "^4.11.1"
+djangorestframework = "^3.13.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.extras]
+django = ["Django"]
+filters = ["Django", "django-filters"]
+jinja2 = ["Jinja2"]
+all = ["django", "PyYAML", "Jinja2"]

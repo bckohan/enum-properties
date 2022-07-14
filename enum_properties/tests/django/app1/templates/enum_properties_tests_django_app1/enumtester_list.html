@@ -1,0 +1,23 @@
+{% extends "enum_properties_tests_django_app1/base.html" %}
+
+{% block content %}
+<h1>EnumTester Objects</h1>
+{% for object in object_list %}
+    <div id="{{object.pk}}" class="enum">
+        <h2>{{ object.pk }}</h2>
+        <p class="small_pos_int">small_pos_int: <b><span class="value">{{ object.small_pos_int.value }}</span></b> <b><span class="label">{{ object.small_pos_int.label }}</span></b></p>
+        <p class="small_int">small_int: <b><span class="value">{{ object.small_int.value }}</span></b> <b><span class="label">{{ object.small_int.label }}</span></b></p>
+        <p class="pos_int">pos_int: <b><span class="value">{{ object.pos_int.value }}</span></b> <b><span class="label">{{ object.pos_int.label }}</span></b></p>
+        <p class="int">int: <b><span class="value">{{ object.int.value }}</span></b> <b><span class="label">{{ object.int.label }}</span></b></p>
+        <p class="big_pos_int">big_pos_int: <b><span class="value">{{ object.big_pos_int.value }}</span></b> <b><span class="label">{{ object.big_pos_int.label }}</span></b></p>
+        <p class="big_int">big_int: <b><span class="value">{{ object.big_int.value }}</span></b> <b><span class="label">{{ object.big_int.label }}</span></b></p>
+        <p class="constant">constant: <b><span class="value">{{ object.constant.value }}</span></b> <b><span class="label">{{ object.constant.label }}</span></b></p>
+        <p class="text">text: <b><span class="value">{{ object.text.value }}</span></b> <b><span class="label">{{ object.text.label }}</span></b></p>
+
+        <p>
+        <a href="{% url 'enum_properties_tests_django_app1:enum-update' pk=object.pk %}">Edit</a>
+        <a href="{% url 'enum_properties_tests_django_app1:enum-delete' pk=object.pk %}">Delete</a>
+        </p>
+    </div>
+{% endfor %}
+{% endblock %}

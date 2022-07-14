@@ -22,22 +22,17 @@ We are actively seeking additional maintainers. If you're interested, please con
 Installation
 ------------
 
-`django-render-static` uses Poetry_ for environment, package and dependency management. Poetry_
+`django-enum` uses Poetry_ for environment, package and dependency management. Poetry_
 greatly simplifies environment bootstrapping. Once it's installed.
 
 .. code-block::
 
-    poetry install -E all
-
-External Dependencies
-~~~~~~~~~~~~~~~~~~~~~
-
-Some of the tests require npm_ to be installed.
+    poetry install
 
 Documentation
 -------------
 
-`django-render-static` documentation is generated using Sphinx_ with the readthedocs_ theme. Any
+`django-enum` documentation is generated using Sphinx_ with the readthedocs_ theme. Any
 new feature PRs must provide updated documentation for the features added. To build the docs run:
 
 .. code-block::
@@ -49,16 +44,15 @@ new feature PRs must provide updated documentation for the features added. To bu
 Static Analysis
 ---------------
 
-`django-render-static` uses mypy_ for static type analysis, and Pylint_ for python linting.
+`django-enum` uses Pylint_ for python linting.
 Header imports are also standardized using isort_. Before any PR is accepted the following must be
 run, and static analysis tools should not produce any errors or warnings. Disabling certain errors
 or warnings where justified is acceptable:
 
 .. code-block::
 
-    poetry run isort render_static
-    poetry run mypy render_static
-    poetry run pylint render_static
+    poetry run isort enum_properties
+    poetry run pylint enum_properties
     poetry run doc8 -q doc
     poetry check
     poetry run pip check
@@ -69,9 +63,10 @@ or warnings where justified is acceptable:
 Running Tests
 -------------
 
-`django-render-static` is setup to use django-pytest_ to allow pytest_ to run Django unit tests.
-All the tests are housed in render_static/tests/tests.py. Before a PR is accepted, all
-tests must be passing and the code coverage must be at 100%.
+`django-enum` is setup to use django-pytest_ to allow pytest_ to run Django unit tests.
+All the tests are housed in enum_properties/tests/tests.py. Before a PR is accepted, all
+tests must be passing and the code coverage must be at 100%. A small number of exempted
+error handling branches are acceptable.
 
 To run the full suite:
 
@@ -90,6 +85,6 @@ you would do:
 
 .. code-block::
 
-    poetry run pytest render_static/tests/tests.py::DefinesToJavascriptTest
-    poetry run pytest render_static/tests/tests.py::DefinesToJavascriptTest::test_classes_to_js
+    poetry run pytest enum_properties/tests/tests.py::TestEnums
+    poetry run pytest enum_properties/tests/tests.py::TestEnums::test_properties_and_symmetry
 

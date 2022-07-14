@@ -6,7 +6,7 @@ SITE_ID = 1
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'NAME': 'test.db',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -14,7 +14,7 @@ DATABASES = {
     }
 }
 
-ROOT_URLCONF = 'django_enum.tests.urls'
+ROOT_URLCONF = 'enum_properties.tests.django.urls'
 
 TEMPLATES = [
     {
@@ -42,7 +42,7 @@ MIDDLEWARE = (
 )
 
 INSTALLED_APPS = (
-    'django_enum.tests.app1',
+    'enum_properties.tests.django.app1',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
