@@ -43,5 +43,5 @@ try:
     ):
         pass
 
-except (ImportError, ModuleNotFoundError):
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass

@@ -35,5 +35,5 @@ try:
         'DjangoEnumProperties',
         'DJANGO_SUPPORTED'
     ]
-except (ModuleNotFoundError, ImportError):
+except (ModuleNotFoundError, ImportError):  # pragma: no cover
     DJANGO_SUPPORTED = False

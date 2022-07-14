@@ -289,14 +289,44 @@ class TestNonDjangoEnums(TestCase):
             metaclass=EnumProperties
         ):
 
-            _ignore_ = ['BLACK']
+            _ignore_ = ['BLACK', 'NOT_ENOUGH_PROPS']
 
             RED = 1, 'Roja', (1, 0, 0), 'ff0000'
             GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
             BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
             BLACK = 4, 'Negra', (1, 1, 1), 'ffffff'
+            NOT_ENOUGH_PROPS = 5, 'Not Enough'
 
         self.assertFalse(hasattr(Color, 'BLACK'))
         self.assertRaises(ValueError, Color, 4)
         self.assertRaises(ValueError, Color, (1, 1, 1))
         self.assertRaises(ValueError, Color, 'ffffff')
+
+    def test_no_props(self):
+
+        class Color(
+            SymmetricMixin,
+            Enum,
+            metaclass=EnumProperties
+        ):
+            RED = 1, 0, 0
+            GREEN = 0, 1, 0
+            BLUE = 0, 0, 1
+
+        self.assertEqual(Color.RED.value, (1, 0, 0))
+        self.assertEqual(Color.GREEN.value, (0, 1, 0))
+        self.assertEqual(Color.BLUE.value, (0, 0, 1))
+
+    def test_not_enough_props(self):
+
+        with self.assertRaises(AssertionError):
+            class Color(
+                SymmetricMixin,
+                Enum,
+                p('prop1'),
+                p('prop2'),
+                metaclass=EnumProperties
+            ):
+                RED = 1, 'p1.1', 'p2.1'
+                GREEN = 2, 'p1.2', 'p2.2'
+                BLUE = 3, 'p1.3'

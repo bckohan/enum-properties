@@ -199,5 +199,5 @@ try:
         """
         return _EnumFieldMetaClass(enum)(enum=enum, **field_kwargs)
 
-except (ImportError, ModuleNotFoundError):
+except (ImportError, ModuleNotFoundError):  # pragma: no cover
     pass

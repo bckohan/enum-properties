@@ -228,6 +228,9 @@ class EnumProperties(EnumMeta):
                 if after > before:
                     try:
                         nv = len(value) - len(self._ep_properties)
+                        assert nv > 0, f'{key} must have ' \
+                                       f'{len(self._ep_properties)} property' \
+                                       f' values.'
                         if self._ep_properties:
                             assert (len(self._ep_properties) ==
                                     len(value[nv:])), \
@@ -237,11 +240,10 @@ class EnumProperties(EnumMeta):
                             for prop, values in self._ep_properties.items():
                                 values.append(value[idx])
                                 idx += 1
-                        if nv > 0:
-                            if nv == 1:
-                                value = value[0]
-                            else:
-                                value = value[0:nv]
+                        if nv == 1:
+                            value = value[0]
+                        else:
+                            value = value[0:nv]
                     except TypeError:
                         pass
                 super().__setitem__(key, value)
