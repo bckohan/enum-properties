@@ -9,12 +9,9 @@ jobs:
       matrix:
         python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
         django-version:
-          - 'Django~=2.2.0' # LTS April 2022
           - 'Django~=3.2.0' # LTS April 2024
           - 'Django~=4.0.0' # April 2023
         exclude:
-          - python-version: '3.10'
-            django-version: 'Django~=2.2.0'
           - python-version: '3.6'
             django-version: 'Django~=4.0.0'
           - python-version: '3.7'
@@ -44,8 +41,8 @@ jobs:
         poetry run pytest
     - name: Run Static Analysis
       run: |
-        poetry run pylint render_static
-        poetry run mypy render_static
+        poetry run pylint django_enum
+        poetry run mypy django_enum
         poetry run doc8 -q doc
         poetry check
         poetry run pip check
