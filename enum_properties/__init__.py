@@ -9,8 +9,10 @@ r"""
 """
 from enum_properties.meta import (
     EnumProperties,
+    EnumPropertiesMeta,
     SymmetricMixin,
-    p
+    p,
+    s
 )
 from enum_properties.django import DJANGO_SUPPORTED
 

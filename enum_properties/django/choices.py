@@ -5,7 +5,8 @@ IntegerChoices and TextChoices.
 """
 from enum_properties import (
     SymmetricMixin,
-    EnumProperties
+    EnumPropertiesMeta,
+    p
 )
 try:
 
@@ -14,32 +15,34 @@ try:
     from django.db.models import TextChoices as DjangoTextChoices
     from django.db.models.enums import ChoicesMeta
 
-    class DjangoEnumProperties(EnumProperties, ChoicesMeta):
+    class DjangoEnumPropertiesMeta(EnumPropertiesMeta, ChoicesMeta):
         """Derive """
         pass
 
+    class DjangoSymmetricMixin(SymmetricMixin):
+        symmetrical_builtins = ['name', 'label']
 
     class TextChoices(
-        SymmetricMixin,
+        DjangoSymmetricMixin,
         DjangoTextChoices,
-        metaclass=DjangoEnumProperties
+        metaclass=DjangoEnumPropertiesMeta
     ):
         pass
 
 
     class IntegerChoices(
-        SymmetricMixin,
+        DjangoSymmetricMixin,
         DjangoIntegerChoices,
-        metaclass=DjangoEnumProperties
+        metaclass=DjangoEnumPropertiesMeta
     ):
         pass
 
 
     class FloatChoices(
-        SymmetricMixin,
+        DjangoSymmetricMixin,
         float,
         Choices,
-        metaclass=DjangoEnumProperties
+        metaclass=DjangoEnumPropertiesMeta
     ):
         pass
 

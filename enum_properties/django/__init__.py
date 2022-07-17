@@ -15,7 +15,12 @@ try:
         TextChoices,
         IntegerChoices,
         FloatChoices,
-        DjangoEnumProperties
+        DjangoEnumPropertiesMeta
+    )
+    from enum_properties.django.forms import EnumChoiceField
+    from enum_properties.django.filters import (
+        EnumFilter,
+        FilterSet
     )
     DJANGO_SUPPORTED = True
 
@@ -32,8 +37,11 @@ try:
         'TextChoices',
         'IntegerChoices',
         'FloatChoices',
-        'DjangoEnumProperties',
-        'DJANGO_SUPPORTED'
+        'DjangoEnumPropertiesMeta',
+        'DJANGO_SUPPORTED',
+        'EnumFilter',
+        'FilterSet',
+        'EnumChoiceField'
     ]
 except (ModuleNotFoundError, ImportError):  # pragma: no cover
     DJANGO_SUPPORTED = False

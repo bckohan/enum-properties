@@ -39,12 +39,15 @@ exclude = ["enum_properties/tests"]
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
+
+# todo move to poetry 1.2 groups
 Django = { version = ">=3.2,<5.0", optional = true }
-django-filter = { version = "^22.1", optional = true }
+pytest-django = {version = "^4.5.2", optional = true}
+djangorestframework = {version = "^3.13.1", optional = true}
+django-filter = {version = "^22.1", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0"
-pytest-django = "^4.1.0"
 Sphinx = "^5.0.2"
 sphinx-rtd-theme = "^1.0.0"
 mypy = "^0.961"
@@ -61,9 +64,7 @@ readme-renderer = "^34.0"
 pygount = "^1.2.4"
 types-PyYAML = "^6.0"
 coverage = "^6.2"
-django-filter = "^22.1"
 beautifulsoup4 = "^4.11.1"
-djangorestframework = "^3.13.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -72,6 +73,5 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.extras]
 django = ["Django"]
-filters = ["Django", "django-filters"]
-jinja2 = ["Jinja2"]
-all = ["django", "PyYAML", "Jinja2"]
+all = ["django"]
+test = ["django", "pytest-django", "django-filter", "djangorestframework"]

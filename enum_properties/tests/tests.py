@@ -1,9 +1,65 @@
 from unittest import TestCase
 from enum import Enum, auto
-from enum_properties import EnumProperties, SymmetricMixin, p
+from enum_properties import (
+    EnumProperties,
+    EnumPropertiesMeta,
+    SymmetricMixin,
+    p,
+    s
+)
 
 
-class TestNonDjangoEnums(TestCase):
+class TestEnums(TestCase):
+
+    def test_p(self):
+        from enum_properties.meta import _Prop
+
+        prop1 = p('prop1')
+        prop2 = s('prop2')
+        prop3 = s('prop3', case_sensitive=False)
+        prop4 = p('prop4')
+
+        self.assertTrue(issubclass(prop1, _Prop))
+        self.assertTrue(issubclass(prop2, _Prop))
+        self.assertTrue(issubclass(prop3, _Prop))
+        self.assertTrue(issubclass(prop4, _Prop))
+        self.assertEqual(prop1.name(), 'prop1')
+        self.assertEqual(prop2.name(), 'prop2')
+        self.assertEqual(prop3.name(), 'prop3')
+        self.assertEqual(prop4.name(), 'prop4')
+        self.assertEqual(prop1(), 'prop1')
+        self.assertEqual(prop2(), 'prop2')
+        self.assertEqual(prop3(), 'prop3')
+        self.assertEqual(prop4(), 'prop4')
+
+        self.assertFalse(prop1.symmetric)
+        self.assertTrue(prop2.symmetric)
+        self.assertTrue(prop3.symmetric)
+        self.assertFalse(prop4.symmetric)
+
+        self.assertFalse(prop1().symmetric)
+        self.assertTrue(prop2().symmetric)
+        self.assertTrue(prop3().symmetric)
+        self.assertFalse(prop4().symmetric)
+
+        self.assertFalse(hasattr(prop1, 'case_sensitive'))
+        self.assertTrue(prop2.case_sensitive)
+        self.assertFalse(prop3.case_sensitive)
+        self.assertFalse(hasattr(prop4, 'case_sensitive'))
+
+        self.assertFalse(hasattr(prop1(), 'case_sensitive'))
+        self.assertTrue(prop2().case_sensitive)
+        self.assertFalse(prop3().case_sensitive)
+        self.assertFalse(hasattr(prop4(), 'case_sensitive'))
+
+    def test_unhashable_symmetry(self):
+        """
+        Tests that a value error is thrown when an unhashable type is used as a symmetrical property
+        """
+        with self.assertRaises(ValueError):
+            class BadEnum(EnumProperties, s('bad_prop')):
+                VAL1 = 'E1', 'E1 Label', 'Good prop'
+                VAL2 = 'E2', 'E2 Label', {'hashable': False}
 
     def test_properties_and_symmetry(self):
 
@@ -12,9 +68,9 @@ class TestNonDjangoEnums(TestCase):
             int,
             Enum,
             p('spanish'),
-            p('rgb', symmetric=True),
-            p('hex', symmetric=True, case_sensitive=False),
-            metaclass=EnumProperties
+            s('rgb'),
+            s('hex', case_sensitive=False),
+            metaclass=EnumPropertiesMeta
         ):
             RED = 1, 'Roja', (1, 0, 0), 'ff0000'
             GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
@@ -57,18 +113,46 @@ class TestNonDjangoEnums(TestCase):
         self.assertRaises(ValueError, Color, 'Azul')
         self.assertRaises(ValueError, Color, 'Blue')
 
+    def test_property_lists(self):
+
+        class Color(
+            EnumProperties,
+            p('spanish'),
+            s('rgb'),
+            s('hex', case_sensitive=False)
+        ):
+            RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+            GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
+            BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
+
+        self.assertEqual(
+            Color.symmetries,
+            ['name', 'rgb', 'hex']
+        )
+
+        self.assertEqual(
+            Color.properties,
+            ['spanish', 'rgb', 'hex']
+        )
+
     def test_properties_no_symmetry(self):
         """
-        Tests that absense of SymmetricMixin works but w/o symmetrical
+        Tests that absence of SymmetricMixin works but w/o symmetrical
         properties
         """
 
+        class DisableSymmetryMixin(SymmetricMixin):
+
+            @classmethod
+            def _missing_(cls, value):
+                return Enum._missing_(value)
+
         class Color(
-            Enum,
+            DisableSymmetryMixin,
+            EnumProperties,
             p('spanish'),
-            p('rgb', symmetric=True),
-            p('hex', symmetric=True, case_sensitive=False),
-            metaclass=EnumProperties
+            s('rgb'),
+            s('hex', case_sensitive=False)
         ):
             RED = 1, 'Roja', (1, 0, 0), 'ff0000'
             GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
@@ -113,11 +197,9 @@ class TestNonDjangoEnums(TestCase):
     def test_symmetry_priorities(self):
 
         class Priority(
-            SymmetricMixin,
-            Enum,
-            p('prop1', symmetric=True),
-            p('prop2', symmetric=True),
-            metaclass=EnumProperties
+            EnumProperties,
+            s('prop1'),
+            s('prop2')
         ):
             FIRST = 1, '3', 3
             SECOND = 2, '2', 2
@@ -133,11 +215,9 @@ class TestNonDjangoEnums(TestCase):
     def test_symmetry_tuples(self):
 
         class Priority(
-            SymmetricMixin,
-            Enum,
-            p('prop1', symmetric=True),
-            p('prop2', symmetric=True),
-            metaclass=EnumProperties
+            EnumProperties,
+            s('prop1'),
+            s('prop2')
         ):
             FIRST = 1, '3', [2.1, '2.3']
             SECOND = 2, '2', [2.2, '2.2']
@@ -159,7 +239,7 @@ class TestNonDjangoEnums(TestCase):
 
     def test_auto(self):
 
-        class ColorAuto(Enum, metaclass=EnumProperties):
+        class ColorAuto(EnumProperties):
             def _generate_next_value_(name, start, count, last_values):
                 return name.title()
 
@@ -175,12 +255,10 @@ class TestNonDjangoEnums(TestCase):
         self.assertEqual(ColorAuto.BLUE, ColorAuto['BLUE'])
 
         class ColorAutoSym(
-            SymmetricMixin,
-            Enum,
+            EnumProperties,
             p('spanish'),
-            p('rgb', symmetric=True),
-            p('hex', symmetric=True, case_sensitive=False),
-            metaclass=EnumProperties
+            s('rgb'),
+            s('hex', case_sensitive=False)
         ):
             def _generate_next_value_(name, start, count, last_values):
                 return name.title()
@@ -227,12 +305,10 @@ class TestNonDjangoEnums(TestCase):
         self.assertRaises(ValueError, ColorAutoSym, 'Azul')
 
         class ColorAutoIntSym(
-            SymmetricMixin,
-            Enum,
+            EnumProperties,
             p('spanish'),
-            p('rgb', symmetric=True),
-            p('hex', symmetric=True, case_sensitive=False),
-            metaclass=EnumProperties
+            s('rgb'),
+            s('hex', case_sensitive=False)
         ):
             RED = auto(), 'Roja', (1, 0, 0), 'ff0000'
             GREEN = auto(), 'Verde', (0, 1, 0), '00ff00'
@@ -281,12 +357,10 @@ class TestNonDjangoEnums(TestCase):
     def test_ignore(self):
 
         class Color(
-            SymmetricMixin,
-            Enum,
+            EnumProperties,
             p('spanish'),
-            p('rgb', symmetric=True),
-            p('hex', symmetric=True, case_sensitive=False),
-            metaclass=EnumProperties
+            s('rgb'),
+            s('hex', case_sensitive=False)
         ):
 
             _ignore_ = ['BLACK', 'NOT_ENOUGH_PROPS']
@@ -305,9 +379,7 @@ class TestNonDjangoEnums(TestCase):
     def test_no_props(self):
 
         class Color(
-            SymmetricMixin,
-            Enum,
-            metaclass=EnumProperties
+            EnumProperties
         ):
             RED = 1, 0, 0
             GREEN = 0, 1, 0
@@ -321,11 +393,9 @@ class TestNonDjangoEnums(TestCase):
 
         with self.assertRaises(AssertionError):
             class Color(
-                SymmetricMixin,
-                Enum,
+                EnumProperties,
                 p('prop1'),
-                p('prop2'),
-                metaclass=EnumProperties
+                p('prop2')
             ):
                 RED = 1, 'p1.1', 'p2.1'
                 GREEN = 2, 'p1.2', 'p2.2'

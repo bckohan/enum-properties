@@ -3,28 +3,49 @@ Metaprogramming and mixin tools that implement property tuple support for
 python enumeration classes. Symmetric lookups are supported with an additional
 SymmetricMixin class.
 """
-from collections import namedtuple
 from collections.abc import Hashable
 from typing import TypeVar, Type
-from enum import EnumMeta
-import types
+from enum import EnumMeta, Enum
+import inspect
 
 
-class _Prop:
-    """An empty class used to identify properties"""
+class _Prop(str):
+    """ Property interface - private """
+
+    def __new__(cls):
+        return super().__new__(cls, cls.name())
+
+    @classmethod
+    def name(cls):
+        """ the name of a property is its class name """
+        return cls.__name__
+
+
+class _SProp(_Prop):
     pass
 
-
-SymmetricProperty = namedtuple("SymmetricProperty", "name case_sensitive")
-
 P = TypeVar('P', bound=_Prop)
+S = TypeVar('S', bound=_SProp)
 
 
-def p(
-    prop_name: str,
-    symmetric: bool = False,
-    case_sensitive: bool = True
-) -> Type[P]:
+def s(prop_name: str, case_sensitive: bool = True) -> Type[S]:
+    """
+    Add a symmetric property. Enumeration values will be coercible from this
+    property's values.
+
+    :param prop_name:
+    :param case_sensitive: If True, symmetric lookup will be
+        case sensitive (default)
+    :return: a named property class
+    """
+    return type(
+        prop_name,
+        (_SProp,),
+        {'symmetric': True, 'case_sensitive': case_sensitive}
+    )
+
+
+def p(prop_name: str) -> Type[P]:
     """
     Add a property of the given name to the enumeration class by inheritance.
     Properties must be specified in the order in which they appear in the
@@ -33,11 +54,9 @@ def p(
     .. code-block::
 
         class EnumType(
-            SymmetricMixin,
-            int,
-            enum.Enum,
+            EnumProperties,
             p('prop1'),
-            p('prop1', symmetric=True, case_sensitive=False)
+            s('prop1', case_sensitive=False)
         ):
 
             VAL1 = 1, _('Value 1'), "prop1's value1", "prop2's value1"
@@ -56,23 +75,16 @@ def p(
             == EnumType("PRoP2'S ValUE1")
 
     :param prop_name: The name of the property
-    :param symmetric: If true, the enumeration will be able to be instantiated
-     from this value
-    :param case_sensitive: If false and symmetric and property is a string,
-        instantiation from this value will be case insensitive
     :return: a named property class
     """
-    return type(
-        prop_name,
-        (_Prop,),
-        {'symmetric': symmetric, 'case_sensitive': case_sensitive}
-    )
+    return type(prop_name, (_Prop,), {'symmetric': False})
 
 
 class SymmetricMixin:
 
     _ep_missing_map_ = {}
-    _ep_symmetric_properties_ = {'name', 'label'}
+    _ep_symmetric_map_ = {}
+    symmetrical_builtins = ['name']
 
     class ValueWrapper:
         """
@@ -142,17 +154,16 @@ class SymmetricMixin:
         :return:
         """
 
-        if value in cls._ep_missing_map_:
+        try:
             return cls._ep_missing_map_[value]
+        except KeyError:
+            pass
 
         if isinstance(value, str):
-            if value.upper() in cls._ep_missing_map_:
-                return cls._ep_missing_map_[value.upper()]
-
-        for prop in getattr(cls, '_ep_symmetric_properties_', set()):
-            for en in cls:
-                if hasattr(en, prop) and getattr(en, prop) == value:
-                    return en
+            try:
+                return cls._ep_symmetric_map_[value.upper()]
+            except KeyError:
+                pass
 
         # wrap value in a ValueWrapper that keeps track of the type
         if not isinstance(value, cls.ValueWrapper):
@@ -169,7 +180,7 @@ class SymmetricMixin:
         return super()._missing_(value)
 
 
-class EnumProperties(EnumMeta):
+class EnumPropertiesMeta(EnumMeta):
     """
     A metaclass for creating enum choices with additional named properties for
     each value.
@@ -185,17 +196,7 @@ class EnumProperties(EnumMeta):
         symmetrical_properties = []
         for base in bases:
             if issubclass(base, _Prop):
-                properties[base.__name__] = []
-                if getattr(base, 'symmetric', False):
-                    symmetrical_properties.append(
-                        SymmetricProperty(
-                            name=base.__name__,
-                            case_sensitive=getattr(
-                                base,
-                                'case_sensitive', True
-                            )
-                        )
-                    )
+                properties[base()] = []
             else:
                 real_bases.append(base)
 
@@ -221,11 +222,13 @@ class EnumProperties(EnumMeta):
                     self[item] = value
 
             def __setitem__(self, key, value):
-                # are we an enum value?
+                # are we an enum value? - just kick this up to parent class
+                # logic, this code runs once on load - its fine that it's doing
+                # a little redundant work and doing it this way ensures robust
+                # fidelity to Enum behavior.
                 before = len(class_dict._member_names)
                 class_dict[key] = value
-                after = len(class_dict._member_names)
-                if after > before:
+                if len(class_dict._member_names) > before:
                     try:
                         nv = len(value) - len(self._ep_properties)
                         assert nv > 0, f'{key} must have ' \
@@ -252,10 +255,6 @@ class EnumProperties(EnumMeta):
 
     def __new__(metacls, classname, bases, classdict, **kwds):
         properties = getattr(classdict, '_ep_properties', {})
-        symmetrical_properties = {
-            prop.name: prop for prop in
-            getattr(classdict, '_ep_symmetrical_properties', [])
-        }
         cls = super().__new__(
             metacls,
             classname,
@@ -264,17 +263,21 @@ class EnumProperties(EnumMeta):
             **kwds
         )
         symmetric_lookup = classdict.get('_ep_missing_map_', {})
+        isymmetric_lookup = {}
+        symmetries = []
 
-        def add_sym_lookup(prop, p_val, enum_inst, case_sensitive):
+        def add_sym_lookup(prop, p_val, enum_inst):
             if not isinstance(p_val, Hashable):
-                raise TypeError(
+                raise ValueError(
                     f'{cls}.{prop}:{p_val} is not hashable. Symmetrical '
                     f'enumeration properties must be hashable or a list of '
                     f'hashable values.'
                 )
             symmetric_lookup[p_val] = enum_inst
-            if not case_sensitive and isinstance(p_val, str):
-                symmetric_lookup[p_val.upper()] = enum_inst
+            if not prop.case_sensitive and isinstance(p_val, str):
+                isymmetric_lookup[p_val.upper()] = enum_inst
+            if prop not in symmetries:
+                symmetries.insert(0, prop)
 
         coerce_types = []
 
@@ -302,7 +305,8 @@ class EnumProperties(EnumMeta):
                     getattr(cls, f'_value2{prop}_map_').get(self.value)
                 )
             )
-            if prop in symmetrical_properties:
+
+            if prop.symmetric:
                 for idx, val in enumerate(values):
                     enum_cls = list(cls._value2member_map_.values())[idx]
                     if isinstance(val, (set, list)):
@@ -311,19 +315,44 @@ class EnumProperties(EnumMeta):
                             add_sym_lookup(
                                 prop,
                                 v,
-                                enum_cls,
-                                symmetrical_properties[prop].case_sensitive
+                                enum_cls
                             )
                     else:
                         add_sym_lookup(
                             prop,
                             val,
-                            enum_cls,
-                            symmetrical_properties[prop].case_sensitive
+                            enum_cls
                         )
                         add_coerce_type(type(val))
 
+        # add builtin symmetries
+        for sym_builtin in reversed(getattr(cls, 'symmetrical_builtins', [])):
+            # allow simple strings for the default case
+            if isinstance(sym_builtin, str):
+                sym_builtin = s(sym_builtin)()
+            else:
+                sym_builtin = sym_builtin()
+
+            for en in cls:
+                assert hasattr(en, sym_builtin), (
+                    f'{cls}.{sym_builtin} does not exist, but is listed in'
+                    f' symmetrical_builtins.'
+                )
+                add_sym_lookup(
+                    sym_builtin,
+                    getattr(en, sym_builtin),
+                    en
+                )
+
         setattr(cls, '_ep_coerce_types_', coerce_types)
+        setattr(cls, 'symmetries', list(symmetries))
+        setattr(cls, 'properties', list(properties.keys()))
         if symmetric_lookup:
             setattr(cls, '_ep_missing_map_', symmetric_lookup)
+        if isymmetric_lookup:
+            setattr(cls, '_ep_symmetric_map_', isymmetric_lookup)
         return cls
+
+
+class EnumProperties(SymmetricMixin, Enum, metaclass=EnumPropertiesMeta):
+    pass
