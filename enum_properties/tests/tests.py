@@ -149,12 +149,12 @@ class TestEnums(TestCase):
             BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
 
         self.assertEqual(
-            [prop for prop in Color.properties if prop.symmetric],
+            [prop for prop in Color.enum_properties if prop.symmetric],
             ['rgb', 'hex']
         )
 
         self.assertEqual(
-            Color.properties,
+            Color.enum_properties,
             ['spanish', 'rgb', 'hex']
         )
 
@@ -184,6 +184,20 @@ class TestEnums(TestCase):
                 s('hex', case_fold=True)
             ):
                 _symmetric_builtins_ = [p('name')]
+
+                RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+                GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
+                BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
+
+    def test_symmetric_builtin_override_missing(self):
+        with self.assertRaises(ValueError):
+            class Color(
+                EnumProperties,
+                p('spanish'),
+                s('rgb'),
+                s('hex', case_fold=True)
+            ):
+                _symmetric_builtins_ = [s('does_not_exist')]
 
                 RED = 1, 'Roja', (1, 0, 0), 'ff0000'
                 GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
@@ -452,7 +466,7 @@ class TestEnums(TestCase):
 
     def test_not_enough_props(self):
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             class Color(
                 EnumProperties,
                 p('prop1'),
@@ -462,7 +476,7 @@ class TestEnums(TestCase):
                 GREEN = 2, 'p1.2', 'p2.2'
                 BLUE = 3, 'p1.3'
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             class Color2(
                 EnumProperties,
                 p('prop1')
@@ -544,3 +558,18 @@ class TestEnums(TestCase):
         self.assertEqual(Color.RED, Color('ff0000'))
         self.assertEqual(Color.GREEN, Color('00ff00'))
         self.assertEqual(Color.BLUE, Color('0000ff'))
+
+    def test_properties_conflict(self):
+        """ enum_properties is reserved - test that we get an exception """
+
+        with self.assertRaises(ValueError):
+            class PropConflict(EnumProperties, p('enum_properties')):
+                ONE = auto(), (1, 2, 3)  # pragma: no cover
+                TWO = auto(), (3, 4, 5)  # pragma: no cover
+
+        with self.assertRaises(ValueError):
+            class PropConflict(EnumProperties, p('prop')):
+                enum_properties = None
+
+                ONE = auto(), (1, 2, 3)  # pragma: no cover
+                TWO = auto(), (3, 4, 5)  # pragma: no cover

@@ -181,7 +181,13 @@ class EnumPropertiesMeta(EnumMeta):
     each value.
     """
 
-    EP_RESERVED = ['_symmetric_builtins_']
+    EXPECTED = ['_symmetric_builtins_']
+    RESERVED = [
+        'enum_properties',
+        '_ep_coerce_types_',
+        '_ep_symmetric_map_',
+        '_ep_isymmetric_map_'
+    ]
 
     @classmethod
     def __prepare__(mcs, cls, bases):
@@ -193,6 +199,11 @@ class EnumPropertiesMeta(EnumMeta):
         symmetric_properties = []
         for base in bases:
             if issubclass(base, _Prop):
+                if (
+                    base.name() in EnumPropertiesMeta.RESERVED +
+                    EnumPropertiesMeta.EXPECTED
+                ):
+                    raise ValueError(f'{base.name()} is reserved.')
                 properties[base()] = []
             else:
                 real_bases.append(base)
@@ -219,8 +230,10 @@ class EnumPropertiesMeta(EnumMeta):
                     self[item] = value
 
             def __setitem__(self, key, value):
-                if key in EnumPropertiesMeta.EP_RESERVED:
+                if key in EnumPropertiesMeta.EXPECTED:
                     dict.__setitem__(self, key, value)
+                elif key in EnumPropertiesMeta.RESERVED:
+                    raise ValueError(f'{key} is reserved.')
                 elif self._ep_properties_:
                     # are we an enum value? - just kick this up to parent class
                     # logic, this code runs once on load - its fine that it's
@@ -231,14 +244,16 @@ class EnumPropertiesMeta(EnumMeta):
                     if len(class_dict._member_names) > before:
                         try:
                             num_vals = len(value) - len(self._ep_properties_)
-                            assert num_vals > 0, f'{key} must have ' \
-                                           f'{len(self._ep_properties_)} ' \
-                                           f'property values.'
-                            assert (len(self._ep_properties_) ==
-                                    len(value[num_vals:])), \
-                                f'{key} must have ' \
-                                f'{len(self._ep_properties_)} property ' \
-                                f'values.'
+                            if (
+                                num_vals < 1 or
+                                len(self._ep_properties_) !=
+                                len(value[num_vals:])
+                            ):
+                                raise ValueError(
+                                    f'{key} must have '
+                                    f'{len(self._ep_properties_)} property '
+                                    f'values.'
+                                )
                             idx = num_vals
                             for values in self._ep_properties_.values():
                                 values.append(value[idx])
@@ -247,10 +262,11 @@ class EnumPropertiesMeta(EnumMeta):
                                 value = value[0]
                             else:
                                 value = value[0:num_vals]
-                        except TypeError:
-                            assert False, f'{key} must have ' \
-                                          f'{len(self._ep_properties_)} ' \
-                                          f'property values.'
+                        except TypeError as type_err:
+                            raise ValueError(
+                                f'{key} must have {len(self._ep_properties_)} '
+                                f'property values.'
+                            ) from type_err
                     super().__setitem__(key, value)
                 else:
                     super().__setitem__(key, value)
@@ -272,7 +288,7 @@ class EnumPropertiesMeta(EnumMeta):
         cls._ep_coerce_types_ = []
         cls._ep_symmetric_map_ = {}
         cls._ep_isymmetric_map_ = {}
-        cls.properties = list(classdict._ep_properties_.keys())
+        cls.enum_properties = list(classdict._ep_properties_.keys())
 
         def add_sym_lookup(prop, p_val, enum_inst):
             if not isinstance(p_val, Hashable):
@@ -296,7 +312,7 @@ class EnumPropertiesMeta(EnumMeta):
             add_coerce_type(type(val.value))
 
         # we reverse to maintain precedence order for symmetric lookups
-        for prop in reversed(list(classdict._ep_properties_.keys())):
+        for prop in reversed(cls.enum_properties):
             values = classdict._ep_properties_[prop]
             setattr(
                 cls,
@@ -340,15 +356,16 @@ class EnumPropertiesMeta(EnumMeta):
                 sym_builtin = sym_builtin()
             else:
                 raise ValueError(
-                    f'_symmetric_builtins_ contained {sym_builtin}, expected '
-                    f'string or s() property.'
+                    f'_symmetric_builtins_ contained {type(sym_builtin)}, '
+                    f'expected string or s() property.'
                 )
 
             for enum_val in cls:
-                assert hasattr(enum_val, sym_builtin), (
-                    f'{cls}.{sym_builtin} does not exist, but is listed in'
-                    f' _symmetric_builtins_.'
-                )
+                if not hasattr(enum_val, sym_builtin):
+                    raise ValueError(
+                        f'{cls}.{sym_builtin} does not exist, but is listed in'
+                        f' _symmetric_builtins_.'
+                    )
                 add_sym_lookup(
                     sym_builtin,
                     getattr(enum_val, sym_builtin),
