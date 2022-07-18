@@ -38,8 +38,9 @@ For example:
     Color.RED.hex == 'ff0000'
 
 :py:class:`~enum_properties.meta.EnumProperties` inherits from enum and all
-other standard python enumeration functionality will work. The 
-:py:class:`~enum_properties.meta.EnumProperties` base class is equivalent to:
+other standard python enumeration functionality will work.
+The :py:class:`~enum_properties.meta.EnumProperties` base class is equivalent
+to:
 
 .. code:: python
 
@@ -146,8 +147,8 @@ Symmetric Builtins
 When extending from Enum_ or other enumeration base classes, some builtin
 properties are available. `name` is available on all standard Enum classes. By
 default :py:class:`~enum_properties.meta.EnumProperties` will make `name` case
-sensitive symmetric. To override this behavior, specify a 
-``_symmetric_builtins_`` list as a class member. The items may be strings or 
+sensitive symmetric. To override this behavior, specify a
+``_symmetric_builtins_`` list as a class member. The items may be strings or
 :py:meth:`~enum_properties.meta.s` values. For example to make name case
 insensitive we might:
 

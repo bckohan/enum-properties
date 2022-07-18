@@ -1,8 +1,8 @@
 # pylint: skip-file
 
+import sys
 from enum import Enum, auto
 from unittest import TestCase
-import sys
 
 from enum_properties import (
     EnumProperties,

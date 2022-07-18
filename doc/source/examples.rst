@@ -124,12 +124,12 @@ We can use our enumeration like so:
 .. code-block:: python
 
     MapBoxStyle.LIGHT.uri == 'mapbox://styles/mapbox/light-v10'
-    
+
     # uri's are symmetric
     MapBoxStyle('mapbox://styles/mapbox/light-v10') == MapBoxStyle.LIGHT
-    
+
     # so are labels (also case insensitive)
     MapBoxStyle('satellite streets') == MapBoxStyle.SATELLITE_STREETS
-    
+
     # when used in API calls (coerced to strings) - they "do the right thing"
     str(MapBoxStyle.DARK) == 'mapbox://styles/mapbox/dark-v10'
