@@ -85,57 +85,109 @@ class TestEnums(TestCase):
         self.assertEqual(CaseFirstMatch.ONE, CaseFirstMatch('ß'))
         self.assertEqual(CaseFirstMatch.TWO, CaseFirstMatch('ΣΊΣΥΦΟΣ'))
 
-    def test_properties_and_symmetry(self):
+    if (
+        not (sys.version_info.major, sys.version_info.minor) == (3, 6)
+    ):  # pragma: no cover
+        def test_properties_and_symmetry(self):
 
-        class Color(
-            SymmetricMixin,
-            int,
-            Enum,
-            p('spanish'),
-            s('rgb'),
-            s('hex', case_fold=True),
-            metaclass=EnumPropertiesMeta
-        ):
-            RED = 1, 'Roja', (1, 0, 0), 'ff0000'
-            GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
-            BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
+            class Color(
+                SymmetricMixin,
+                int,
+                Enum,
+                p('spanish'),
+                s('rgb'),
+                s('hex', case_fold=True),
+                metaclass=EnumPropertiesMeta
+            ):
+                RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+                GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
+                BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
 
-        self.assertEqual(Color.RED, Color((1, 0, 0)))
-        self.assertEqual(Color.RED, Color('ff0000'))
-        self.assertEqual(Color.RED, Color('FF0000'))
-        self.assertEqual(Color.RED, Color('RED'))
-        self.assertEqual(Color.RED, Color['RED'])
-        self.assertEqual(Color.RED, Color(1))
-        self.assertEqual(Color.RED.value, 1)
-        self.assertEqual(Color.RED.spanish, 'Roja')
-        self.assertEqual(Color.RED.hex, 'ff0000')
-        self.assertRaises(ValueError, Color, 'Roja')
-        self.assertRaises(ValueError, Color, 'Red')
+            self.assertEqual(Color.RED, Color((1, 0, 0)))
+            self.assertEqual(Color.RED, Color('ff0000'))
+            self.assertEqual(Color.RED, Color('FF0000'))
+            self.assertEqual(Color.RED, Color('RED'))
+            self.assertEqual(Color.RED, Color['RED'])
+            self.assertEqual(Color.RED, Color(1))
+            self.assertEqual(Color.RED.value, 1)
+            self.assertEqual(Color.RED.spanish, 'Roja')
+            self.assertEqual(Color.RED.hex, 'ff0000')
+            self.assertRaises(ValueError, Color, 'Roja')
+            self.assertRaises(ValueError, Color, 'Red')
 
-        self.assertEqual(Color.GREEN, Color((0, 1, 0)))
-        self.assertEqual(Color.GREEN, Color('00ff00'))
-        self.assertEqual(Color.GREEN, Color('00FF00'))
-        self.assertEqual(Color.GREEN, Color('GREEN'))
-        self.assertEqual(Color.GREEN, Color['GREEN'])
-        self.assertEqual(Color.GREEN, Color(2))
-        self.assertEqual(Color.GREEN.value, 2)
-        self.assertEqual(Color.GREEN.spanish, 'Verde')
-        self.assertEqual(Color.GREEN.hex, '00ff00')
-        self.assertRaises(ValueError, Color, 'Verde')
-        self.assertRaises(ValueError, Color, 'Green')
+            self.assertEqual(Color.GREEN, Color((0, 1, 0)))
+            self.assertEqual(Color.GREEN, Color('00ff00'))
+            self.assertEqual(Color.GREEN, Color('00FF00'))
+            self.assertEqual(Color.GREEN, Color('GREEN'))
+            self.assertEqual(Color.GREEN, Color['GREEN'])
+            self.assertEqual(Color.GREEN, Color(2))
+            self.assertEqual(Color.GREEN.value, 2)
+            self.assertEqual(Color.GREEN.spanish, 'Verde')
+            self.assertEqual(Color.GREEN.hex, '00ff00')
+            self.assertRaises(ValueError, Color, 'Verde')
+            self.assertRaises(ValueError, Color, 'Green')
 
 
-        self.assertEqual(Color.BLUE, Color((0, 0, 1)))
-        self.assertEqual(Color.BLUE, Color('0000ff'))
-        self.assertEqual(Color.BLUE, Color('0000FF'))
-        self.assertEqual(Color.BLUE, Color('BLUE'))
-        self.assertEqual(Color.BLUE, Color['BLUE'])
-        self.assertEqual(Color.BLUE, Color(3))
-        self.assertEqual(Color.BLUE.value, 3)
-        self.assertEqual(Color.BLUE.spanish, 'Azul')
-        self.assertEqual(Color.BLUE.hex, '0000ff')
-        self.assertRaises(ValueError, Color, 'Azul')
-        self.assertRaises(ValueError, Color, 'Blue')
+            self.assertEqual(Color.BLUE, Color((0, 0, 1)))
+            self.assertEqual(Color.BLUE, Color('0000ff'))
+            self.assertEqual(Color.BLUE, Color('0000FF'))
+            self.assertEqual(Color.BLUE, Color('BLUE'))
+            self.assertEqual(Color.BLUE, Color['BLUE'])
+            self.assertEqual(Color.BLUE, Color(3))
+            self.assertEqual(Color.BLUE.value, 3)
+            self.assertEqual(Color.BLUE.spanish, 'Azul')
+            self.assertEqual(Color.BLUE.hex, '0000ff')
+            self.assertRaises(ValueError, Color, 'Azul')
+            self.assertRaises(ValueError, Color, 'Blue')
+    else:
+        def test_properties_and_symmetry(self):
+
+            class Color(
+                EnumProperties,
+                p('spanish'),
+                s('rgb'),
+                s('hex', case_fold=True)
+            ):
+                RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+                GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
+                BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
+
+            self.assertEqual(Color.RED, Color((1, 0, 0)))
+            self.assertEqual(Color.RED, Color('ff0000'))
+            self.assertEqual(Color.RED, Color('FF0000'))
+            self.assertEqual(Color.RED, Color('RED'))
+            self.assertEqual(Color.RED, Color['RED'])
+            self.assertEqual(Color.RED, Color(1))
+            self.assertEqual(Color.RED.value, 1)
+            self.assertEqual(Color.RED.spanish, 'Roja')
+            self.assertEqual(Color.RED.hex, 'ff0000')
+            self.assertRaises(ValueError, Color, 'Roja')
+            self.assertRaises(ValueError, Color, 'Red')
+
+            self.assertEqual(Color.GREEN, Color((0, 1, 0)))
+            self.assertEqual(Color.GREEN, Color('00ff00'))
+            self.assertEqual(Color.GREEN, Color('00FF00'))
+            self.assertEqual(Color.GREEN, Color('GREEN'))
+            self.assertEqual(Color.GREEN, Color['GREEN'])
+            self.assertEqual(Color.GREEN, Color(2))
+            self.assertEqual(Color.GREEN.value, 2)
+            self.assertEqual(Color.GREEN.spanish, 'Verde')
+            self.assertEqual(Color.GREEN.hex, '00ff00')
+            self.assertRaises(ValueError, Color, 'Verde')
+            self.assertRaises(ValueError, Color, 'Green')
+
+            self.assertEqual(Color.BLUE, Color((0, 0, 1)))
+            self.assertEqual(Color.BLUE, Color('0000ff'))
+            self.assertEqual(Color.BLUE, Color('0000FF'))
+            self.assertEqual(Color.BLUE, Color('BLUE'))
+            self.assertEqual(Color.BLUE, Color['BLUE'])
+            self.assertEqual(Color.BLUE, Color(3))
+            self.assertEqual(Color.BLUE.value, 3)
+            self.assertEqual(Color.BLUE.spanish, 'Azul')
+            self.assertEqual(Color.BLUE.hex, '0000ff')
+            self.assertRaises(ValueError, Color, 'Azul')
+            self.assertRaises(ValueError, Color, 'Blue')
+
 
     def test_property_lists(self):
 
@@ -423,7 +475,10 @@ class TestEnums(TestCase):
         self.assertEqual(ColorAutoIntSym.BLUE.hex, '0000ff')
         self.assertRaises(ValueError, ColorAutoIntSym, 'Azul')
 
-    if not (sys.version_info.major, sys.version_info.minor) == (3, 6):  # pragma: no cover
+    # todo remove check when 3.6 support is dropped
+    if (
+        not (sys.version_info.major, sys.version_info.minor) == (3, 6)
+    ):  # pragma: no cover
         def test_ignore(self):
             class Color(
                 EnumProperties,
