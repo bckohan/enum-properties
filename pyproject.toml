@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "enum-properties"
 version = "0.1.0"
-description = "Concise and helpful extensions for Enum."
+description = "Add properties to Python enumeration values with a simple declarative syntax."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/bckohan/enum-properties"
@@ -16,6 +16,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python",
+    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
