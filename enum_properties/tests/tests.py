@@ -511,3 +511,36 @@ class TestEnums(TestCase):
         self.assertIsNone(Color.TRANSPARENT.hex)
 
         self.assertEqual(Color.TRANSPARENT, Color(None))
+
+    def test_examples(self):
+        """
+        Any example used in docs or readme should be tested here
+        todo way to make this dry? sphinx plugin?
+        """
+
+        class Color(EnumProperties, p('rgb'), p('hex')):
+            RED = auto(), (1, 0, 0), 'ff0000'
+            GREEN = auto(), (0, 1, 0), '00ff00'
+            BLUE = auto(), (0, 0, 1), '0000ff'
+
+        self.assertEqual(Color.RED.rgb, (1, 0, 0))
+        self.assertEqual(Color.GREEN.rgb, (0, 1, 0))
+        self.assertEqual(Color.BLUE.rgb, (0, 0, 1))
+
+        self.assertEqual(Color.RED.hex, 'ff0000')
+        self.assertEqual(Color.GREEN.hex, '00ff00')
+        self.assertEqual(Color.BLUE.hex, '0000ff')
+
+        class Color(EnumProperties, s('rgb'), s('hex')):
+
+            RED = auto(), (1, 0, 0), 'ff0000'
+            GREEN = auto(), (0, 1, 0), '00ff00'
+            BLUE = auto(), (0, 0, 1), '0000ff'
+
+        self.assertEqual(Color.RED, Color((1, 0, 0)))
+        self.assertEqual(Color.GREEN, Color((0, 1, 0)))
+        self.assertEqual(Color.BLUE, Color((0, 0, 1)))
+
+        self.assertEqual(Color.RED, Color('ff0000'))
+        self.assertEqual(Color.GREEN, Color('00ff00'))
+        self.assertEqual(Color.BLUE, Color('0000ff'))
