@@ -2,6 +2,7 @@
 
 from enum import Enum, auto
 from unittest import TestCase
+import sys
 
 from enum_properties import (
     EnumProperties,
@@ -422,27 +423,27 @@ class TestEnums(TestCase):
         self.assertEqual(ColorAutoIntSym.BLUE.hex, '0000ff')
         self.assertRaises(ValueError, ColorAutoIntSym, 'Azul')
 
-    def test_ignore(self):
+    if not (sys.version_info.major, sys.version_info.minor) == (3, 6):  # pragma: no cover
+        def test_ignore(self):
+            class Color(
+                EnumProperties,
+                p('spanish'),
+                s('rgb'),
+                s('hex', case_fold=True)
+            ):
 
-        class Color(
-            EnumProperties,
-            p('spanish'),
-            s('rgb'),
-            s('hex', case_fold=True)
-        ):
+                _ignore_ = ['BLACK', 'NOT_ENOUGH_PROPS']
 
-            _ignore_ = ['BLACK', 'NOT_ENOUGH_PROPS']
+                RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+                GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
+                BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
+                BLACK = 4, 'Negra', (1, 1, 1), 'ffffff'
+                NOT_ENOUGH_PROPS = 5, 'Not Enough'
 
-            RED = 1, 'Roja', (1, 0, 0), 'ff0000'
-            GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
-            BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
-            BLACK = 4, 'Negra', (1, 1, 1), 'ffffff'
-            NOT_ENOUGH_PROPS = 5, 'Not Enough'
-
-        self.assertFalse(hasattr(Color, 'BLACK'))
-        self.assertRaises(ValueError, Color, 4)
-        self.assertRaises(ValueError, Color, (1, 1, 1))
-        self.assertRaises(ValueError, Color, 'ffffff')
+            self.assertFalse(hasattr(Color, 'BLACK'))
+            self.assertRaises(ValueError, Color, 4)
+            self.assertRaises(ValueError, Color, (1, 1, 1))
+            self.assertRaises(ValueError, Color, 'ffffff')
 
     def test_no_props(self):
 
