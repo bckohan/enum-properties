@@ -7,12 +7,12 @@ Usage
 =====
 
 To add properties to an enumeration you must inherit from
-:py:class:`~enum_properties.meta.EnumProperties` instead of Enum_, list property
-values in a tuple with each enumeration value and let 
+:py:class:`~enum_properties.meta.EnumProperties` instead of Enum_, list
+property values in a tuple with each enumeration value and let
 :py:class:`~enum_properties.meta.EnumProperties` know that your properties
-exist and what their names are by adding :py:meth:`~enum_properties.meta.p` values to the base class list. 
-The :py:meth:`~enum_properties.meta.p` values must be in the same order as property values are listed in
-the value tuples:
+exist and what their names are by adding :py:meth:`~enum_properties.meta.p`
+values to the base class list. The :py:meth:`~enum_properties.meta.p` values
+must be in the same order as property values are listed in the value tuples:
 
 .. note::
 
@@ -55,8 +55,9 @@ Symmetry
 
 For some enumerations it will make sense to be able to instantiate an
 enumeration value instance from one of the property values. This is called
-property symmetry. To mark a property as symmetric, use :py:meth:`~enum_properties.meta.s` values instead
-of :py:meth:`~enum_properties.meta.p` values:
+property symmetry. To mark a property as symmetric, use
+:py:meth:`~enum_properties.meta.s` values instead of
+:py:meth:`~enum_properties.meta.p` values:
 
 .. code:: python
 
