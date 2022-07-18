@@ -179,7 +179,31 @@ class SymmetricMixin:  # pylint: disable=R0903
 class EnumPropertiesMeta(EnumMeta):
     """
     A metaclass for creating enum choices with additional named properties for
-    each value.
+    each value. An Enum can be given property support simply by:
+
+    .. code-block::
+
+        import enum
+        from enum_properties import EnumPropertiesMeta
+
+        class MyEnum(enum.Enum, metaclass=EnumPropertiesMeta):
+            ...
+
+    To support symmetrical properties, add the SymmetricMixin:
+
+    .. code-block::
+
+        import enum
+        from enum_properties import (
+            EnumPropertiesMeta,
+            SymmetricMixin
+        )
+
+        class MyEnum(SymmetricMixin, enum.Enum, metaclass=EnumPropertiesMeta):
+            ...
+
+    All enum.Enum functionality is compatible with the EnumPropertiesMeta
+    metaclass.
     """
 
     EXPECTED = ['_symmetric_builtins_']
@@ -191,7 +215,7 @@ class EnumPropertiesMeta(EnumMeta):
     ]
 
     @classmethod
-    def __prepare__(mcs, cls, bases):
+    def __prepare__(mcs, cls, bases):  # pylint: disable=W0221
         bases = list(bases)
         properties = {}
         real_bases = []
@@ -274,7 +298,7 @@ class EnumPropertiesMeta(EnumMeta):
 
         return _PropertyEnumDict()
 
-    def __new__(
+    def __new__(  # pylint: disable=W0221
             mcs: EnumPropertiesMeta,
             classname,
             bases,

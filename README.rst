@@ -43,13 +43,13 @@ EnumProperties is a lightweight extension to Python's Enum class. Example:
     # the named p() values in the Enum's inheritance become properties on
     # each value, matching the order in which they are specified
 
-    Color.RED.rgb == (1, 0, 0)
+    Color.RED.rgb   == (1, 0, 0)
     Color.GREEN.rgb == (0, 1, 0)
-    Color.BLUE.rgb == (0, 0, 1)
+    Color.BLUE.rgb  == (0, 0, 1)
 
-    Color.RED.hex == 'ff0000'
+    Color.RED.hex   == 'ff0000'
     Color.GREEN.hex == '00ff00'
-    Color.BLUE.hex == '0000ff'
+    Color.BLUE.hex  == '0000ff'
 
 Properties may also be symmetrically mapped to enumeration values, using
 s() values:

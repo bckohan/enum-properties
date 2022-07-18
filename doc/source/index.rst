@@ -1,35 +1,92 @@
-============
-Introduction
-============
+=======================
+Enum Properties
+=======================
 
-Use Django's dynamic templates to render static files. That is, files that are collected
-during the ``collectstatic`` routine and likely served above Django on the stack. Static
-templates should be rendered preceding any run of ``collectstatic``.
+Add properties to Python enumeration values in a simple declarative syntax.
+EnumProperties is a lightweight extension to Python's Enum class. Example:
 
-For example, a frequently occurring pattern that violates the DRY principle is the presence of
-defines, or enum like structures in server side Python code that are simply replicated in client
-side JavaScript. Single-sourcing these structures by generating client side code from the server
-side code maintains DRYness.
+.. code:: python
 
-`django-render-static` includes builtins for:
-    - Replicating Django's `reverse` function in JavaScript (:ref:`urls_to_js`)
-    - Auto-translating Python class and module structures into JavaScript
-      (:ref:`modules_to_js`, :ref:`classes_to_js`)
+    from enum_properties import EnumProperties, p
+    from enum import auto
 
-You can report bugs and discuss features on the
-`issues page <https://github.com/bckohan/django-render-static/issues>`_.
+    class Color(EnumProperties, p('rgb'), p('hex')):
 
-`Contributions <https://github.com/bckohan/django-render-static/blob/main/CONTRIBUTING.rst>`_ are
-encouraged! Especially additional template tags and filters!
+        # name   value      rgb       hex
+        RED    = auto(), (1, 0, 0), 'ff0000'
+        GREEN  = auto(), (0, 1, 0), '00ff00'
+        BLUE   = auto(), (0, 0, 1), '0000ff'
+
+    # the named p() values in the Enum's inheritance become properties on
+    # each value, matching the order in which they are specified
+
+    Color.RED.rgb   == (1, 0, 0)
+    Color.GREEN.rgb == (0, 1, 0)
+    Color.BLUE.rgb  == (0, 0, 1)
+
+    Color.RED.hex   == 'ff0000'
+    Color.GREEN.hex == '00ff00'
+    Color.BLUE.hex  == '0000ff'
+
+Properties may also be symmetrically mapped to enumeration values, using
+s() values:
+
+.. code:: python
+
+    from enum_properties import EnumProperties, s
+    from enum import auto
+
+    class Color(EnumProperties, s('rgb'), s('hex', case_fold=True)):
+
+        RED    = auto(), (1, 0, 0), 'ff0000'
+        GREEN  = auto(), (0, 1, 0), '00ff00'
+        BLUE   = auto(), (0, 0, 1), '0000ff'
+
+    # any named s() values in the Enum's inheritance become properties on
+    # each value, and the enumeration value may be instantiated from the
+    # property's value
+
+    Color((1, 0, 0)) == Color.RED
+    Color((0, 1, 0)) == Color.GREEN
+    Color((0, 0, 1)) == Color.BLUE
+
+    Color('ff0000') == Color.RED
+    Color('FF0000') == Color.RED  # case_fold makes mapping case insensitive
+    Color('00ff00') == Color.GREEN
+    Color('00FF00') == Color.GREEN
+    Color('0000ff') == Color.BLUE
+    Color('0000FF') == Color.BLUE
+
+    Color.RED.hex == 'ff0000'
+
+Please report bugs and discuss features on the
+`issues page <https://github.com/bckohan/enum-properties/issues>`_.
+
+`Contributions <https://github.com/bckohan/enum-properties/blob/main/CONTRIBUTING.rst>`_ are
+encouraged!
+
+`Full documentation at read the docs. <https://enum-properties.readthedocs.io/en/latest/>`_
+
+Installation
+------------
+
+1. Clone enum-properties from GitHub_ or install a release off PyPI_ :
+
+.. code:: bash
+
+       pip install enum-properties
+
+
+.. _GitHub: http://github.com/bckohan/enum-properties
+.. _PyPI: http://pypi.python.org/pypi/enum-properties
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   installation
-   tldr
-   configuration
-   templatetags
-   commands
+   usage
+   symmetry
+   examples
    reference
    changelog
