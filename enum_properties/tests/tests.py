@@ -829,3 +829,40 @@ class TestEnums(TestCase):
         self.assertEqual(PriorityEx('3'), PriorityEx.THREE)
         self.assertEqual(PriorityEx(4), PriorityEx.ONE)
         self.assertEqual(PriorityEx('4'), PriorityEx.TWO)
+
+    def test_type_coercion_precedence(self):
+        """
+        test that type coercion is attempted in the same precedence order as
+        value resolution.
+        """
+        class HashableType:
+            def __init__(self, value):
+                self.value = value
+
+            def __eq__(self, other):
+                return (
+                    self.__class__ is other.__class__ and
+                    self.value == other.value
+                )
+
+            def __hash__(self):
+                return self.value.__hash__()
+
+        class Type1(HashableType):
+            pass
+
+        class Type2(HashableType):
+            pass
+
+        class PriorityEx(EnumProperties, s('prop1'), s('prop2')):
+            ONE = 2, Type1(0), Type2(1)
+            TWO = 3, Type2(0), Type1(1)
+
+        # coercion to Type1 should be tried before coercion to type 2
+        self.assertEqual(PriorityEx(Type1(0)), PriorityEx.ONE)
+        self.assertEqual(PriorityEx(Type2(0)), PriorityEx.TWO)
+        self.assertEqual(PriorityEx(Type1(1)), PriorityEx.TWO)
+        self.assertEqual(PriorityEx(Type2(1)), PriorityEx.ONE)
+
+        self.assertEqual(PriorityEx(0), PriorityEx.ONE)
+        self.assertEqual(PriorityEx(1), PriorityEx.TWO)

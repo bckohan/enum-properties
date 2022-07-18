@@ -85,69 +85,9 @@ class SymmetricMixin:  # pylint: disable=R0903
     _ep_isymmetric_map_ = {}
     _symmetric_builtins_ = ['name']
 
-    class ValueWrapper:
-        """
-        A wrapper class used to recursively iterate through type coercions
-        of a potential matching enumeration value in priority order.
-        """
-
-        value = None
-        types = []
-        enum = None
-
-        @staticmethod
-        def from_value(
-                value,
-                typ,
-                types,
-                enum_cls
-        ):
-            """Wrap a value in our type coercion iterator"""
-            class Value(SymmetricMixin.ValueWrapper, typ):
-                """Wrapper class"""
-            wrapped = Value(value)
-            wrapped.value = value
-            wrapped.types = types
-            wrapped.enum = enum_cls
-            return wrapped
-
-        @property
-        def type(self):
-            """Get the wrapped value's type."""
-            return type(self.value)
-
-        def __next__(self):
-            """
-            Get the next wrapped value, coerced to the next type of highest
-            priority - this will recurse with _missing_ until a match is
-            found or all types are exhausted.
-
-            :return None if no match was found, the matching enumeration
-                otherwise
-            """
-            while self.types:
-                # skip already coerced types, or types of our own Enum type
-                if self.types[0] is self.type or self.types[0] is self.enum:
-                    self.types.pop(0)
-                    continue
-                try:
-                    # this will invoke _missing_ again
-                    return self.enum(  # pylint: disable=E1102
-                        self.from_value(
-                            self.value,
-                            self.types.pop(0),
-                            self.types,
-                            self.enum
-                        )
-                    )
-                except (TypeError, ValueError):
-                    pass
-            return None
-
     @classmethod
     def _missing_(cls, value):
         """
-        The implementation of symmetric ``_missing_`` is necessarily complex.
         Arbitrary types can be mapped to enumeration values so long as they
         are hashable. Coercion to all possible types must be attempted on
         value, in priority order before failure.
@@ -169,18 +109,25 @@ class SymmetricMixin:  # pylint: disable=R0903
             except KeyError:
                 pass
 
-        # wrap value in a ValueWrapper that keeps track of the type
-        if not isinstance(value, cls.ValueWrapper):
-            value = cls.ValueWrapper.from_value(
-                value,
-                type(value),
-                getattr(cls, '_ep_coerce_types_', []).copy(),
-                cls
-            )
+        for coerce_to in cls._ep_coerce_types_:
+            try:
+                val = coerce_to(value)
+                try:
+                    return cls._value2member_map_[val]
+                except KeyError:
+                    pass
 
-        result = next(value)
-        if isinstance(result, cls):
-            return result
+                try:
+                    return cls._ep_symmetric_map_[val]
+                except KeyError:
+                    pass
+
+                if isinstance(val, str):
+                    return cls._ep_isymmetric_map_[_do_casenorm(val)]
+
+            except (KeyError, TypeError, ValueError):
+                pass
+
         return super()._missing_(value)
 
 
