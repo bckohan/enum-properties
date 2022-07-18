@@ -297,7 +297,7 @@ class EnumPropertiesMeta(EnumMeta):
         return _PropertyEnumDict()
 
     def __new__(  # pylint: disable=W0221
-            mcs: EnumPropertiesMeta,
+            mcs,
             classname,
             bases,
             classdict
