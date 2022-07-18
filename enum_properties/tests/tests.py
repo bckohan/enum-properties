@@ -1,11 +1,14 @@
-from unittest import TestCase
+# pylint: skip-file
+
 from enum import Enum, auto
+from unittest import TestCase
+
 from enum_properties import (
     EnumProperties,
     EnumPropertiesMeta,
     SymmetricMixin,
     p,
-    s
+    s,
 )
 
 
@@ -16,7 +19,7 @@ class TestEnums(TestCase):
 
         prop1 = p('prop1')
         prop2 = s('prop2')
-        prop3 = s('prop3', case_sensitive=False)
+        prop3 = s('prop3', case_fold=True)
         prop4 = p('prop4')
 
         self.assertTrue(issubclass(prop1, _Prop))
@@ -42,24 +45,44 @@ class TestEnums(TestCase):
         self.assertTrue(prop3().symmetric)
         self.assertFalse(prop4().symmetric)
 
-        self.assertFalse(hasattr(prop1, 'case_sensitive'))
-        self.assertTrue(prop2.case_sensitive)
-        self.assertFalse(prop3.case_sensitive)
-        self.assertFalse(hasattr(prop4, 'case_sensitive'))
+        self.assertFalse(hasattr(prop1, 'case_fold'))
+        self.assertFalse(prop2.case_fold)
+        self.assertTrue(prop3.case_fold)
+        self.assertFalse(hasattr(prop4, 'case_fold'))
 
-        self.assertFalse(hasattr(prop1(), 'case_sensitive'))
-        self.assertTrue(prop2().case_sensitive)
-        self.assertFalse(prop3().case_sensitive)
-        self.assertFalse(hasattr(prop4(), 'case_sensitive'))
+        self.assertFalse(hasattr(prop1(), 'case_fold'))
+        self.assertFalse(prop2().case_fold)
+        self.assertTrue(prop3().case_fold)
+        self.assertFalse(hasattr(prop4(), 'case_fold'))
 
     def test_unhashable_symmetry(self):
         """
-        Tests that a value error is thrown when an unhashable type is used as a symmetrical property
+        Tests that a value error is thrown when an unhashable type is used as
+        a symmetric property
         """
         with self.assertRaises(ValueError):
             class BadEnum(EnumProperties, s('bad_prop')):
                 VAL1 = 'E1', 'E1 Label', 'Good prop'
                 VAL2 = 'E2', 'E2 Label', {'hashable': False}
+
+    def test_unicode_casefold(self):
+
+        class CaseAgnostic(EnumProperties, s('label', case_fold=True)):
+            ONE = 1, 'ß'
+            TWO = 2, 'Σίσυφος'
+
+        self.assertEqual(CaseAgnostic.ONE, CaseAgnostic('ss'))
+        self.assertEqual(CaseAgnostic.TWO, CaseAgnostic('ΣΊΣΥΦΟΣ'))
+
+        # test that closest case matches first
+        class CaseFirstMatch(EnumProperties, s('label', case_fold=True)):
+            ONE = 1, 'ß'
+            TWO = 2, 'Σίσυφος'
+            THREE = 3, 'ss'
+
+        self.assertEqual(CaseFirstMatch.THREE, CaseFirstMatch('ss'))
+        self.assertEqual(CaseFirstMatch.ONE, CaseFirstMatch('ß'))
+        self.assertEqual(CaseFirstMatch.TWO, CaseFirstMatch('ΣΊΣΥΦΟΣ'))
 
     def test_properties_and_symmetry(self):
 
@@ -69,7 +92,7 @@ class TestEnums(TestCase):
             Enum,
             p('spanish'),
             s('rgb'),
-            s('hex', case_sensitive=False),
+            s('hex', case_fold=True),
             metaclass=EnumPropertiesMeta
         ):
             RED = 1, 'Roja', (1, 0, 0), 'ff0000'
@@ -119,15 +142,15 @@ class TestEnums(TestCase):
             EnumProperties,
             p('spanish'),
             s('rgb'),
-            s('hex', case_sensitive=False)
+            s('hex', case_fold=True)
         ):
             RED = 1, 'Roja', (1, 0, 0), 'ff0000'
             GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
             BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
 
         self.assertEqual(
-            Color.symmetries,
-            ['name', 'rgb', 'hex']
+            [prop for prop in Color.properties if prop.symmetric],
+            ['rgb', 'hex']
         )
 
         self.assertEqual(
@@ -135,9 +158,40 @@ class TestEnums(TestCase):
             ['spanish', 'rgb', 'hex']
         )
 
+    def test_symmetric_builtin_override(self):
+        class Color(
+            EnumProperties,
+            p('spanish'),
+            s('rgb'),
+            s('hex', case_fold=True)
+        ):
+            _symmetric_builtins_ = [s('name', case_fold=True)]
+
+            RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+            GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
+            BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
+
+        self.assertEqual(Color.RED, Color('red'))
+        self.assertEqual(Color.GREEN, Color('gREen'))
+        self.assertEqual(Color.BLUE, Color('Blue'))
+
+    def test_symmetric_builtin_override_wrongtype(self):
+        with self.assertRaises(ValueError):
+            class Color(
+                EnumProperties,
+                p('spanish'),
+                s('rgb'),
+                s('hex', case_fold=True)
+            ):
+                _symmetric_builtins_ = [p('name')]
+
+                RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+                GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
+                BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
+
     def test_properties_no_symmetry(self):
         """
-        Tests that absence of SymmetricMixin works but w/o symmetrical
+        Tests that absence of SymmetricMixin works but w/o symmetric
         properties
         """
 
@@ -152,7 +206,7 @@ class TestEnums(TestCase):
             EnumProperties,
             p('spanish'),
             s('rgb'),
-            s('hex', case_sensitive=False)
+            s('hex', case_fold=True)
         ):
             RED = 1, 'Roja', (1, 0, 0), 'ff0000'
             GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
@@ -258,7 +312,7 @@ class TestEnums(TestCase):
             EnumProperties,
             p('spanish'),
             s('rgb'),
-            s('hex', case_sensitive=False)
+            s('hex', case_fold=True)
         ):
             def _generate_next_value_(name, start, count, last_values):
                 return name.title()
@@ -308,7 +362,7 @@ class TestEnums(TestCase):
             EnumProperties,
             p('spanish'),
             s('rgb'),
-            s('hex', case_sensitive=False)
+            s('hex', case_fold=True)
         ):
             RED = auto(), 'Roja', (1, 0, 0), 'ff0000'
             GREEN = auto(), 'Verde', (0, 1, 0), '00ff00'
@@ -360,7 +414,7 @@ class TestEnums(TestCase):
             EnumProperties,
             p('spanish'),
             s('rgb'),
-            s('hex', case_sensitive=False)
+            s('hex', case_fold=True)
         ):
 
             _ignore_ = ['BLACK', 'NOT_ENOUGH_PROPS']
@@ -378,9 +432,7 @@ class TestEnums(TestCase):
 
     def test_no_props(self):
 
-        class Color(
-            EnumProperties
-        ):
+        class Color(EnumProperties):
             RED = 1, 0, 0
             GREEN = 0, 1, 0
             BLUE = 0, 0, 1
@@ -388,6 +440,15 @@ class TestEnums(TestCase):
         self.assertEqual(Color.RED.value, (1, 0, 0))
         self.assertEqual(Color.GREEN.value, (0, 1, 0))
         self.assertEqual(Color.BLUE.value, (0, 0, 1))
+
+        class Color2(EnumProperties):
+            RED = 1
+            GREEN = 2
+            BLUE = 3
+
+        self.assertEqual(Color2.RED.value, 1)
+        self.assertEqual(Color2.GREEN.value, 2)
+        self.assertEqual(Color2.BLUE.value, 3)
 
     def test_not_enough_props(self):
 
@@ -400,3 +461,53 @@ class TestEnums(TestCase):
                 RED = 1, 'p1.1', 'p2.1'
                 GREEN = 2, 'p1.2', 'p2.2'
                 BLUE = 3, 'p1.3'
+
+        with self.assertRaises(AssertionError):
+            class Color2(
+                EnumProperties,
+                p('prop1')
+            ):
+                RED = 1, 'p1.1'
+                GREEN = 2
+                BLUE = 3, 'p1.3'  # pragma: no cover
+
+    def test_null_props(self):
+
+        class Color(
+            EnumProperties,
+            p('spanish'),
+            s('rgb'),
+            s('hex', case_fold=True)
+        ):
+            RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+            GREEN = 2, None, (0, 1, 0), '00ff00'
+            BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
+            BLACK = 4, 'Negra', (1, 1, 1), 'ffffff'
+            TRANSPARENT = 5, 'Transparente', None, None
+
+        self.assertEqual(Color.RED.value, 1)
+        self.assertEqual(Color.RED.spanish, 'Roja')
+        self.assertEqual(Color.RED.rgb, (1, 0, 0))
+        self.assertEqual(Color.RED.hex, 'ff0000')
+
+        self.assertEqual(Color.GREEN.value, 2)
+        self.assertIsNone(Color.GREEN.spanish)
+        self.assertEqual(Color.GREEN.rgb, (0, 1, 0))
+        self.assertEqual(Color.GREEN.hex, '00ff00')
+
+        self.assertEqual(Color.BLUE.value, 3)
+        self.assertEqual(Color.BLUE.spanish, 'Azul')
+        self.assertEqual(Color.BLUE.rgb, (0, 0, 1))
+        self.assertEqual(Color.BLUE.hex, '0000ff')
+
+        self.assertEqual(Color.BLACK.value, 4)
+        self.assertEqual(Color.BLACK.spanish, 'Negra')
+        self.assertEqual(Color.BLACK.rgb, (1, 1, 1))
+        self.assertEqual(Color.BLACK.hex, 'ffffff')
+
+        self.assertEqual(Color.TRANSPARENT.value, 5)
+        self.assertEqual(Color.TRANSPARENT.spanish, 'Transparente')
+        self.assertIsNone(Color.TRANSPARENT.rgb)
+        self.assertIsNone(Color.TRANSPARENT.hex)
+
+        self.assertEqual(Color.TRANSPARENT, Color(None))

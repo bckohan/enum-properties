@@ -1,31 +1,25 @@
 [tool.poetry]
 name = "enum-properties"
 version = "0.1.0"
-description = "Full pythonic enumeration support for Django."
+description = "Concise and helpful extensions for Enum."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/bckohan/enum-properties"
 homepage = "https://enum-properties.readthedocs.io"
-keywords = ["enum",  "properties", "defines", "field", "django", "database"]
+keywords = ["enum",  "properties", "defines", "field"]
 classifiers = [
     "Environment :: Console",
-    "Framework :: Django",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Development Status :: 5 - Production/Stable",
-    "Framework :: Django :: 3.2",
-    "Framework :: Django :: 4.0",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Topic :: Internet :: WWW/HTTP",
-    "Topic :: Internet :: WWW/HTTP :: Site Management",
     "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
@@ -38,13 +32,7 @@ packages = [
 exclude = ["enum_properties/tests"]
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0"
-
-# todo move to poetry 1.2 groups
-Django = { version = ">=3.2,<5.0", optional = true }
-pytest-django = {version = "^4.5.2", optional = true}
-djangorestframework = {version = "^3.13.1", optional = true}
-django-filter = {version = "^22.1", optional = true}
+python = ">=3.7.2,<4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0"
@@ -55,23 +43,15 @@ isort = "^5.6.4"
 doc8 = "^0.11.0"
 darglint = "^1.5.7"
 pytest-cov = "^3.0.0"
-pylint = "^2.6.0"
+pylint = "^2.14.0"
 sphinx-argparse = "^0.3.0"
-Js2Py = "^0.71"
 deepdiff = "^5.2.3"
 safety = "^2.0.0"
 readme-renderer = "^34.0"
 pygount = "^1.2.4"
-types-PyYAML = "^6.0"
 coverage = "^6.2"
-beautifulsoup4 = "^4.11.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-
-[tool.poetry.extras]
-django = ["Django"]
-all = ["django"]
-test = ["django", "pytest-django", "django-filter", "djangorestframework"]

@@ -12,9 +12,8 @@ from enum_properties.meta import (
     EnumPropertiesMeta,
     SymmetricMixin,
     p,
-    s
+    s,
 )
-from enum_properties.django import DJANGO_SUPPORTED
 
 VERSION = (0, 1, 0)
 

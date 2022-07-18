@@ -12,18 +12,23 @@
 Contributing
 ############
 
-Contributions are encouraged and welcome!! Please use the issue page to submit feature requests or
-bug reports. Issues with attached PRs will be given priority and have a much higher likelihood of
-acceptance. Please also open an issue and associate it with any submitted PRs.
+Contributions are encouraged! Please use the issue page to submit feature
+requests or bug reports. Issues with attached PRs will be given priority and
+have a much higher likelihood of acceptance. Please also open an issue and
+associate it with any submitted PRs. That said, the aim is to keep this library
+as lightweight as possible. Only features with broad based use cases will be
+considered.
 
-We are actively seeking additional maintainers. If you're interested, please contact me_.
+We are actively seeking additional maintainers. If you're interested, please
+contact me_.
 
 
 Installation
 ------------
 
-`enum-properties` uses Poetry_ for environment, package and dependency management. Poetry_
-greatly simplifies environment bootstrapping. Once it's installed.
+`enum-properties` uses Poetry_ for environment, package and dependency
+management. Poetry_ greatly simplifies environment bootstrapping. Once it's
+installed:
 
 .. code-block::
 
@@ -32,8 +37,9 @@ greatly simplifies environment bootstrapping. Once it's installed.
 Documentation
 -------------
 
-`enum-properties` documentation is generated using Sphinx_ with the readthedocs_ theme. Any
-new feature PRs must provide updated documentation for the features added. To build the docs run:
+`enum-properties` documentation is generated using Sphinx_ with the
+readthedocs_ theme. Any new feature PRs must provide updated documentation for
+the features added. To build the docs run:
 
 .. code-block::
 
@@ -44,10 +50,12 @@ new feature PRs must provide updated documentation for the features added. To bu
 Static Analysis
 ---------------
 
-`enum-properties` uses Pylint_ for python linting.
-Header imports are also standardized using isort_. Before any PR is accepted the following must be
-run, and static analysis tools should not produce any errors or warnings. Disabling certain errors
-or warnings where justified is acceptable:
+`enum-properties` uses Pylint_ for python linting. Header imports are also
+standardized using isort_. Static type checking is not done because the code
+simply relies too heavily on metaprogramming for it to be useful. Before any
+PR is accepted the following must be run, and static analysis tools should not
+produce any errors or warnings. Disabling certain errors or warnings where
+justified is acceptable:
 
 .. code-block::
 
@@ -63,10 +71,10 @@ or warnings where justified is acceptable:
 Running Tests
 -------------
 
-`enum-properties` is setup to use django-pytest_ to allow pytest_ to run Django unit tests.
-All the tests are housed in enum_properties/tests/tests.py. Before a PR is accepted, all
-tests must be passing and the code coverage must be at 100%. A small number of exempted
-error handling branches are acceptable.
+`enum-properties` is setup to use pytest_ to run unit tests. All the tests are
+housed in enum_properties/tests/tests.py. Before a PR is accepted, all tests
+must be passing and the code coverage must be at 100%. A small number of
+exempted error handling branches are acceptable.
 
 To run the full suite:
 
@@ -80,8 +88,8 @@ To run a single test, or group of tests in a class:
 
     poetry run pytest <path_to_tests_file>::ClassName::FunctionName
 
-For instance to run all tests in DefinesToJavascriptTest, and then just the test_classes_to_js test
-you would do:
+For instance to run all tests in TestEnums, and then just the
+test_properties_and_symmetry test you would do:
 
 .. code-block::
 
