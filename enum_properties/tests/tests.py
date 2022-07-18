@@ -622,7 +622,7 @@ class TestEnums(TestCase):
             """
             https://docs.mapbox.com/api/maps/styles/
             """
-            _symmetric_builtins_ = ['name', 'url']
+            _symmetric_builtins_ = ['name', 'uri']
 
             STREETS = 'streets', 'Streets', 11
             OUTDOORS = 'outdoors', 'Outdoors', 11
@@ -634,11 +634,11 @@ class TestEnums(TestCase):
             NAVIGATION_NIGHT = 'navigation-night', 'Navigation Night', 1
 
             @property
-            def url(self):
+            def uri(self):
                 return f'mapbox://styles/mapbox/{self.value}-v{self.version}'
 
             def __str__(self):
-                return self.url
+                return self.uri
 
         self.assertEqual(MapBoxStyle.STREETS.version, 11)
         self.assertEqual(MapBoxStyle.OUTDOORS.version, 11)
@@ -650,31 +650,31 @@ class TestEnums(TestCase):
         self.assertEqual(MapBoxStyle.NAVIGATION_NIGHT.version, 1)
 
         self.assertEqual(
-            MapBoxStyle.STREETS.url,
+            MapBoxStyle.STREETS.uri,
             'mapbox://styles/mapbox/streets-v11'
         )
         self.assertEqual(
-            MapBoxStyle.LIGHT.url,
+            MapBoxStyle.LIGHT.uri,
             'mapbox://styles/mapbox/light-v10'
         )
         self.assertEqual(
-            MapBoxStyle.DARK.url,
+            MapBoxStyle.DARK.uri,
             'mapbox://styles/mapbox/dark-v10'
         )
         self.assertEqual(
-            MapBoxStyle.SATELLITE.url,
+            MapBoxStyle.SATELLITE.uri,
             'mapbox://styles/mapbox/satellite-v9'
         )
         self.assertEqual(
-            MapBoxStyle.SATELLITE_STREETS.url,
+            MapBoxStyle.SATELLITE_STREETS.uri,
             'mapbox://styles/mapbox/satellite-streets-v11'
         )
         self.assertEqual(
-            MapBoxStyle.NAVIGATION_DAY.url,
+            MapBoxStyle.NAVIGATION_DAY.uri,
             'mapbox://styles/mapbox/navigation-day-v1'
         )
         self.assertEqual(
-            MapBoxStyle.NAVIGATION_NIGHT.url,
+            MapBoxStyle.NAVIGATION_NIGHT.uri,
             'mapbox://styles/mapbox/navigation-night-v1'
         )
 
@@ -765,6 +765,37 @@ class TestEnums(TestCase):
             MapBoxStyle('navigation-night')
         )
 
+        class AddressRoute(
+            EnumProperties,
+            s('abbr', case_fold=True),
+            s('alt', case_fold=True)
+        ):
+            _symmetric_builtins_ = [s('name', case_fold=True)]
+
+            # name  value    abbr         alt
+            ALLEY = 1, 'ALY', ['ALLEE', 'ALLY']
+            AVENUE = 2, 'AVE', ['AV', 'AVEN', 'AVENU', 'AVN', 'AVNUE']
+            CIRCLE = 3, 'CIR', ['CIRC', 'CIRCL', 'CRCL', 'CRCLE']
+
+        self.assertTrue(
+            AddressRoute.ALLEY == AddressRoute('Alley') ==
+            AddressRoute('aly') == AddressRoute('ALLee') ==
+            AddressRoute('ALLY')
+        )
+
+        self.assertTrue(
+            AddressRoute.AVENUE == AddressRoute('Avenue') ==
+            AddressRoute('AVE') == AddressRoute('av') ==
+            AddressRoute('aven') == AddressRoute('AVENU') ==
+            AddressRoute('Avn') == AddressRoute('AvnUE')
+        )
+
+        self.assertTrue(
+            AddressRoute.CIRCLE == AddressRoute('circle') ==
+            AddressRoute('Cir') == AddressRoute('CIRC') ==
+            AddressRoute('circl') == AddressRoute('crcl') ==
+            AddressRoute('crCle') == AddressRoute('crCLE')
+        )
 
     def test_properties_conflict(self):
         """ enum_properties is reserved - test that we get an exception """
