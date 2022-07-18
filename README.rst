@@ -25,7 +25,9 @@
 Enum Properties
 #######################
 
-Add properties to Python enumeration values in a simple declarative syntax. Example:
+Add properties to Python enumeration values in a simple declarative syntax.
+EnumProperties is a lightweight, non-invasive extension to Python's Enum class.
+Example:
 
 .. code:: python
 
@@ -80,13 +82,11 @@ s() values:
 
     Color.RED.hex == 'ff0000'
 
-EnumProperties is a lightweight, non-invasive extension to Python's Enum class.
-
 Please report bugs and discuss features on the
 `issues page <https://github.com/bckohan/enum-properties/issues>`_.
 
 `Contributions <https://github.com/bckohan/enum-properties/blob/main/CONTRIBUTING.rst>`_ are
-encouraged! Especially additional template tags and filters!
+encouraged!
 
 `Full documentation at read the docs. <https://enum-properties.readthedocs.io/en/latest/>`_
 
