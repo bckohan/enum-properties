@@ -15,7 +15,7 @@ from enum_properties.meta import (
     s,
 )
 
-VERSION = (1, 0, 0)
+VERSION = (1, 0, 1)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
