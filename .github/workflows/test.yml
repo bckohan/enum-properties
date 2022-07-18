@@ -7,19 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
-        django-version:
-          - 'Django~=3.2.0' # LTS April 2024
-          - 'Django~=4.0.0' # April 2023
-        exclude:
-          - python-version: '3.6'
-            django-version: 'Django~=4.0.0'
-          - python-version: '3.7'
-            django-version: 'Django~=4.0.0'
+        python-version: ['3.7', '3.8', '3.9', '3.10']
 
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -34,15 +25,14 @@ jobs:
       run: |
         poetry config virtualenvs.in-project true
         poetry run pip install --upgrade pip
-        poetry install -E all
-        poetry run pip install -U "${{ matrix.django-version }}"
+        poetry install
     - name: Run Unit Tests
       run: |
         poetry run pytest
     - name: Run Static Analysis
       run: |
-        poetry run pylint django_enum
-        poetry run mypy django_enum
+        poetry run pylint enum_properties
+        poetry run mypy enum_properties
         poetry run doc8 -q doc
         poetry check
         poetry run pip check
