@@ -6,4 +6,4 @@ sphinxcontrib-htmlhelp==2.0.0; python_version >= "3.5"
 sphinxcontrib-jsmath==1.0.1; python_version >= "3.5"
 sphinxcontrib-qthelp==1.0.3; python_version >= "3.5"
 sphinxcontrib-serializinghtml==1.1.5; python_version >= "3.5"
-enum-properties==0.1
+enum-properties==1.0.0
