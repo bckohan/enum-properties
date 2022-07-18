@@ -35,9 +35,10 @@ EnumProperties is a lightweight extension to Python's Enum class. Example:
 
     class Color(EnumProperties, p('rgb'), p('hex')):
 
-        RED = auto(), (1, 0, 0), 'ff0000'
-        GREEN = auto(), (0, 1, 0), '00ff00'
-        BLUE = auto(), (0, 0, 1), '0000ff'
+        # name   value      rgb       hex
+        RED    = auto(), (1, 0, 0), 'ff0000'
+        GREEN  = auto(), (0, 1, 0), '00ff00'
+        BLUE   = auto(), (0, 0, 1), '0000ff'
 
     # the named p() values in the Enum's inheritance become properties on
     # each value, matching the order in which they are specified
@@ -60,9 +61,9 @@ s() values:
 
     class Color(EnumProperties, s('rgb'), s('hex', case_fold=True)):
 
-        RED = auto(), (1, 0, 0), 'ff0000'
-        GREEN = auto(), (0, 1, 0), '00ff00'
-        BLUE = auto(), (0, 0, 1), '0000ff'
+        RED    = auto(), (1, 0, 0), 'ff0000'
+        GREEN  = auto(), (0, 1, 0), '00ff00'
+        BLUE   = auto(), (0, 0, 1), '0000ff'
 
     # any named s() values in the Enum's inheritance become properties on
     # each value, and the enumeration value may be instantiated from the
