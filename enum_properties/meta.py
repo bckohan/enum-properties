@@ -339,8 +339,7 @@ class EnumPropertiesMeta(EnumMeta):
         for val in cls:
             add_coerce_type(type(val.value))
 
-        # we reverse to maintain precedence order for symmetric lookups
-        for prop in reversed(cls.enum_properties):
+        for prop in cls.enum_properties:
             values = classdict._ep_properties_[prop]
             setattr(
                 cls,
@@ -356,24 +355,31 @@ class EnumPropertiesMeta(EnumMeta):
                 )
             )
 
-            if prop.symmetric:
-                for idx, val in enumerate(values):
-                    enum_cls = list(cls._value2member_map_.values())[idx]
-                    if isinstance(val, (set, list)):
-                        for val_item in val:
-                            add_coerce_type(type(val_item))
-                            add_sym_lookup(
-                                prop,
-                                val_item,
-                                enum_cls
-                            )
-                    else:
+        # we reverse to maintain precedence order for symmetric lookups
+        for prop in reversed([
+            prop for prop in cls.enum_properties if prop.symmetric
+        ]):
+            for idx, val in enumerate(
+                reversed(classdict._ep_properties_[prop])
+            ):
+                enum_cls = list(cls._value2member_map_.values())[
+                    len(cls._value2member_map_)-1-idx
+                ]
+                if isinstance(val, (set, list)):
+                    for val_item in val:
+                        add_coerce_type(type(val_item))
                         add_sym_lookup(
                             prop,
-                            val,
+                            val_item,
                             enum_cls
                         )
-                        add_coerce_type(type(val))
+                else:
+                    add_sym_lookup(
+                        prop,
+                        val,
+                        enum_cls
+                    )
+                    add_coerce_type(type(val))
 
         # add builtin symmetries
         for sym_builtin in reversed(getattr(cls, '_symmetric_builtins_', [])):

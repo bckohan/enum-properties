@@ -811,3 +811,21 @@ class TestEnums(TestCase):
 
                 ONE = auto(), (1, 2, 3)  # pragma: no cover
                 TWO = auto(), (3, 4, 5)  # pragma: no cover
+
+    def test_precedence(self):
+
+        class PriorityEx(
+            EnumProperties,
+            s('prop1'),
+            s('prop2', case_fold=True)
+        ):
+            ONE = 0, '1', [3, 4]
+            TWO = 1, '2', [3, '4']
+            THREE = 2, '3', [3, 4]
+
+        self.assertEqual(PriorityEx(0), PriorityEx.ONE)
+        self.assertEqual(PriorityEx('1'), PriorityEx.ONE)
+        self.assertEqual(PriorityEx(3), PriorityEx.ONE)
+        self.assertEqual(PriorityEx('3'), PriorityEx.THREE)
+        self.assertEqual(PriorityEx(4), PriorityEx.ONE)
+        self.assertEqual(PriorityEx('4'), PriorityEx.TWO)
