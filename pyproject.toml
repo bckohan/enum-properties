@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "enum-properties"
-version = "0.1.0"
+version = "1.0.0"
 description = "Add properties to Python enumeration values with a simple declarative syntax."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"

@@ -26,7 +26,8 @@ Enum Properties
 #######################
 
 Add properties to Python enumeration values with a simple declarative syntax.
-EnumProperties is a lightweight extension to Python's Enum class. Example:
+EnumProperties is a lightweight extension to
+`Python's Enum class <https://docs.python.org/3/library/enum.html>`_. Example:
 
 .. code:: python
 
@@ -102,4 +103,3 @@ Installation
 
 .. _GitHub: http://github.com/bckohan/enum-properties
 .. _PyPI: http://pypi.python.org/pypi/enum-properties
-

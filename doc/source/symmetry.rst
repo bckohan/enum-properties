@@ -1,5 +1,0 @@
-.. _ref-symmetry:
-
-========
-Symmetry
-========

@@ -2,8 +2,7 @@
 Change Log
 ==========
 
-v0.1.0
+v1.0.0
 ====================
 
-* Initial Release
-
+* Initial Release (production/stable)

@@ -86,7 +86,6 @@ Installation
    :caption: Contents:
 
    usage
-   symmetry
    examples
    reference
    changelog

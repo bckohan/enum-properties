@@ -614,6 +614,158 @@ class TestEnums(TestCase):
         self.assertEqual(Color.GREEN, Color('00ff00'))
         self.assertEqual(Color.BLUE, Color('0000ff'))
 
+        class MapBoxStyle(
+            EnumProperties,
+            s('label', case_fold=True),
+            p('version')
+        ):
+            """
+            https://docs.mapbox.com/api/maps/styles/
+            """
+            _symmetric_builtins_ = ['name', 'url']
+
+            STREETS = 'streets', 'Streets', 11
+            OUTDOORS = 'outdoors', 'Outdoors', 11
+            LIGHT = 'light', 'Light', 10
+            DARK = 'dark', 'Dark', 10
+            SATELLITE = 'satellite', 'Satellite', 9
+            SATELLITE_STREETS = 'satellite-streets', 'Satellite Streets', 11
+            NAVIGATION_DAY = 'navigation-day', 'Navigation Day', 1
+            NAVIGATION_NIGHT = 'navigation-night', 'Navigation Night', 1
+
+            @property
+            def url(self):
+                return f'mapbox://styles/mapbox/{self.value}-v{self.version}'
+
+            def __str__(self):
+                return self.url
+
+        self.assertEqual(MapBoxStyle.STREETS.version, 11)
+        self.assertEqual(MapBoxStyle.OUTDOORS.version, 11)
+        self.assertEqual(MapBoxStyle.LIGHT.version, 10)
+        self.assertEqual(MapBoxStyle.DARK.version, 10)
+        self.assertEqual(MapBoxStyle.SATELLITE.version, 9)
+        self.assertEqual(MapBoxStyle.SATELLITE_STREETS.version, 11)
+        self.assertEqual(MapBoxStyle.NAVIGATION_DAY.version, 1)
+        self.assertEqual(MapBoxStyle.NAVIGATION_NIGHT.version, 1)
+
+        self.assertEqual(
+            MapBoxStyle.STREETS.url,
+            'mapbox://styles/mapbox/streets-v11'
+        )
+        self.assertEqual(
+            MapBoxStyle.LIGHT.url,
+            'mapbox://styles/mapbox/light-v10'
+        )
+        self.assertEqual(
+            MapBoxStyle.DARK.url,
+            'mapbox://styles/mapbox/dark-v10'
+        )
+        self.assertEqual(
+            MapBoxStyle.SATELLITE.url,
+            'mapbox://styles/mapbox/satellite-v9'
+        )
+        self.assertEqual(
+            MapBoxStyle.SATELLITE_STREETS.url,
+            'mapbox://styles/mapbox/satellite-streets-v11'
+        )
+        self.assertEqual(
+            MapBoxStyle.NAVIGATION_DAY.url,
+            'mapbox://styles/mapbox/navigation-day-v1'
+        )
+        self.assertEqual(
+            MapBoxStyle.NAVIGATION_NIGHT.url,
+            'mapbox://styles/mapbox/navigation-night-v1'
+        )
+
+        self.assertEqual(
+            str(MapBoxStyle.STREETS),
+            'mapbox://styles/mapbox/streets-v11'
+        )
+        self.assertEqual(
+            str(MapBoxStyle.LIGHT),
+            'mapbox://styles/mapbox/light-v10'
+        )
+        self.assertEqual(
+            str(MapBoxStyle.DARK),
+            'mapbox://styles/mapbox/dark-v10'
+        )
+        self.assertEqual(
+            str(MapBoxStyle.SATELLITE),
+            'mapbox://styles/mapbox/satellite-v9'
+        )
+        self.assertEqual(
+            str(MapBoxStyle.SATELLITE_STREETS),
+            'mapbox://styles/mapbox/satellite-streets-v11'
+        )
+        self.assertEqual(
+            str(MapBoxStyle.NAVIGATION_DAY),
+            'mapbox://styles/mapbox/navigation-day-v1'
+        )
+        self.assertEqual(
+            str(MapBoxStyle.NAVIGATION_NIGHT),
+            'mapbox://styles/mapbox/navigation-night-v1'
+        )
+
+        self.assertEqual(
+            MapBoxStyle.STREETS,
+            MapBoxStyle('mapbox://styles/mapbox/streets-v11')
+        )
+        self.assertEqual(
+            MapBoxStyle.LIGHT,
+            MapBoxStyle('mapbox://styles/mapbox/light-v10')
+        )
+        self.assertEqual(
+            MapBoxStyle.DARK,
+            MapBoxStyle('mapbox://styles/mapbox/dark-v10')
+        )
+        self.assertEqual(
+            MapBoxStyle.SATELLITE,
+            MapBoxStyle('mapbox://styles/mapbox/satellite-v9')
+        )
+        self.assertEqual(
+            MapBoxStyle.SATELLITE_STREETS,
+            MapBoxStyle('mapbox://styles/mapbox/satellite-streets-v11')
+        )
+        self.assertEqual(
+            MapBoxStyle.NAVIGATION_DAY,
+            MapBoxStyle('mapbox://styles/mapbox/navigation-day-v1')
+        )
+        self.assertEqual(
+            MapBoxStyle.NAVIGATION_NIGHT,
+            MapBoxStyle('mapbox://styles/mapbox/navigation-night-v1')
+        )
+
+        self.assertEqual(
+            MapBoxStyle.STREETS,
+            MapBoxStyle('streets')
+        )
+        self.assertEqual(
+            MapBoxStyle.LIGHT,
+            MapBoxStyle('light')
+        )
+        self.assertEqual(
+            MapBoxStyle.DARK,
+            MapBoxStyle('dark')
+        )
+        self.assertEqual(
+            MapBoxStyle.SATELLITE,
+            MapBoxStyle('satellite')
+        )
+        self.assertEqual(
+            MapBoxStyle.SATELLITE_STREETS,
+            MapBoxStyle('satellite-streets')
+        )
+        self.assertEqual(
+            MapBoxStyle.NAVIGATION_DAY,
+            MapBoxStyle('navigation-day')
+        )
+        self.assertEqual(
+            MapBoxStyle.NAVIGATION_NIGHT,
+            MapBoxStyle('navigation-night')
+        )
+
+
     def test_properties_conflict(self):
         """ enum_properties is reserved - test that we get an exception """
 

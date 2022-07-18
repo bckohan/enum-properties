@@ -1,10 +1,10 @@
 """
 Metaprogramming and mixin tools that implement property tuple support for
-python enumeration classes. Symmetric lookups are supported with an additional
-SymmetricMixin class.
+python enumeration classes.
 
-Given how dynamic the typing is in this code, it's not much of a value add to
-add static type checking - revisit in the future if advances warrant it.
+.. todo::
+    Given how dynamic the typing is in this module, it is not of much value to
+    add static type checking - revisit in the future if advances warrant it.
 """
 # pylint: disable=protected-access
 import unicodedata
@@ -40,10 +40,10 @@ def s(  # pylint: disable=C0103
     Add a symmetric property. Enumeration values will be coercible from this
     property's values.
 
-    :param prop_name:
+    :param prop_name: The name of the property
     :param case_fold: If False, symmetric lookup will be
         case sensitive (default)
-    :return: a named property class
+    :return: a named symmetric property class
     """
     return type(
         prop_name,
@@ -69,6 +69,11 @@ class SymmetricMixin:  # pylint: disable=R0903
     This mixin enables symmetric Enum creation from properties marked
     symmetric. It is included by default in the EnumProperties base class,
     but can be disabled by overriding _missing_ and explicitly skipping it.
+
+    If an enumeration type inherits builtin properties (e.g. name), those
+    properties can be made symmetric by supplying a `_symmetric_builtins_`
+    member containing a list of string property names or s() values. By
+    default the `name` property will be a case sensitive symmetric property.
     """
 
     _ep_symmetric_map_ = {}
