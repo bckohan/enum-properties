@@ -13,11 +13,12 @@ from enum import Enum, EnumMeta
 
 
 def _do_casenorm(text):
+    """Normalize unicode text to be case agnostic."""
     return unicodedata.normalize('NFKD', text.casefold())
 
 
 class _Prop(str):
-    """ Property interface - private """
+    """Property interface - private"""
 
     def __new__(cls):
         return super().__new__(cls, cls.name())
@@ -29,7 +30,7 @@ class _Prop(str):
 
 
 class _SProp(_Prop):
-    pass
+    """Symmetric property interface - private"""
 
 
 def s(  # pylint: disable=C0103
@@ -56,7 +57,9 @@ def p(prop_name):  # pylint: disable=C0103
     """
     Add a property of the given name to the enumeration class by inheritance.
     Properties must be specified in the order in which they appear in the
-    value tuple specification.
+    value tuple specification. This call works by constructing a new type with
+    a classname that corresponds to the property name. The class inherits from
+    str and can be instantiated as a string by calling its empty constructor.
 
     :param prop_name: The name of the property
     :return: a named property class
@@ -66,14 +69,16 @@ def p(prop_name):  # pylint: disable=C0103
 
 class SymmetricMixin:  # pylint: disable=R0903
     """
-    This mixin enables symmetric Enum creation from properties marked
-    symmetric. It is included by default in the EnumProperties base class,
-    but can be disabled by overriding _missing_ and explicitly skipping it.
+    This mixin enables symmetric Enum_ creation from properties marked
+    symmetric. It is included by default in the
+    :py:class:`~enum_properties.meta.EnumProperties` base class, but can be
+    disabled by overriding ``_missing_`` and explicitly skipping it.
 
     If an enumeration type inherits builtin properties (e.g. name), those
-    properties can be made symmetric by supplying a `_symmetric_builtins_`
-    member containing a list of string property names or s() values. By
-    default the `name` property will be a case sensitive symmetric property.
+    properties can be made symmetric by supplying a ``_symmetric_builtins_``
+    member containing a list of string property names or
+    :py:meth:`~enum_properties.meta.s` values. By default, the ``name``
+    property will be a case sensitive symmetric property.
     """
 
     _ep_symmetric_map_ = {}
@@ -82,8 +87,8 @@ class SymmetricMixin:  # pylint: disable=R0903
 
     class ValueWrapper:
         """
-        A wrapper classed used to recursively iterate through type coercions
-        of a potential matching enumeration value in priority order
+        A wrapper class used to recursively iterate through type coercions
+        of a potential matching enumeration value in priority order.
         """
 
         value = None
@@ -142,7 +147,7 @@ class SymmetricMixin:  # pylint: disable=R0903
     @classmethod
     def _missing_(cls, value):
         """
-        The implementation of symmetric _missing_ is necessarily complex.
+        The implementation of symmetric ``_missing_`` is necessarily complex.
         Arbitrary types can be mapped to enumeration values so long as they
         are hashable. Coercion to all possible types must be attempted on
         value, in priority order before failure.
@@ -182,7 +187,7 @@ class SymmetricMixin:  # pylint: disable=R0903
 class EnumPropertiesMeta(EnumMeta):
     """
     A metaclass for creating enum choices with additional named properties for
-    each value. An Enum can be given property support simply by:
+    each value. An Enum_ can be given property support simply by:
 
     .. code-block::
 
@@ -205,11 +210,20 @@ class EnumPropertiesMeta(EnumMeta):
         class MyEnum(SymmetricMixin, enum.Enum, metaclass=EnumPropertiesMeta):
             ...
 
-    All enum.Enum functionality is compatible with the EnumPropertiesMeta
-    metaclass.
+    All Enum_ functionality is compatible with the EnumPropertiesMeta
+    metaclass. This class works by stripping out the
+    :py:meth:`~enum_properties.meta.p` and :py:meth:`~enum_properties.meta.s`
+    values during ``__prepare__`` and using their class name's as expected
+    property values to set the appropriate values to properties in ``__new__``.
+
+    .. automethod:: __prepare__
+
     """
 
+    # members expected to be supplied by inheriting classes
     EXPECTED = ['_symmetric_builtins_']
+
+    # members reserved for use by EnumProperties
     RESERVED = [
         'enum_properties',
         '_ep_coerce_types_',
@@ -219,6 +233,14 @@ class EnumPropertiesMeta(EnumMeta):
 
     @classmethod
     def __prepare__(mcs, cls, bases):  # pylint: disable=W0221
+        """
+        Strip properties out of inheritance and record them on our class
+        dictionary for per-value based assignment in ``__new__``.
+
+        :raises ValueError: If a reserved name is present as either a property
+            or a member, or if the number of specified properties does not
+            match the number of listed property values in the value tuples.
+        """
         bases = list(bases)
         properties = {}
         real_bases = []
@@ -307,6 +329,19 @@ class EnumPropertiesMeta(EnumMeta):
             bases,
             classdict
     ):
+        """
+        Enumeration class construction runs in the following stages:
+
+        1) pass up the inheritance tree to build the initial enumeration class.
+        2) Add property value to enumeration value maps for each property and
+            the property accessors that use them
+        3) Add casefolded symmetric maps for any symmetric properties
+        4) Add any symmetric builtin properties to our symmetric maps
+
+        :raises ValueError: if ``_symmetric_builtins_`` is specified
+            incorrectly, or if non-hashable values are provided for a
+            symmetric property.
+        """
         cls = super().__new__(
             mcs,
             classname,
@@ -411,14 +446,14 @@ class EnumPropertiesMeta(EnumMeta):
 
 class EnumProperties(SymmetricMixin, Enum, metaclass=EnumPropertiesMeta):
     """
-    Use this base class instead of Enum to enable enumeration properties.
+    Use this base class instead of Enum_ to enable enumeration properties.
     For example:
 
     .. code-block::
 
         class EnumType(
             EnumProperties,
-            p('prop1'), #
+            p('prop1'),
             s('prop1', case_fold=True)  # case insensitive symmetric property
         ):
 
@@ -426,13 +461,12 @@ class EnumProperties(SymmetricMixin, Enum, metaclass=EnumPropertiesMeta):
             VAL2 = 2, "prop1's value2", "prop2's value2"
             VAL3 = 3, "prop1's value3", "prop2's value3"
 
-        EnumType.VAL1.value == 1
-        EnumType.VAL1.name == 'VAL1'
-        EnumType.VAL1 == EnumType('VAL1') # auto symmetry w/ name strings
-        EnumType.VAL1.prop1 == "prop1's value1"
-        EnumType.VAL1.prop2 == "prop2's value1"
-        EnumType("prop1's value1") # throws ValueError b/c not symmetric
-        EnumType("prop2's value1")
-            == EnumType.VAL1
-            == EnumType("PRoP2'S ValUE1")
+    This is a shortcut for:
+
+    .. code-block::
+
+        class EnumType(SymmetricMixin, Enum, metaclass=EnumPropertiesMeta):
+            ...
+
+    See :ref:`usage` for more details.
     """

@@ -1,9 +1,11 @@
+.. include:: refs.rst
+
 =======================
 Enum Properties
 =======================
 
 Add properties to Python enumeration values in a simple declarative syntax.
-EnumProperties is a lightweight extension to Python's Enum class. Example:
+Enum Properties is a lightweight extension to Python's Enum_ class. Example:
 
 .. code:: python
 
@@ -75,11 +77,6 @@ Installation
 .. code:: bash
 
        pip install enum-properties
-
-
-.. _GitHub: http://github.com/bckohan/enum-properties
-.. _PyPI: http://pypi.python.org/pypi/enum-properties
-
 
 .. toctree::
    :maxdepth: 2

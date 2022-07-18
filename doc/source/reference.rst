@@ -1,4 +1,6 @@
-.. _ref-reference:
+.. include:: refs.rst
+
+.. _reference:
 
 =========
 Reference
@@ -10,9 +12,7 @@ Module
 ------
 
 .. automodule:: enum_properties.meta
-
-    .. autofunction:: p
-    .. autofunction:: s
-    .. autoclass:: EnumProperties
-    .. autoclass:: EnumPropertiesMeta
-    .. autoclass:: SymmetricMixin
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

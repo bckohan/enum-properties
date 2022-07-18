@@ -1,4 +1,6 @@
-.. _ref-examples:
+.. include:: refs.rst
+
+.. _examples:
 
 ========
 Examples
@@ -35,15 +37,16 @@ enumeration. We might implement it like so:
         AVENUE  = 2,    'AVE', ['AV', 'AVEN', 'AVENU', 'AVN', 'AVNUE']
         CIRCLE  = 3,    'CIR', ['CIRC', 'CIRCL', 'CRCL', 'CRCLE']
 
-        # ... most types elided for brevity
+        # ... other types elided for brevity
 
 
-The builtin `name` property is the long-form official name for the route. By
-default enum properties does not make the `name` property case insensitive, so
-we override the default behavior by specifying it in `_symmetric_builtins_`. We
-also add a case insensitive abbreviation property and alt property. The alt
-property is a list of common alternative abbreviations. Now we can instantiate
-our enum from any valid route name, abbreviation or common alternative like so:
+The builtin ``name`` property is the long-form official name for the route. By
+default enum properties does not make the ``name`` property case insensitive,
+so we override the default behavior by specifying it in
+``_symmetric_builtins_``. We also add a case insensitive abbreviation property
+and alt property. The alt property is a list of common alternative
+abbreviations. Now we can instantiate our enum from any valid route name,
+abbreviation or common alternative like so:
 
 .. code-block:: python
 
@@ -51,8 +54,8 @@ our enum from any valid route name, abbreviation or common alternative like so:
 
 We use an integer literal as our enumeration values to save space if these
 enumerations need to be persisted in a datastore by value. By specifying them
-directly instead of using auto() we reserve the ability to add additional route
-types in alphabetical order without invalidating any persisted data.
+directly instead of using ``auto()`` we reserve the ability to add additional
+route types in alphabetical order without invalidating any persisted data.
 
 Map Box Style
 _____________
@@ -99,7 +102,7 @@ implement our style enumeration like so:
 
 We've used the style's name slug as the value of the enumeration. If storage
 was an issue (e.g. database) we could have separated this out into a separate
-property called `slug` and used a small integer or single character as the
+property called ``slug`` and used a small integer or single character as the
 enumeration value. We've also added a symmetric case insensitive human friendly
 label for each style and a version property.
 
@@ -107,13 +110,14 @@ The version numbers will increment over time, but we're only concerned with the
 most recent versions, so we'll increment their values in this enumeration as
 they change. If this enumeration is persisted by value, any version number
 updates exist only in code and will be picked up as those persisted values are
-re-instantiated as `MapBoxStyle` enumerations.
+re-instantiated as ``MapBoxStyle`` enumerations.
 
-The last property we've added is the uri property. We've added it as concrete
-property on the class because it can be created from the slug and version.
-We could have specified it in the value tuple but that would be very verbose
-and less `DRY <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_. To
-make this property symmetric we added it to the `_symmetric_builtins_` list.
+The last property we've added is the ``uri`` property. We've added it as
+concrete property on the class because it can be created from the slug and
+version. We could have specified it in the value tuple but that would be very
+verbose and less
+`DRY <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_. To make this
+property symmetric we added it to the ``_symmetric_builtins_`` list.
 
 We can use our enumeration like so:
 
