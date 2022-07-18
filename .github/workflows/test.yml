@@ -32,7 +32,6 @@ jobs:
     - name: Run Static Analysis
       run: |
         poetry run pylint enum_properties
-        poetry run mypy enum_properties
         poetry run doc8 -q doc
         poetry check
         poetry run pip check
