@@ -6,6 +6,7 @@ authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/bckohan/enum-properties"
 homepage = "https://enum-properties.readthedocs.io"
+readme = "README.rst"
 keywords = ["enum",  "properties", "defines", "field"]
 classifiers = [
     "Environment :: Console",
