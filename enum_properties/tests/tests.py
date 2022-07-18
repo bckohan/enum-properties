@@ -139,7 +139,7 @@ class TestEnums(TestCase):
             self.assertEqual(Color.BLUE.hex, '0000ff')
             self.assertRaises(ValueError, Color, 'Azul')
             self.assertRaises(ValueError, Color, 'Blue')
-    else:
+    else:   # pragma: no cover
         def test_properties_and_symmetry(self):
 
             class Color(
@@ -187,7 +187,6 @@ class TestEnums(TestCase):
             self.assertEqual(Color.BLUE.hex, '0000ff')
             self.assertRaises(ValueError, Color, 'Azul')
             self.assertRaises(ValueError, Color, 'Blue')
-
 
     def test_property_lists(self):
 
