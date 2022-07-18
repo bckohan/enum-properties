@@ -7,8 +7,6 @@ Given how dynamic the typing is in this code, it's not much of a value add to
 add static type checking - revisit in the future if advances warrant it.
 """
 # pylint: disable=protected-access
-from __future__ import annotations
-
 import unicodedata
 from collections.abc import Hashable
 from enum import Enum, EnumMeta
