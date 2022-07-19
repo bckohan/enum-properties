@@ -1,6 +1,8 @@
 from datetime import datetime
 import sys
 from pathlib import Path
+from sphinx.ext.autodoc import between
+
 sys.path.append(str(Path(__file__).parent.parent.parent))
 import enum_properties
 
@@ -65,3 +67,13 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = []
 
 todo_include_todos = True
+
+
+def setup(app):
+    # Register a sphinx.ext.autodoc.between listener to ignore everything
+    # between lines that contain the word IGNORE
+    app.connect(
+        'autodoc-process-docstring',
+        between('^.*[*]{79}.*$', exclude=True)
+    )
+    return app

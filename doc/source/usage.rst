@@ -7,11 +7,11 @@ Usage
 =====
 
 To add properties to an enumeration you must inherit from
-:py:class:`~enum_properties.meta.EnumProperties` instead of Enum_, list
+:py:class:`~enum_properties.EnumProperties` instead of Enum_, list
 property values in a tuple with each enumeration value and let
-:py:class:`~enum_properties.meta.EnumProperties` know that your properties
-exist and what their names are by adding :py:meth:`~enum_properties.meta.p`
-values to the base class list. The :py:meth:`~enum_properties.meta.p` values
+:py:class:`~enum_properties.EnumProperties` know that your properties
+exist and what their names are by adding :py:meth:`~enum_properties.p`
+values to the base class list. The :py:meth:`~enum_properties.p` values
 must be in the same order as property values are listed in the value tuples:
 
 .. note::
@@ -37,9 +37,9 @@ For example:
     # The property values are accessible by name on the enumeration values:
     Color.RED.hex == 'ff0000'
 
-:py:class:`~enum_properties.meta.EnumProperties` inherits from enum and all
+:py:class:`~enum_properties.EnumProperties` inherits from enum and all
 other standard python enumeration functionality will work.
-The :py:class:`~enum_properties.meta.EnumProperties` base class is equivalent
+The :py:class:`~enum_properties.EnumProperties` base class is equivalent
 to:
 
 .. code:: python
@@ -57,8 +57,8 @@ Symmetry
 For some enumerations it will make sense to be able to instantiate an
 enumeration value instance from one of the property values. This is called
 property symmetry. To mark a property as symmetric, use
-:py:meth:`~enum_properties.meta.s` values instead of
-:py:meth:`~enum_properties.meta.p` values:
+:py:meth:`~enum_properties.s` values instead of
+:py:meth:`~enum_properties.p` values:
 
 .. code:: python
 
@@ -76,11 +76,11 @@ property symmetry. To mark a property as symmetric, use
 
 Symmetric string properties are by default case sensitive. To mark a property
 as case insensitive, use the `case_fold=True` parameter on the
-:py:meth:`~enum_properties.meta.s` value.
+:py:meth:`~enum_properties.s` value.
 
 Symmetric property support is added through the
-:py:class:`~enum_properties.meta.SymmetricMixin` class which is included in the
-:py:class:`~enum_properties.meta.EnumProperties` base class. The above is
+:py:class:`~enum_properties.SymmetricMixin` class which is included in the
+:py:class:`~enum_properties.EnumProperties` base class. The above is
 equivalent to this:
 
 .. code:: python
@@ -101,7 +101,7 @@ hashable values. Each value in the list will be symmetric to the enumeration
 value. Tuples are hashable and are treated as singular property values. See the
 ``AddressRoute`` example in :ref:`examples`.
 
-:py:class:`~enum_properties.meta.SymmetricMixin` tries very hard to resolve
+:py:class:`~enum_properties.SymmetricMixin` tries very hard to resolve
 enumeration values from objects. Type coercion to all potential value types
 will be attempted before giving up. For instance, if we have a color object
 that is coercible to a string hex value we could instantiate our Color
@@ -146,10 +146,10 @@ Symmetric Builtins
 
 When extending from Enum_ or other enumeration base classes, some builtin
 properties are available. `name` is available on all standard Enum classes. By
-default :py:class:`~enum_properties.meta.EnumProperties` will make `name` case
+default :py:class:`~enum_properties.EnumProperties` will make `name` case
 sensitive symmetric. To override this behavior, specify a
 ``_symmetric_builtins_`` list as a class member. The items may be strings or
-:py:meth:`~enum_properties.meta.s` values. For example to make name case
+:py:meth:`~enum_properties.s` values. For example to make name case
 insensitive we might:
 
 .. code-block:: python

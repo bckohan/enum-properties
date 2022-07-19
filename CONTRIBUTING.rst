@@ -15,8 +15,8 @@ Contributing
 Contributions are encouraged! Please use the issue page to submit feature
 requests or bug reports. Issues with attached PRs will be given priority and
 have a much higher likelihood of acceptance. Please also open an issue and
-associate it with any submitted PRs. That said, the aim is to keep this library
-as lightweight as possible. Only features with broad based use cases will be
+associate it with any submitted PRs. The aim is to keep this library as
+lightweight as possible. Only features with broad based use cases will be
 considered.
 
 We are actively seeking additional maintainers. If you're interested, please
@@ -27,8 +27,7 @@ Installation
 ------------
 
 `enum-properties` uses Poetry_ for environment, package and dependency
-management. Poetry_ greatly simplifies environment bootstrapping. Once it's
-installed:
+management.
 
 .. code-block::
 

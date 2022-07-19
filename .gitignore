@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 /poetry.lock
 /test.db
+.DS_Store
+.idea

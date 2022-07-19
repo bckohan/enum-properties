@@ -11,7 +11,7 @@ Reference
 Module
 ------
 
-.. automodule:: enum_properties.meta
+.. automodule:: enum_properties
    :members:
    :undoc-members:
    :show-inheritance:

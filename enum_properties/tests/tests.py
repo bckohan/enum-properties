@@ -16,7 +16,7 @@ from enum_properties import (
 class TestEnums(TestCase):
 
     def test_p(self):
-        from enum_properties.meta import _Prop
+        from enum_properties import _Prop
 
         prop1 = p('prop1')
         prop2 = s('prop2')
