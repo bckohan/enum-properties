@@ -97,13 +97,13 @@ class SymmetricMixin:  # pylint: disable=R0903
     """
     This mixin enables symmetric Enum_ creation from properties marked
     symmetric. It is included by default in the
-    :py:class:`~enum_properties.meta.EnumProperties` base class, but can be
+    :py:class:`~enum_properties.EnumProperties` base class, but can be
     disabled by overriding ``_missing_`` and explicitly skipping it.
 
     If an enumeration type inherits builtin properties (e.g. name), those
     properties can be made symmetric by supplying a ``_symmetric_builtins_``
     member containing a list of string property names or
-    :py:meth:`~enum_properties.meta.s` values. By default, the ``name``
+    :py:meth:`~enum_properties.s` values. By default, the ``name``
     property will be a case sensitive symmetric property.
     """
 
@@ -185,7 +185,7 @@ class EnumPropertiesMeta(EnumMeta):
 
     All Enum_ functionality is compatible with the EnumPropertiesMeta
     metaclass. This class works by stripping out the
-    :py:meth:`~enum_properties.meta.p` and :py:meth:`~enum_properties.meta.s`
+    :py:meth:`~enum_properties.p` and :py:meth:`~enum_properties.s`
     values during ``__prepare__`` and using their class name's as expected
     property values to set the appropriate values to properties in ``__new__``.
 
