@@ -2,10 +2,15 @@
 Change Log
 ==========
 
+v1.1.0
+======
+
+* Implemented `Provide equality comparisons for symmetric property values <https://github.com/bckohan/enum-properties/issues/2>`_
+
 v1.0.2
 ======
 
-* Implemented `Consolidate source files <https://github.com/bckohan/enum-properties/issues/1>`_
+* Fixed `Consolidate source files <https://github.com/bckohan/enum-properties/issues/1>`_
 
 v1.0.1
 ======
