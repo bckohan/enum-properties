@@ -107,6 +107,33 @@ class TestEnums(TestCase):
             self.assertEqual(Color.RED, Color('RED'))
             self.assertEqual(Color.RED, Color['RED'])
             self.assertEqual(Color.RED, Color(1))
+
+            # test symmetric equality
+            self.assertEqual(Color.RED, (1, 0, 0))
+            self.assertEqual(Color.RED, 'ff0000')
+            self.assertEqual(Color.RED, 'FF0000')
+            self.assertEqual(Color.RED, 'RED')
+            self.assertEqual(Color.RED, 1)
+
+            self.assertTrue(Color.RED != (1, 1, 0))
+            self.assertTrue(Color.RED != '00ff00')
+            self.assertTrue(Color.RED != 'EE0000')
+            self.assertTrue(Color.RED != 'GRAY')
+            self.assertTrue(Color.RED != 3)
+
+            self.assertFalse(Color.RED != (1, 0, 0))
+            self.assertFalse(Color.RED != 'ff0000')
+            self.assertFalse(Color.RED != 'FF0000')
+            self.assertFalse(Color.RED != 'RED')
+            self.assertFalse(Color.RED != 1)
+
+            self.assertNotEqual(Color.RED, (1, 1, 0))
+            self.assertNotEqual(Color.RED, 'EE0000')
+            self.assertNotEqual(Color.RED, '00ff00')
+            self.assertNotEqual(Color.RED, 'GREEN')
+            self.assertNotEqual(Color.RED, 5)
+            ############################
+
             self.assertEqual(Color.RED.value, 1)
             self.assertEqual(Color.RED.spanish, 'Roja')
             self.assertEqual(Color.RED.hex, 'ff0000')
@@ -125,6 +152,13 @@ class TestEnums(TestCase):
             self.assertRaises(ValueError, Color, 'Verde')
             self.assertRaises(ValueError, Color, 'Green')
 
+            # test symmetric equality
+            self.assertEqual(Color.GREEN, (0, 1, 0))
+            self.assertEqual(Color.GREEN, '00ff00')
+            self.assertEqual(Color.GREEN, '00FF00')
+            self.assertEqual(Color.GREEN, 'GREEN')
+            self.assertEqual(Color.GREEN, 2)
+            self.assertNotEqual(Color.GREEN, (1, 1, 0))
 
             self.assertEqual(Color.BLUE, Color((0, 0, 1)))
             self.assertEqual(Color.BLUE, Color('0000ff'))
@@ -133,10 +167,20 @@ class TestEnums(TestCase):
             self.assertEqual(Color.BLUE, Color['BLUE'])
             self.assertEqual(Color.BLUE, Color(3))
             self.assertEqual(Color.BLUE.value, 3)
+            self.assertEqual(Color.BLUE, 3)
             self.assertEqual(Color.BLUE.spanish, 'Azul')
             self.assertEqual(Color.BLUE.hex, '0000ff')
             self.assertRaises(ValueError, Color, 'Azul')
             self.assertRaises(ValueError, Color, 'Blue')
+
+            # test symmetric equality
+            self.assertEqual(Color.BLUE, (0, 0, 1))
+            self.assertEqual(Color.BLUE, '0000ff')
+            self.assertEqual(Color.BLUE, '0000FF')
+            self.assertEqual(Color.BLUE, 'BLUE')
+            self.assertEqual(Color.BLUE, 3)
+            self.assertNotEqual(Color.BLUE, '00EE00')
+
     else:   # pragma: no cover
         def test_properties_and_symmetry(self):
 
@@ -162,6 +206,32 @@ class TestEnums(TestCase):
             self.assertRaises(ValueError, Color, 'Roja')
             self.assertRaises(ValueError, Color, 'Red')
 
+            # test symmetric equality
+            self.assertEqual(Color.RED, (1, 0, 0))
+            self.assertEqual(Color.RED, 'ff0000')
+            self.assertEqual(Color.RED, 'FF0000')
+            self.assertEqual(Color.RED, 'RED')
+            self.assertEqual(Color.RED, 1)
+
+            self.assertTrue(Color.RED != (1, 1, 0))
+            self.assertTrue(Color.RED != '00ff00')
+            self.assertTrue(Color.RED != 'EE0000')
+            self.assertTrue(Color.RED != 'GRAY')
+            self.assertTrue(Color.RED != 3)
+
+            self.assertFalse(Color.RED != (1, 0, 0))
+            self.assertFalse(Color.RED != 'ff0000')
+            self.assertFalse(Color.RED != 'FF0000')
+            self.assertFalse(Color.RED != 'RED')
+            self.assertFalse(Color.RED != 1)
+
+            self.assertNotEqual(Color.RED, (1, 1, 0))
+            self.assertNotEqual(Color.RED, 'EE0000')
+            self.assertNotEqual(Color.RED, '00ff00')
+            self.assertNotEqual(Color.RED, 'GREEN')
+            self.assertNotEqual(Color.RED, 5)
+            ############################
+
             self.assertEqual(Color.GREEN, Color((0, 1, 0)))
             self.assertEqual(Color.GREEN, Color('00ff00'))
             self.assertEqual(Color.GREEN, Color('00FF00'))
@@ -174,6 +244,14 @@ class TestEnums(TestCase):
             self.assertRaises(ValueError, Color, 'Verde')
             self.assertRaises(ValueError, Color, 'Green')
 
+            # test symmetric equality
+            self.assertEqual(Color.GREEN, (0, 1, 0))
+            self.assertEqual(Color.GREEN, '00ff00')
+            self.assertEqual(Color.GREEN, '00FF00')
+            self.assertEqual(Color.GREEN, 'GREEN')
+            self.assertEqual(Color.GREEN, 2)
+            self.assertNotEqual(Color.GREEN, 'EE0000')
+
             self.assertEqual(Color.BLUE, Color((0, 0, 1)))
             self.assertEqual(Color.BLUE, Color('0000ff'))
             self.assertEqual(Color.BLUE, Color('0000FF'))
@@ -185,6 +263,14 @@ class TestEnums(TestCase):
             self.assertEqual(Color.BLUE.hex, '0000ff')
             self.assertRaises(ValueError, Color, 'Azul')
             self.assertRaises(ValueError, Color, 'Blue')
+
+            # test symmetric equality
+            self.assertEqual(Color.BLUE, (0, 0, 1))
+            self.assertEqual(Color.BLUE, '0000ff')
+            self.assertEqual(Color.BLUE, '0000FF')
+            self.assertEqual(Color.BLUE, 'BLUE')
+            self.assertEqual(Color.BLUE, 3)
+            self.assertNotEqual(Color.BLUE, (0, 1, 1))
 
     def test_property_lists(self):
 
@@ -598,19 +684,27 @@ class TestEnums(TestCase):
         self.assertEqual(Color.GREEN.hex, '00ff00')
         self.assertEqual(Color.BLUE.hex, '0000ff')
 
-        class Color(EnumProperties, s('rgb'), s('hex')):
+        class Color(EnumProperties, s('rgb'), s('hex', case_fold=True)):
 
-            RED = auto(), (1, 0, 0), 'ff0000'
-            GREEN = auto(), (0, 1, 0), '00ff00'
-            BLUE = auto(), (0, 0, 1), '0000ff'
+            RED = auto(), (1, 0, 0), '0xff0000'
+            GREEN = auto(), (0, 1, 0), '0x00ff00'
+            BLUE = auto(), (0, 0, 1), '0x0000ff'
 
         self.assertEqual(Color.RED, Color((1, 0, 0)))
         self.assertEqual(Color.GREEN, Color((0, 1, 0)))
         self.assertEqual(Color.BLUE, Color((0, 0, 1)))
 
-        self.assertEqual(Color.RED, Color('ff0000'))
-        self.assertEqual(Color.GREEN, Color('00ff00'))
-        self.assertEqual(Color.BLUE, Color('0000ff'))
+        self.assertEqual(Color.RED, Color('0xff0000'))
+        self.assertEqual(Color.GREEN, Color('0x00ff00'))
+        self.assertEqual(Color.BLUE, Color('0x0000ff'))
+
+        self.assertTrue(Color.RED == Color(hex(16711680)) == hex(16711680) == '0xff0000' == Color.RED)
+        self.assertTrue(Color.RED == (1, 0, 0))
+        self.assertTrue((1, 0, 0) == Color.RED)
+        self.assertTrue(Color.RED != (0, 1, 0))
+        self.assertTrue((0, 1, 0) != Color.RED)
+        self.assertTrue(Color.RED == '0xFF0000')
+        self.assertTrue('0xFF0000' == Color.RED)
 
         class MapBoxStyle(
             EnumProperties,

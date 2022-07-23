@@ -20,7 +20,7 @@ import unicodedata
 from collections.abc import Hashable
 from enum import Enum, EnumMeta
 
-VERSION = (1, 0, 2)
+VERSION = (1, 1, 0)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -110,6 +110,19 @@ class SymmetricMixin:  # pylint: disable=R0903
     _ep_symmetric_map_ = {}
     _ep_isymmetric_map_ = {}
     _symmetric_builtins_ = ['name']
+
+    def __eq__(self, value):
+        """Symmetric equality - try to coerce value before failure"""
+        if isinstance(value, self.__class__):
+            return self.value == value.value
+        try:
+            return self.value == self.__class__(value).value
+        except (ValueError, TypeError):
+            return False
+
+    def __ne__(self, value):
+        """Symmetric inequality is the inverse of symmetric equality"""
+        return not self.__eq__(value)
 
     @classmethod
     def _missing_(cls, value):

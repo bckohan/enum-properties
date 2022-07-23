@@ -68,11 +68,11 @@ property symmetry. To mark a property as symmetric, use
     class Color(EnumProperties, s('rgb'), s('hex', case_fold=True)):
 
         # name   value      rgb       hex
-        RED    = auto(), (1, 0, 0), 'ff0000'
-        GREEN  = auto(), (0, 1, 0), '00ff00'
-        BLUE   = auto(), (0, 0, 1), '0000ff'
+        RED    = auto(), (1, 0, 0), '0xff0000'
+        GREEN  = auto(), (0, 1, 0), '0x00ff00'
+        BLUE   = auto(), (0, 0, 1), '0x0000ff'
 
-    Color.RED == Color((1, 0, 0)) == Color('FF0000') == Color('ff0000')
+    Color.RED == Color((1, 0, 0)) == Color('0xFF0000') == Color('0xff0000')
 
 Symmetric string properties are by default case sensitive. To mark a property
 as case insensitive, use the `case_fold=True` parameter on the
@@ -88,7 +88,13 @@ equivalent to this:
     from enum_properties import EnumPropertiesMeta, SymmetricMixin, s
     from enum import Enum, auto
 
-    class Color(SymmetricMixin, Enum, s('rgb'), s('hex', case_fold=True), metaclass=EnumPropertiesMeta):
+    class Color(
+        SymmetricMixin,
+        Enum,
+        s('rgb'),
+        s('hex', case_fold=True),
+        metaclass=EnumPropertiesMeta
+    ):
         ...
 
 .. warning::
@@ -105,7 +111,15 @@ value. Tuples are hashable and are treated as singular property values. See the
 enumeration values from objects. Type coercion to all potential value types
 will be attempted before giving up. For instance, if we have a color object
 that is coercible to a string hex value we could instantiate our Color
-enumeration from it:
+enumeration from it and perform equality comparisons:
+
+.. code:: python
+
+    # str(hex(16711680)) == '0xff0000'
+    Color.RED == Color(hex(16711680)) == hex(16711680)
+    Color.RED == (1, 0, 0)
+    Color.RED != (0, 1, 0)
+    Color.RED == '0xFF0000'
 
 
 Conflicts and Precedence
