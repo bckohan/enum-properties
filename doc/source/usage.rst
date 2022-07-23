@@ -109,8 +109,8 @@ value. Tuples are hashable and are treated as singular property values. See the
 
 :py:class:`~enum_properties.SymmetricMixin` tries very hard to resolve
 enumeration values from objects. Type coercion to all potential value types
-will be attempted before giving up. For instance, if we have a color object
-that is coercible to a string hex value we could instantiate our Color
+will be attempted before giving up. For instance, if we have a hex object that
+is coercible to a string hex value we could instantiate our Color
 enumeration from it and perform equality comparisons:
 
 .. code:: python
