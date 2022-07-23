@@ -5,7 +5,7 @@ Change Log
 v1.1.0
 ======
 
-* Implemented `Provide equality comparisons for symmetric property values <https://github.com/bckohan/enum-properties/issues/2>`_
+* Implemented `Provide equality comparisons for symmetric property values <https://github.com/bckohan/enum-properties/issues/3>`_
 
 v1.0.2
 ======
