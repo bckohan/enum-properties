@@ -1,4 +1,5 @@
 import sys
+from collections.abc import Hashable
 from enum import Enum, auto
 from unittest import TestCase
 
@@ -958,3 +959,57 @@ class TestEnums(TestCase):
 
         self.assertEqual(PriorityEx(0), PriorityEx.ONE)
         self.assertEqual(PriorityEx(1), PriorityEx.TWO)
+
+    def test_hashable_enums(self):
+
+        class HashableEnum1(Enum):
+            VAL0 = 0
+            VAL1 = 1
+            VAL2 = 2
+
+        class HashableEnum2(Enum):
+            VAL0 = 0
+            VAL1 = 1
+            VAL2 = 2
+
+        self.assertTrue(isinstance(HashableEnum1.VAL0, Hashable))
+        self.assertTrue(isinstance(HashableEnum2.VAL1, Hashable))
+
+        class TransitiveEnum(EnumProperties, p('label'), s('pos')):
+            VAL0 = 0, 'Value 0', HashableEnum1.VAL0
+            VAL1 = 1, 'Value 1', HashableEnum1.VAL1
+            VAL2 = 2, 'Value 2', HashableEnum2.VAL2
+
+        self.assertTrue(isinstance(TransitiveEnum.VAL2, Hashable))
+
+        self.assertEqual(TransitiveEnum(HashableEnum1.VAL0), TransitiveEnum.VAL0)
+        self.assertEqual(TransitiveEnum(HashableEnum1.VAL1), TransitiveEnum.VAL1)
+        self.assertEqual(TransitiveEnum(HashableEnum2.VAL2), TransitiveEnum.VAL2)
+
+        self.assertRaises(ValueError, TransitiveEnum, HashableEnum1.VAL2)
+        self.assertRaises(ValueError, TransitiveEnum, HashableEnum2.VAL0)
+        self.assertRaises(ValueError, TransitiveEnum, HashableEnum2.VAL1)
+
+        test_dict = {
+            HashableEnum1.VAL0: 'Zero',
+            HashableEnum1.VAL1: 'One',
+            HashableEnum1.VAL2: 'Two',
+            HashableEnum2.VAL0: 'zero',
+            HashableEnum2.VAL1: 'one',
+            HashableEnum2.VAL2: 'two',
+            TransitiveEnum.VAL0: 'ZERO',
+            TransitiveEnum.VAL1: 'ONE',
+            TransitiveEnum.VAL2: 'TWO',
+        }
+
+        self.assertEqual(test_dict[HashableEnum1.VAL0], 'Zero')
+        self.assertEqual(test_dict[HashableEnum1.VAL1], 'One')
+        self.assertEqual(test_dict[HashableEnum1.VAL2], 'Two')
+
+        self.assertEqual(test_dict[HashableEnum2.VAL0], 'zero')
+        self.assertEqual(test_dict[HashableEnum2.VAL1], 'one')
+        self.assertEqual(test_dict[HashableEnum2.VAL2], 'two')
+
+        self.assertEqual(test_dict[TransitiveEnum.VAL0], 'ZERO')
+        self.assertEqual(test_dict[TransitiveEnum.VAL1], 'ONE')
+        self.assertEqual(test_dict[TransitiveEnum.VAL2], 'TWO')

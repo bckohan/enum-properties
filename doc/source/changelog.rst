@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.1.1
+======
+
+* Fixed `SymmetricMixin objects are not hashable <https://github.com/bckohan/enum-properties/issues/4>`_
+
 v1.1.0
 ======
 

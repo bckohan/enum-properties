@@ -20,7 +20,7 @@ import unicodedata
 from collections.abc import Hashable
 from enum import Enum, EnumMeta
 
-VERSION = (1, 1, 0)
+VERSION = (1, 1, 1)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -123,6 +123,15 @@ class SymmetricMixin:  # pylint: disable=R0903
     def __ne__(self, value):
         """Symmetric inequality is the inverse of symmetric equality"""
         return not self.__eq__(value)
+
+    def __hash__(self):
+        """
+        Providing a logical __eq__ requires a __hash__ implementation to keep
+        SymetricMixin enums hashable. Some objects will compare equal to enum
+        values but will have different hash functions. This is ok, so long as
+        Enumeration value instances always have the same hashes.
+        """
+        return hash((self.__class__, self._value_))
 
     @classmethod
     def _missing_(cls, value):
