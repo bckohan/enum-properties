@@ -1,11 +1,9 @@
-import sys
 from collections.abc import Hashable
 from enum import Enum, auto
 from unittest import TestCase
 
 from enum_properties import (
     EnumProperties,
-    EnumPropertiesMeta,
     FlagProperties,
     IntEnumProperties,
     IntFlagProperties,
@@ -87,194 +85,95 @@ class TestEnums(TestCase):
         self.assertEqual(CaseFirstMatch.ONE, CaseFirstMatch('ß'))
         self.assertEqual(CaseFirstMatch.TWO, CaseFirstMatch('ΣΊΣΥΦΟΣ'))
 
-    if (
-        not (sys.version_info.major, sys.version_info.minor) == (3, 6)
-    ):  # pragma: no cover
-        def test_properties_and_symmetry(self):
+    def test_properties_and_symmetry(self):
 
-            class Color(
-                SymmetricMixin,
-                int,
-                Enum,
-                p('spanish'),
-                s('rgb'),
-                s('hex', case_fold=True),
-                metaclass=EnumPropertiesMeta
-            ):
-                RED = 1, 'Roja', (1, 0, 0), 'ff0000'
-                GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
-                BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
+        class Color(
+            IntEnumProperties,
+            p('spanish'),
+            s('rgb'),
+            s('hex', case_fold=True)
+        ):
+            RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+            GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
+            BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
 
-            self.assertEqual(Color.RED, Color((1, 0, 0)))
-            self.assertEqual(Color.RED, Color('ff0000'))
-            self.assertEqual(Color.RED, Color('FF0000'))
-            self.assertEqual(Color.RED, Color('RED'))
-            self.assertEqual(Color.RED, Color['RED'])
-            self.assertEqual(Color.RED, Color(1))
+        self.assertEqual(Color.RED, Color((1, 0, 0)))
+        self.assertEqual(Color.RED, Color('ff0000'))
+        self.assertEqual(Color.RED, Color('FF0000'))
+        self.assertEqual(Color.RED, Color('RED'))
+        self.assertEqual(Color.RED, Color['RED'])
+        self.assertEqual(Color.RED, Color(1))
+        self.assertEqual(Color.RED.value, 1)
+        self.assertEqual(Color.RED.spanish, 'Roja')
+        self.assertEqual(Color.RED.hex, 'ff0000')
+        self.assertRaises(ValueError, Color, 'Roja')
+        self.assertRaises(ValueError, Color, 'Red')
 
-            # test symmetric equality
-            self.assertEqual(Color.RED, (1, 0, 0))
-            self.assertEqual(Color.RED, 'ff0000')
-            self.assertEqual(Color.RED, 'FF0000')
-            self.assertEqual(Color.RED, 'RED')
-            self.assertEqual(Color.RED, 1)
+        # test symmetric equality
+        self.assertEqual(Color.RED, (1, 0, 0))
+        self.assertEqual(Color.RED, 'ff0000')
+        self.assertEqual(Color.RED, 'FF0000')
+        self.assertEqual(Color.RED, 'RED')
+        self.assertEqual(Color.RED, 1)
 
-            self.assertTrue(Color.RED != (1, 1, 0))
-            self.assertTrue(Color.RED != '00ff00')
-            self.assertTrue(Color.RED != 'EE0000')
-            self.assertTrue(Color.RED != 'GRAY')
-            self.assertTrue(Color.RED != 3)
+        self.assertTrue(Color.RED != (1, 1, 0))
+        self.assertTrue(Color.RED != '00ff00')
+        self.assertTrue(Color.RED != 'EE0000')
+        self.assertTrue(Color.RED != 'GRAY')
+        self.assertTrue(Color.RED != 3)
 
-            self.assertFalse(Color.RED != (1, 0, 0))
-            self.assertFalse(Color.RED != 'ff0000')
-            self.assertFalse(Color.RED != 'FF0000')
-            self.assertFalse(Color.RED != 'RED')
-            self.assertFalse(Color.RED != 1)
+        self.assertFalse(Color.RED != (1, 0, 0))
+        self.assertFalse(Color.RED != 'ff0000')
+        self.assertFalse(Color.RED != 'FF0000')
+        self.assertFalse(Color.RED != 'RED')
+        self.assertFalse(Color.RED != 1)
 
-            self.assertNotEqual(Color.RED, (1, 1, 0))
-            self.assertNotEqual(Color.RED, 'EE0000')
-            self.assertNotEqual(Color.RED, '00ff00')
-            self.assertNotEqual(Color.RED, 'GREEN')
-            self.assertNotEqual(Color.RED, 5)
-            ############################
+        self.assertNotEqual(Color.RED, (1, 1, 0))
+        self.assertNotEqual(Color.RED, 'EE0000')
+        self.assertNotEqual(Color.RED, '00ff00')
+        self.assertNotEqual(Color.RED, 'GREEN')
+        self.assertNotEqual(Color.RED, 5)
+        ############################
 
-            self.assertEqual(Color.RED.value, 1)
-            self.assertEqual(Color.RED.spanish, 'Roja')
-            self.assertEqual(Color.RED.hex, 'ff0000')
-            self.assertRaises(ValueError, Color, 'Roja')
-            self.assertRaises(ValueError, Color, 'Red')
+        self.assertEqual(Color.GREEN, Color((0, 1, 0)))
+        self.assertEqual(Color.GREEN, Color('00ff00'))
+        self.assertEqual(Color.GREEN, Color('00FF00'))
+        self.assertEqual(Color.GREEN, Color('GREEN'))
+        self.assertEqual(Color.GREEN, Color['GREEN'])
+        self.assertEqual(Color.GREEN, Color(2))
+        self.assertEqual(Color.GREEN.value, 2)
+        self.assertEqual(Color.GREEN.spanish, 'Verde')
+        self.assertEqual(Color.GREEN.hex, '00ff00')
+        self.assertRaises(ValueError, Color, 'Verde')
+        self.assertRaises(ValueError, Color, 'Green')
 
-            self.assertEqual(Color.GREEN, Color((0, 1, 0)))
-            self.assertEqual(Color.GREEN, Color('00ff00'))
-            self.assertEqual(Color.GREEN, Color('00FF00'))
-            self.assertEqual(Color.GREEN, Color('GREEN'))
-            self.assertEqual(Color.GREEN, Color['GREEN'])
-            self.assertEqual(Color.GREEN, Color(2))
-            self.assertEqual(Color.GREEN.value, 2)
-            self.assertEqual(Color.GREEN.spanish, 'Verde')
-            self.assertEqual(Color.GREEN.hex, '00ff00')
-            self.assertRaises(ValueError, Color, 'Verde')
-            self.assertRaises(ValueError, Color, 'Green')
+        # test symmetric equality
+        self.assertEqual(Color.GREEN, (0, 1, 0))
+        self.assertEqual(Color.GREEN, '00ff00')
+        self.assertEqual(Color.GREEN, '00FF00')
+        self.assertEqual(Color.GREEN, 'GREEN')
+        self.assertEqual(Color.GREEN, 2)
+        self.assertNotEqual(Color.GREEN, 'EE0000')
 
-            # test symmetric equality
-            self.assertEqual(Color.GREEN, (0, 1, 0))
-            self.assertEqual(Color.GREEN, '00ff00')
-            self.assertEqual(Color.GREEN, '00FF00')
-            self.assertEqual(Color.GREEN, 'GREEN')
-            self.assertEqual(Color.GREEN, 2)
-            self.assertNotEqual(Color.GREEN, (1, 1, 0))
+        self.assertEqual(Color.BLUE, Color((0, 0, 1)))
+        self.assertEqual(Color.BLUE, Color('0000ff'))
+        self.assertEqual(Color.BLUE, Color('0000FF'))
+        self.assertEqual(Color.BLUE, Color('BLUE'))
+        self.assertEqual(Color.BLUE, Color['BLUE'])
+        self.assertEqual(Color.BLUE, Color(3))
+        self.assertEqual(Color.BLUE.value, 3)
+        self.assertEqual(Color.BLUE.spanish, 'Azul')
+        self.assertEqual(Color.BLUE.hex, '0000ff')
+        self.assertRaises(ValueError, Color, 'Azul')
+        self.assertRaises(ValueError, Color, 'Blue')
 
-            self.assertEqual(Color.BLUE, Color((0, 0, 1)))
-            self.assertEqual(Color.BLUE, Color('0000ff'))
-            self.assertEqual(Color.BLUE, Color('0000FF'))
-            self.assertEqual(Color.BLUE, Color('BLUE'))
-            self.assertEqual(Color.BLUE, Color['BLUE'])
-            self.assertEqual(Color.BLUE, Color(3))
-            self.assertEqual(Color.BLUE.value, 3)
-            self.assertEqual(Color.BLUE, 3)
-            self.assertEqual(Color.BLUE.spanish, 'Azul')
-            self.assertEqual(Color.BLUE.hex, '0000ff')
-            self.assertRaises(ValueError, Color, 'Azul')
-            self.assertRaises(ValueError, Color, 'Blue')
-
-            # test symmetric equality
-            self.assertEqual(Color.BLUE, (0, 0, 1))
-            self.assertEqual(Color.BLUE, '0000ff')
-            self.assertEqual(Color.BLUE, '0000FF')
-            self.assertEqual(Color.BLUE, 'BLUE')
-            self.assertEqual(Color.BLUE, 3)
-            self.assertNotEqual(Color.BLUE, '00EE00')
-
-    else:   # pragma: no cover
-        def test_properties_and_symmetry(self):
-
-            class Color(
-                IntEnumProperties,
-                p('spanish'),
-                s('rgb'),
-                s('hex', case_fold=True)
-            ):
-                RED = 1, 'Roja', (1, 0, 0), 'ff0000'
-                GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
-                BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
-
-            self.assertEqual(Color.RED, Color((1, 0, 0)))
-            self.assertEqual(Color.RED, Color('ff0000'))
-            self.assertEqual(Color.RED, Color('FF0000'))
-            self.assertEqual(Color.RED, Color('RED'))
-            self.assertEqual(Color.RED, Color['RED'])
-            self.assertEqual(Color.RED, Color(1))
-            self.assertEqual(Color.RED.value, 1)
-            self.assertEqual(Color.RED.spanish, 'Roja')
-            self.assertEqual(Color.RED.hex, 'ff0000')
-            self.assertRaises(ValueError, Color, 'Roja')
-            self.assertRaises(ValueError, Color, 'Red')
-
-            # test symmetric equality
-            self.assertEqual(Color.RED, (1, 0, 0))
-            self.assertEqual(Color.RED, 'ff0000')
-            self.assertEqual(Color.RED, 'FF0000')
-            self.assertEqual(Color.RED, 'RED')
-            self.assertEqual(Color.RED, 1)
-
-            self.assertTrue(Color.RED != (1, 1, 0))
-            self.assertTrue(Color.RED != '00ff00')
-            self.assertTrue(Color.RED != 'EE0000')
-            self.assertTrue(Color.RED != 'GRAY')
-            self.assertTrue(Color.RED != 3)
-
-            self.assertFalse(Color.RED != (1, 0, 0))
-            self.assertFalse(Color.RED != 'ff0000')
-            self.assertFalse(Color.RED != 'FF0000')
-            self.assertFalse(Color.RED != 'RED')
-            self.assertFalse(Color.RED != 1)
-
-            self.assertNotEqual(Color.RED, (1, 1, 0))
-            self.assertNotEqual(Color.RED, 'EE0000')
-            self.assertNotEqual(Color.RED, '00ff00')
-            self.assertNotEqual(Color.RED, 'GREEN')
-            self.assertNotEqual(Color.RED, 5)
-            ############################
-
-            self.assertEqual(Color.GREEN, Color((0, 1, 0)))
-            self.assertEqual(Color.GREEN, Color('00ff00'))
-            self.assertEqual(Color.GREEN, Color('00FF00'))
-            self.assertEqual(Color.GREEN, Color('GREEN'))
-            self.assertEqual(Color.GREEN, Color['GREEN'])
-            self.assertEqual(Color.GREEN, Color(2))
-            self.assertEqual(Color.GREEN.value, 2)
-            self.assertEqual(Color.GREEN.spanish, 'Verde')
-            self.assertEqual(Color.GREEN.hex, '00ff00')
-            self.assertRaises(ValueError, Color, 'Verde')
-            self.assertRaises(ValueError, Color, 'Green')
-
-            # test symmetric equality
-            self.assertEqual(Color.GREEN, (0, 1, 0))
-            self.assertEqual(Color.GREEN, '00ff00')
-            self.assertEqual(Color.GREEN, '00FF00')
-            self.assertEqual(Color.GREEN, 'GREEN')
-            self.assertEqual(Color.GREEN, 2)
-            self.assertNotEqual(Color.GREEN, 'EE0000')
-
-            self.assertEqual(Color.BLUE, Color((0, 0, 1)))
-            self.assertEqual(Color.BLUE, Color('0000ff'))
-            self.assertEqual(Color.BLUE, Color('0000FF'))
-            self.assertEqual(Color.BLUE, Color('BLUE'))
-            self.assertEqual(Color.BLUE, Color['BLUE'])
-            self.assertEqual(Color.BLUE, Color(3))
-            self.assertEqual(Color.BLUE.value, 3)
-            self.assertEqual(Color.BLUE.spanish, 'Azul')
-            self.assertEqual(Color.BLUE.hex, '0000ff')
-            self.assertRaises(ValueError, Color, 'Azul')
-            self.assertRaises(ValueError, Color, 'Blue')
-
-            # test symmetric equality
-            self.assertEqual(Color.BLUE, (0, 0, 1))
-            self.assertEqual(Color.BLUE, '0000ff')
-            self.assertEqual(Color.BLUE, '0000FF')
-            self.assertEqual(Color.BLUE, 'BLUE')
-            self.assertEqual(Color.BLUE, 3)
-            self.assertNotEqual(Color.BLUE, (0, 1, 1))
+        # test symmetric equality
+        self.assertEqual(Color.BLUE, (0, 0, 1))
+        self.assertEqual(Color.BLUE, '0000ff')
+        self.assertEqual(Color.BLUE, '0000FF')
+        self.assertEqual(Color.BLUE, 'BLUE')
+        self.assertEqual(Color.BLUE, 3)
+        self.assertNotEqual(Color.BLUE, (0, 1, 1))
 
     def test_property_lists(self):
 
@@ -562,30 +461,26 @@ class TestEnums(TestCase):
         self.assertEqual(ColorAutoIntSym.BLUE.hex, '0000ff')
         self.assertRaises(ValueError, ColorAutoIntSym, 'Azul')
 
-    # todo remove check when 3.6 support is dropped
-    if (
-        not (sys.version_info.major, sys.version_info.minor) == (3, 6)
-    ):  # pragma: no cover
-        def test_ignore(self):
-            class Color(
-                EnumProperties,
-                p('spanish'),
-                s('rgb'),
-                s('hex', case_fold=True)
-            ):
+    def test_ignore(self):
+        class Color(
+            EnumProperties,
+            p('spanish'),
+            s('rgb'),
+            s('hex', case_fold=True)
+        ):
 
-                _ignore_ = ['BLACK', 'NOT_ENOUGH_PROPS']
+            _ignore_ = ['BLACK', 'NOT_ENOUGH_PROPS']
 
-                RED = 1, 'Roja', (1, 0, 0), 'ff0000'
-                GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
-                BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
-                BLACK = 4, 'Negra', (1, 1, 1), 'ffffff'
-                NOT_ENOUGH_PROPS = 5, 'Not Enough'
+            RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+            GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
+            BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
+            BLACK = 4, 'Negra', (1, 1, 1), 'ffffff'
+            NOT_ENOUGH_PROPS = 5, 'Not Enough'
 
-            self.assertFalse(hasattr(Color, 'BLACK'))
-            self.assertRaises(ValueError, Color, 4)
-            self.assertRaises(ValueError, Color, (1, 1, 1))
-            self.assertRaises(ValueError, Color, 'ffffff')
+        self.assertFalse(hasattr(Color, 'BLACK'))
+        self.assertRaises(ValueError, Color, 4)
+        self.assertRaises(ValueError, Color, (1, 1, 1))
+        self.assertRaises(ValueError, Color, 'ffffff')
 
     def test_no_props(self):
 
