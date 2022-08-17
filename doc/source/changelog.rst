@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.2.0
+======
+
+* Fixed `Add types and support for Flag and IntFlag <https://github.com/bckohan/enum-properties/issues/5>`_
+
 v1.1.1
 ======
 

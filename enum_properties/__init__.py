@@ -12,15 +12,15 @@ python enumeration classes.
 
 .. todo::
     Given how dynamic the typing is in this module, static type checking is
-    very frustrating - revisit in the future if advances warrant it.
+    awkward - revisit in the future if advances warrant it.
 
 """
+import enum
 # pylint: disable=protected-access
 import unicodedata
 from collections.abc import Hashable
-from enum import Enum, EnumMeta
 
-VERSION = (1, 1, 1)
+VERSION = (1, 2, 0)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -179,7 +179,7 @@ class SymmetricMixin:  # pylint: disable=R0903
         return super()._missing_(value)
 
 
-class EnumPropertiesMeta(EnumMeta):
+class EnumPropertiesMeta(enum.EnumMeta):
     """
     A metaclass for creating enum choices with additional named properties for
     each value. An Enum_ can be given property support simply by:
@@ -439,7 +439,7 @@ class EnumPropertiesMeta(EnumMeta):
         return cls
 
 
-class EnumProperties(SymmetricMixin, Enum, metaclass=EnumPropertiesMeta):
+class EnumProperties(SymmetricMixin, enum.Enum, metaclass=EnumPropertiesMeta):
     """
     Use this base class instead of Enum_ to enable enumeration properties.
     For example:
@@ -464,4 +464,30 @@ class EnumProperties(SymmetricMixin, Enum, metaclass=EnumPropertiesMeta):
             ...
 
     See :ref:`usage` for more details.
+    """
+
+
+class IntEnumProperties(
+    SymmetricMixin,
+    enum.IntEnum,
+    metaclass=EnumPropertiesMeta
+):
+    """
+    An IntEnum that supports properties.
+    """
+
+
+class FlagProperties(SymmetricMixin, enum.Flag, metaclass=EnumPropertiesMeta):
+    """
+    A Flag that supports properties
+    """
+
+
+class IntFlagProperties(
+    SymmetricMixin,
+    enum.IntFlag,
+    metaclass=EnumPropertiesMeta
+):
+    """
+    An IntFlag that supports properties.
     """

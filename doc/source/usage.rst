@@ -7,7 +7,8 @@ Usage
 =====
 
 To add properties to an enumeration you must inherit from
-:py:class:`~enum_properties.EnumProperties` instead of Enum_, list
+:py:class:`~enum_properties.EnumProperties` or
+:py:class:`~enum_properties.IntEnumProperties` instead of Enum_, list
 property values in a tuple with each enumeration value and let
 :py:class:`~enum_properties.EnumProperties` know that your properties
 exist and what their names are by adding :py:meth:`~enum_properties.p`
@@ -140,7 +141,11 @@ based on the following priority order:
 
 .. code-block:: python
 
-    class PriorityEx(EnumProperties, s('prop1'), s('prop2', case_fold=True)):
+    class PriorityEx(
+        IntEnumProperties,
+        s('prop1'),
+        s('prop2', case_fold=True)
+    ):
 
         # <-------- Higher Precedence
         # name  value   prop1     prop2    #  ^
@@ -179,3 +184,29 @@ insensitive we might:
 
     # now we can do this:
     Color('red') == Color.RED
+
+
+Flags
+-----
+
+Enumeration ``IntFlag`` and ``Flag`` types that support properties are also
+provided by the :py:class:`~enum_properties.IntFlagProperties` and
+:py:class:`~enum_properties.FlagProperties` classes. For example:
+
+.. code-block:: python
+
+        class Perm(
+            IntFlagProperties,
+            s('label', case_fold=True),
+        ):
+
+            R = 1, 'read'
+            W = 2, 'write'
+            X = 4, 'execute'
+            RWX = 7, 'all'
+
+        # combined flags can be specified and given properties
+        assert (Perm.R | Perm.W | Perm.X).label == 'all'
+
+        # properties for combined flags, that are not listed will be None
+        assert (Perm.R | Perm.W).label is None

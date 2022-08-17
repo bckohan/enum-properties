@@ -6,6 +6,9 @@ from unittest import TestCase
 from enum_properties import (
     EnumProperties,
     EnumPropertiesMeta,
+    FlagProperties,
+    IntEnumProperties,
+    IntFlagProperties,
     SymmetricMixin,
     p,
     s,
@@ -186,7 +189,7 @@ class TestEnums(TestCase):
         def test_properties_and_symmetry(self):
 
             class Color(
-                EnumProperties,
+                IntEnumProperties,
                 p('spanish'),
                 s('rgb'),
                 s('hex', case_fold=True)
@@ -1013,3 +1016,80 @@ class TestEnums(TestCase):
         self.assertEqual(test_dict[TransitiveEnum.VAL0], 'ZERO')
         self.assertEqual(test_dict[TransitiveEnum.VAL1], 'ONE')
         self.assertEqual(test_dict[TransitiveEnum.VAL2], 'TWO')
+
+
+class TestFlags(TestCase):
+
+    def test_int_flag(self):
+
+        class Perm(
+            IntFlagProperties,
+            s('label', case_fold=True),
+        ):
+
+            R = 1, 'read'
+            W = 2, 'write'
+            X = 4, 'execute'
+            RWX = 7, 'all'
+
+        self.assertEqual(Perm.R.label, 'read')
+        self.assertEqual(Perm.W.label, 'write')
+        self.assertEqual(Perm.X.label, 'execute')
+        self.assertEqual(Perm.RWX.label, 'all')
+
+        self.assertTrue(Perm.R is Perm('read'))
+        self.assertTrue(Perm.W is Perm('write'))
+        self.assertTrue(Perm.X is Perm('execute'))
+        self.assertTrue(Perm.RWX is Perm('all'))
+
+        self.assertTrue((Perm.R | Perm.W | Perm.X) is Perm('RWX'))
+
+        self.assertEqual((Perm.R | Perm.W | Perm.X).label, 'all')
+        self.assertEqual(
+            (Perm('READ') | Perm('write') | Perm('X')).label,
+            'all'
+        )
+
+        self.assertIsNone((Perm.R | Perm.W).label)
+        self.assertIsNone((Perm.W | Perm.X).label)
+        self.assertIsNone((Perm.R | Perm.X).label)
+
+        self.assertFalse(bool(Perm.R & Perm.X))
+        self.assertIsNone((Perm.R & Perm.X).label)
+
+    def test_flag(self):
+
+        class Perm(
+            FlagProperties,
+            s('label', case_fold=True),
+        ):
+
+            R = auto(), 'read'
+            W = auto(), 'write'
+            X = auto(), 'execute'
+            RWX = R | W | X, 'all'
+
+        self.assertEqual(Perm.R.label, 'read')
+        self.assertEqual(Perm.W.label, 'write')
+        self.assertEqual(Perm.X.label, 'execute')
+        self.assertEqual(Perm.RWX.label, 'all')
+
+        self.assertTrue(Perm.R is Perm('read'))
+        self.assertTrue(Perm.W is Perm('write'))
+        self.assertTrue(Perm.X is Perm('execute'))
+        self.assertTrue(Perm.RWX is Perm('all'))
+
+        self.assertTrue((Perm.R | Perm.W | Perm.X) is Perm('RWX'))
+
+        self.assertEqual((Perm.R | Perm.W | Perm.X).label, 'all')
+        self.assertEqual(
+            (Perm('READ') | Perm('write') | Perm('X')).label,
+            'all'
+        )
+
+        self.assertIsNone((Perm.R | Perm.W).label)
+        self.assertIsNone((Perm.W | Perm.X).label)
+        self.assertIsNone((Perm.R | Perm.X).label)
+
+        self.assertFalse(bool(Perm.R & Perm.X))
+        self.assertIsNone((Perm.R & Perm.X).label)
