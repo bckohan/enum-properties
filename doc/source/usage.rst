@@ -8,8 +8,8 @@ Usage
 
 To add properties to an enumeration you must inherit from
 :py:class:`~enum_properties.EnumProperties` or
-:py:class:`~enum_properties.IntEnumProperties` instead of Enum_, list
-property values in a tuple with each enumeration value and let
+:py:class:`~enum_properties.IntEnumProperties` instead of Enum_ and IntEnum_,
+list property values in a tuple with each enumeration value and let
 :py:class:`~enum_properties.EnumProperties` know that your properties
 exist and what their names are by adding :py:meth:`~enum_properties.p`
 values to the base class list. The :py:meth:`~enum_properties.p` values
@@ -164,7 +164,7 @@ Symmetric Builtins
 ##################
 
 When extending from Enum_ or other enumeration base classes, some builtin
-properties are available. `name` is available on all standard Enum classes. By
+properties are available. `name` is available on all standard Enum_ classes. By
 default :py:class:`~enum_properties.EnumProperties` will make `name` case
 sensitive symmetric. To override this behavior, specify a
 ``_symmetric_builtins_`` list as a class member. The items may be strings or
@@ -189,8 +189,8 @@ insensitive we might:
 Flags
 -----
 
-Enumeration ``IntFlag`` and ``Flag`` types that support properties are also
-provided by the :py:class:`~enum_properties.IntFlagProperties` and
+IntFlag_ and Flag_ types that support properties are also provided by the
+:py:class:`~enum_properties.IntFlagProperties` and
 :py:class:`~enum_properties.FlagProperties` classes. For example:
 
 .. code-block:: python

@@ -31,6 +31,9 @@ __copyright__ = 'Copyright 2022 Brian Kohan'
 __all__ = [
     'VERSION',
     'EnumProperties',
+    'IntEnumProperties',
+    'FlagProperties',
+    'IntFlagProperties',
     'EnumPropertiesMeta',
     'SymmetricMixin',
     'p',
