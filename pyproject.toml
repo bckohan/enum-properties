@@ -35,7 +35,7 @@ exclude = ["enum_properties/tests"]
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.0"
 Sphinx = "^5.0.2"
 sphinx-rtd-theme = "^1.0.0"
