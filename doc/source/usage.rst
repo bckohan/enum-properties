@@ -210,3 +210,13 @@ IntFlag_ and Flag_ types that support properties are also provided by the
 
         # properties for combined flags, that are not listed will be None
         assert (Perm.R | Perm.W).label is None
+
+Flag enumerations can also be created from iterables and generators containing
+values or symmetric values.
+
+.. code-block:: python
+
+    assert Perm([Perm.R, Perm.W, Perm.X]) == Perm.RWX
+    assert Perm({'read', 'write', 'execute'}) == Perm.RWX
+    assert Perm((perm for perm in (1, 'write', Perm.X)) == Perm.RWX
+

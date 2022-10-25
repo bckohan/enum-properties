@@ -13,6 +13,10 @@ from enum_properties import (
 )
 
 
+class Unhashable:
+    pass
+
+
 class TestEnums(TestCase):
 
     def test_p(self):
@@ -938,6 +942,11 @@ class TestFlags(TestCase):
         self.assertTrue(Perm.RWX is Perm('all'))
 
         self.assertTrue((Perm.R | Perm.W | Perm.X) is Perm('RWX'))
+        self.assertTrue(Perm([Perm.R, Perm.W, Perm.X]) is Perm('RWX'))
+        self.assertTrue(Perm({'read', 'write', 'execute'}) is Perm('RWX'))
+        self.assertTrue(
+            Perm((val for val in (Perm.R, 'write', 4))) is Perm('RWX')
+        )
 
         self.assertEqual((Perm.R | Perm.W | Perm.X).label, 'all')
         self.assertEqual(
@@ -975,6 +984,11 @@ class TestFlags(TestCase):
         self.assertTrue(Perm.RWX is Perm('all'))
 
         self.assertTrue((Perm.R | Perm.W | Perm.X) is Perm('RWX'))
+        self.assertTrue(Perm([Perm.R, Perm.W, Perm.X]) is Perm('RWX'))
+        self.assertTrue(Perm({'read', 'write', 'execute'}) is Perm('RWX'))
+        self.assertTrue(
+            Perm((val for val in (Perm.R, 'write', 4))) is Perm('RWX')
+        )
 
         self.assertEqual((Perm.R | Perm.W | Perm.X).label, 'all')
         self.assertEqual(

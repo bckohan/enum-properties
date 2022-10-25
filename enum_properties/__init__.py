@@ -18,9 +18,9 @@ python enumeration classes.
 import enum
 # pylint: disable=protected-access
 import unicodedata
-from collections.abc import Hashable
+from collections.abc import Generator, Hashable, Iterable
 
-VERSION = (1, 2, 0)
+VERSION = (1, 2, 1)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -137,7 +137,7 @@ class SymmetricMixin:  # pylint: disable=R0903
         return hash((self.__class__, self._value_))
 
     @classmethod
-    def _missing_(cls, value):
+    def _missing_(cls, value):  # pylint: disable=R0911
         """
         Arbitrary types can be mapped to enumeration values so long as they
         are hashable. Coercion to all possible types must be attempted on
@@ -148,6 +148,18 @@ class SymmetricMixin:  # pylint: disable=R0903
         :raises ValueError: if no enumeration match can be found.
         :return: A valid instance of this enumeration
         """
+        if (
+            issubclass(cls, enum.Flag) and
+            (not isinstance(value, Hashable) and isinstance(value, Iterable))
+            or isinstance(value, Generator)
+        ):
+            composite = None
+            for val in value:
+                if composite is None:
+                    composite = cls(val)
+                else:
+                    composite |= cls(val)
+            return composite
 
         try:
             return cls._ep_symmetric_map_[value]

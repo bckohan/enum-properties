@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.2.1
+======
+
+* Implemented `Allow Flag Enumerations to be created from iterables <https://github.com/bckohan/enum-properties/issues/15>`_
+
 v1.2.0
 ======
 
