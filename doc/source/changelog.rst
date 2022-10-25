@@ -2,6 +2,13 @@
 Change Log
 ==========
 
+v1.3.0
+======
+
+* Fixed `Initialize Flag enum with empty iterable should resolve to Flag(0) - no selections. <https://github.com/bckohan/enum-properties/issues/19>`_
+* Added `Support for python 3.11. <https://github.com/bckohan/enum-properties/issues/18>`_
+* Implemented `Generally allow composite flag enumerations to be treated as iterables of active flags. <https://github.com/bckohan/enum-properties/issues/17>`_
+
 v1.2.2
 ======
 

@@ -223,3 +223,34 @@ values or symmetric values.
     assert Perm({'read', 'write', 'execute'}) == Perm.RWX
     assert Perm((perm for perm in (1, 'write', Perm.X)) == Perm.RWX
 
+    # iterate through active flags
+    assert [perm for perm in Perm.RWX] == [Perm.R, Perm.W, Perm.X]
+
+    # note (empty flag - returns empty list)
+    assert Perm(0).flagged == []
+
+    # instantiate a Flag off an empty iterable
+    assert Perm(0) == Perm([])
+
+    # check number of active flags:
+    assert len(Perm(0)) == 0
+    assert len(Perm.RWX) == 3
+    assert len(Perm.R | Perm.X) == 2
+    assert len(Perm.R & Perm.X) == 0
+
+
+.. note::
+
+    Iterable behavior on flags is added using the
+    :py:class:`~enum_properties.DecomposeMixin`. To create a flag enumeration
+    without the iterable extensions we can simply declare it manually without
+    the mixin:
+
+    .. code-block:: python
+
+        class MyFlag(
+            SymmetricMixin,
+            enum.IntFlag,
+            metaclass=EnumPropertiesMeta
+        ):
+            ...
