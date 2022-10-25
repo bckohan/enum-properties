@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.2.2
+======
+
+* Implemented `Add convenience property to decompose Flag enumeration values <https://github.com/bckohan/enum-properties/issues/16>`_
+
 v1.2.1
 ======
 

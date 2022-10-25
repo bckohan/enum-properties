@@ -211,6 +211,9 @@ IntFlag_ and Flag_ types that support properties are also provided by the
         # properties for combined flags, that are not listed will be None
         assert (Perm.R | Perm.W).label is None
 
+        # list the active flags:
+        assert (Perm.R | Perm.W | Perm.X).flagged == [Perm.R, Perm.W, Perm.X]
+
 Flag enumerations can also be created from iterables and generators containing
 values or symmetric values.
 

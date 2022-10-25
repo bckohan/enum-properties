@@ -961,6 +961,10 @@ class TestFlags(TestCase):
         self.assertFalse(bool(Perm.R & Perm.X))
         self.assertIsNone((Perm.R & Perm.X).label)
 
+        self.assertCountEqual((Perm.R | Perm.W).flagged, [Perm.R, Perm.W])
+        self.assertCountEqual(Perm.RWX.flagged, [Perm.R, Perm.W, Perm.X])
+        self.assertEqual(Perm.R.flagged, [Perm.R])
+
     def test_flag(self):
 
         class Perm(
@@ -1002,3 +1006,8 @@ class TestFlags(TestCase):
 
         self.assertFalse(bool(Perm.R & Perm.X))
         self.assertIsNone((Perm.R & Perm.X).label)
+
+        self.assertCountEqual((Perm.R | Perm.W).flagged, [Perm.R, Perm.W])
+        self.assertCountEqual(Perm.RWX.flagged, [Perm.R, Perm.W, Perm.X])
+        self.assertEqual(Perm.R.flagged, [Perm.R])
+        self.assertEqual((Perm.R & Perm.X).flagged, [Perm(0)])

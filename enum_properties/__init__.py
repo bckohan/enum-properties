@@ -20,7 +20,7 @@ import enum
 import unicodedata
 from collections.abc import Generator, Hashable, Iterable
 
-VERSION = (1, 2, 1)
+VERSION = (1, 2, 2)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -36,6 +36,7 @@ __all__ = [
     'IntFlagProperties',
     'EnumPropertiesMeta',
     'SymmetricMixin',
+    'DecomposeMixin',
     'p',
     's'
 ]
@@ -492,13 +493,36 @@ class IntEnumProperties(
     """
 
 
-class FlagProperties(SymmetricMixin, enum.Flag, metaclass=EnumPropertiesMeta):
+class DecomposeMixin:  # pylint: disable=R0903
+    """
+    A mixin for Flag enumerations that decomposes composite enumeration values
+    into the constituent activated flags.
+    """
+
+    @property
+    def flagged(self):
+        """
+        Returns the list of flags that are activated.
+        """
+        # do import here to keep lib less brittle b/c this is a private
+        # include and may change, rely on CI to find issues
+        from enum import _decompose  # pylint: disable=C0415
+        return _decompose(self.__class__, self._value_)[0]
+
+
+class FlagProperties(
+    DecomposeMixin,
+    SymmetricMixin,
+    enum.Flag,
+    metaclass=EnumPropertiesMeta
+):
     """
     A Flag that supports properties
     """
 
 
 class IntFlagProperties(
+    DecomposeMixin,
     SymmetricMixin,
     enum.IntFlag,
     metaclass=EnumPropertiesMeta
