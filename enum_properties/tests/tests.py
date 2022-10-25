@@ -964,6 +964,16 @@ class TestFlags(TestCase):
         self.assertCountEqual((Perm.R | Perm.W).flagged, [Perm.R, Perm.W])
         self.assertCountEqual(Perm.RWX.flagged, [Perm.R, Perm.W, Perm.X])
         self.assertEqual(Perm.R.flagged, [Perm.R])
+        self.assertEqual((Perm.R & Perm.X).flagged, [])
+
+        self.assertEqual(len((Perm.R | Perm.W)), 2)
+        self.assertEqual(len(Perm.RWX), 3)
+        self.assertEqual(len(Perm.R), 1)
+        self.assertEqual(len((Perm.R & Perm.X)), 0)
+
+        self.assertEqual(Perm([]), Perm(0))
+        self.assertEqual(Perm({}), Perm(0))
+        self.assertEqual(Perm((item for item in [])), Perm(0))
 
     def test_flag(self):
 
@@ -1010,4 +1020,33 @@ class TestFlags(TestCase):
         self.assertCountEqual((Perm.R | Perm.W).flagged, [Perm.R, Perm.W])
         self.assertCountEqual(Perm.RWX.flagged, [Perm.R, Perm.W, Perm.X])
         self.assertEqual(Perm.R.flagged, [Perm.R])
-        self.assertEqual((Perm.R & Perm.X).flagged, [Perm(0)])
+        self.assertEqual((Perm.R & Perm.X).flagged, [])
+
+        self.assertEqual(len((Perm.R | Perm.W)), 2)
+        self.assertEqual(len(Perm.RWX), 3)
+        self.assertEqual(len(Perm.R), 1)
+        self.assertEqual(len((Perm.R & Perm.X)), 0)
+
+        self.assertEqual(Perm([]), Perm(0))
+        self.assertEqual(Perm({}), Perm(0))
+        self.assertEqual(Perm((item for item in [])), Perm(0))
+
+        self.assertCountEqual(
+            [perm for perm in Perm.RWX],
+            [Perm.R, Perm.W, Perm.X]
+        )
+
+        self.assertCountEqual(
+            [perm for perm in (Perm.R | Perm.X)],
+            [Perm.R, Perm.X]
+        )
+
+        self.assertCountEqual(
+            [perm for perm in Perm.R],
+            [Perm.R]
+        )
+
+        self.assertCountEqual(
+            [perm for perm in (Perm.R & Perm.X)],
+            []
+        )

@@ -20,7 +20,14 @@ import enum
 import unicodedata
 from collections.abc import Generator, Hashable, Iterable
 
-VERSION = (1, 2, 2)
+try:
+    from functools import cached_property
+except ImportError:
+    # todo remove when python 3.7 support is dropped
+    cached_property = property  # pragma: no cover
+
+
+VERSION = (1, 3, 0)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -160,6 +167,8 @@ class SymmetricMixin:  # pylint: disable=R0903
                     composite = cls(val)
                 else:
                     composite |= cls(val)
+            if composite is None:
+                return cls(0)
             return composite
 
         try:
@@ -493,21 +502,41 @@ class IntEnumProperties(
     """
 
 
-class DecomposeMixin:  # pylint: disable=R0903
+class DecomposeMixin:
     """
     A mixin for Flag enumerations that decomposes composite enumeration values
-    into the constituent activated flags.
+    and allows us to treat composite enumeration values as iterables of
+    activated flags.
     """
 
-    @property
+    # instances are immutable and this has a small penalty to compute - it is
+    # therefore a great candidate for a lazily computed cached_property
+    @cached_property
     def flagged(self):
         """
-        Returns the list of flags that are activated.
+        Returns the list of flags that are active.
         """
         # do import here to keep lib less brittle b/c this is a private
         # include and may change, rely on CI to find issues
         from enum import _decompose  # pylint: disable=C0415
-        return _decompose(self.__class__, self._value_)[0]
+        return [
+            flag for flag in _decompose(self.__class__, self._value_)[0]
+            if flag != 0
+        ]
+
+    def __iter__(self):
+        """
+        Return a generator for the active flags.
+        """
+        return (flag for flag in self.flagged)
+
+    def __len__(self):
+        """
+        Returns the number of active flags.
+        """
+        if self.value == 0:
+            return 0
+        return len(self.flagged)
 
 
 class FlagProperties(
