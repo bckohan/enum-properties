@@ -931,6 +931,10 @@ class TestFlags(TestCase):
             X = 4, 'execute'
             RWX = 7, 'all'
 
+            @property
+            def custom_prop(self):
+                return self.label.upper()
+
         self.assertEqual(Perm.R.label, 'read')
         self.assertEqual(Perm.W.label, 'write')
         self.assertEqual(Perm.X.label, 'execute')
@@ -940,6 +944,9 @@ class TestFlags(TestCase):
         self.assertTrue(Perm.W is Perm('write'))
         self.assertTrue(Perm.X is Perm('execute'))
         self.assertTrue(Perm.RWX is Perm('all'))
+
+        self.assertEqual(Perm.W.custom_prop, 'WRITE')
+        self.assertEqual(Perm.RWX.custom_prop, 'ALL')
 
         self.assertTrue((Perm.R | Perm.W | Perm.X) is Perm('RWX'))
         self.assertTrue(Perm([Perm.R, Perm.W, Perm.X]) is Perm('RWX'))
@@ -987,6 +994,10 @@ class TestFlags(TestCase):
             X = auto(), 'execute'
             RWX = R | W | X, 'all'
 
+            @property
+            def custom_prop(self):
+                return self.label.upper()
+
         self.assertEqual(Perm.R.label, 'read')
         self.assertEqual(Perm.W.label, 'write')
         self.assertEqual(Perm.X.label, 'execute')
@@ -996,6 +1007,9 @@ class TestFlags(TestCase):
         self.assertTrue(Perm.W is Perm('write'))
         self.assertTrue(Perm.X is Perm('execute'))
         self.assertTrue(Perm.RWX is Perm('all'))
+
+        self.assertEqual(Perm.W.custom_prop, 'WRITE')
+        self.assertEqual(Perm.RWX.custom_prop, 'ALL')
 
         self.assertTrue((Perm.R | Perm.W | Perm.X) is Perm('RWX'))
         self.assertTrue(Perm([Perm.R, Perm.W, Perm.X]) is Perm('RWX'))

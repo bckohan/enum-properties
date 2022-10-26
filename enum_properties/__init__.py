@@ -18,13 +18,17 @@ python enumeration classes.
 import enum
 # pylint: disable=protected-access
 import unicodedata
-from collections.abc import Generator, Hashable, Iterable
+from collections.abc import (  # pylint: disable=E0611
+    Generator,
+    Hashable,
+    Iterable,
+)
 
 try:
     from functools import cached_property
-except ImportError:
+except ImportError:  # pragma: no cover
     # todo remove when python 3.7 support is dropped
-    cached_property = property  # pragma: no cover
+    cached_property = property  # pylint: disable=C0103
 
 
 VERSION = (1, 3, 0)
@@ -120,7 +124,7 @@ class SymmetricMixin:  # pylint: disable=R0903
 
     _ep_symmetric_map_ = {}
     _ep_isymmetric_map_ = {}
-    _symmetric_builtins_ = ['name']
+    _symmetric_builtins_ = []
 
     def __eq__(self, value):
         """Symmetric equality - try to coerce value before failure"""
@@ -369,11 +373,12 @@ class EnumPropertiesMeta(enum.EnumMeta):
             classdict
         )
         cls._ep_coerce_types_ = []
-        cls._ep_symmetric_map_ = {}
+        cls._ep_symmetric_map_ = cls._member_map_
         cls._ep_isymmetric_map_ = {}
         cls.enum_properties = list(classdict._ep_properties_.keys())
 
         def add_sym_lookup(prop, p_val, enum_inst):
+            print(prop, p_val, enum_inst)
             if not isinstance(p_val, Hashable):
                 raise ValueError(
                     f'{cls}.{prop}:{p_val} is not hashable. Symmetrical '
@@ -516,19 +521,22 @@ class DecomposeMixin:
         """
         Returns the list of flags that are active.
         """
-        # do import here to keep lib less brittle b/c this is a private
-        # include and may change, rely on CI to find issues
-        from enum import _decompose  # pylint: disable=C0415
-        return [
-            flag for flag in _decompose(self.__class__, self._value_)[0]
-            if flag != 0
-        ]
+        return list(flag for flag in iter(self))
 
     def __iter__(self):
         """
         Return a generator for the active flags.
         """
-        return (flag for flag in self.flagged)
+        return (
+            member for member in self.__class__
+            if (
+                (member.value != 0) and
+                # make sure member is a power of 2, composites are included in
+                # iteration < 3.11
+                ((member.value & (member.value - 1)) == 0) and
+                (self.value & member.value == member.value)
+            )
+        )
 
     def __len__(self):
         """
