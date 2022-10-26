@@ -31,7 +31,7 @@ except ImportError:  # pragma: no cover
     cached_property = property  # pylint: disable=C0103
 
 
-VERSION = (1, 3, 0)
+VERSION = (1, 3, 1)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -378,7 +378,6 @@ class EnumPropertiesMeta(enum.EnumMeta):
         cls.enum_properties = list(classdict._ep_properties_.keys())
 
         def add_sym_lookup(prop, p_val, enum_inst):
-            print(prop, p_val, enum_inst)
             if not isinstance(p_val, Hashable):
                 raise ValueError(
                     f'{cls}.{prop}:{p_val} is not hashable. Symmetrical '
