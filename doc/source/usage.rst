@@ -226,8 +226,8 @@ values or symmetric values.
     # iterate through active flags
     assert [perm for perm in Perm.RWX] == [Perm.R, Perm.W, Perm.X]
 
-    # note (empty flag - returns empty list)
-    assert Perm(0).flagged == []
+    # flagged property returns list of flags
+    assert (Perm.R | Perm.W).flagged == [Perm.R, Perm.W]
 
     # instantiate a Flag off an empty iterable
     assert Perm(0) == Perm([])
