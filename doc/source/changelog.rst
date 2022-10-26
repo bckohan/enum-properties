@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v1.3.1
+======
+
+* Fixed `Remove errant print statement <https://github.com/bckohan/enum-properties/issues/20>`_
+
+
 v1.3.0
 ======
 
