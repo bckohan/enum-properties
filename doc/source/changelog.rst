@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v1.3.3
+======
+
+* Fixed `LICENSE included in source package. <https://github.com/bckohan/enum-properties/issues/30>`_
+
+
 v1.3.2
 ======
 
