@@ -1,4 +1,5 @@
 import pickle
+import sys
 from collections.abc import Hashable
 from enum import Enum, auto
 from io import BytesIO
@@ -1288,6 +1289,7 @@ class TestNestedClassOnEnum(TestCase):
     def test_example(self):
 
         class MyEnum(EnumProperties, p('label')):
+
             class Type1:
                 pass
 
@@ -1309,3 +1311,58 @@ class TestNestedClassOnEnum(TestCase):
         self.assertTrue(MyEnum.Type1().__class__ is MyEnum.Type1)
         self.assertTrue(MyEnum.Type2().__class__ is MyEnum.Type2)
         self.assertTrue(MyEnum.Type3().__class__ is MyEnum.Type3)
+
+    if sys.version_info >= (3, 11):  # pragma: no cover
+        def test_nonmember_decorator(self):
+            from enum import nonmember
+
+            class MyEnum(EnumProperties, p('label')):
+
+                @nonmember
+                class Type1:
+                    pass
+
+                @nonmember
+                class Type2:
+                    pass
+
+                @nonmember
+                class Type3:
+                    pass
+
+                VALUE1 = Type1, 'label1'
+                VALUE2 = Type2, 'label2'
+                VALUE3 = Type3, 'label3'
+                VALUE4 = nonmember((Type3, 'label4'))
+
+            # nested classes are usable like normal
+            self.assertEqual(MyEnum.Type1, MyEnum.VALUE1.value)
+            self.assertEqual(MyEnum.Type2, MyEnum.VALUE2.value)
+            self.assertEqual(MyEnum.Type3, MyEnum.VALUE3.value)
+            self.assertEqual(len(MyEnum), 3)
+            self.assertEqual(MyEnum.VALUE4, (MyEnum.Type3, 'label4'))
+            self.assertTrue(MyEnum.Type1().__class__ is MyEnum.Type1)
+            self.assertTrue(MyEnum.Type2().__class__ is MyEnum.Type2)
+            self.assertTrue(MyEnum.Type3().__class__ is MyEnum.Type3)
+
+        def test_member_decorator(self):
+            from enum import member
+
+            with self.assertRaises(ValueError):
+                class MyEnum(EnumProperties, p('label')):
+
+                    @member
+                    class Type1:
+                        pass
+
+                    @member
+                    class Type2:
+                        pass
+
+                    @member
+                    class Type3:
+                        pass
+
+                    VALUE1 = Type1, 'label1'
+                    VALUE2 = Type2, 'label2'
+                    VALUE3 = Type3, 'label3'

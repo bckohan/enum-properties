@@ -261,15 +261,16 @@ Nested Classes
 
 .. note::
 
-    Nested classes behave normally on enums that inherit from
+    In python <3.13, nested classes behave normally on enums that inherit from
     :py:class:`~enum_properties.EnumProperties` and that specify at least one
-    property.
+    property. In python 3.13 this behavior will remain unchanged in
+    enum-properties and normal Enum_ classes will adopt it.
 
-On enums that inherit from Enum_ nested classes become enumeration values
-because types may be values and a quirk of Python makes it difficult to
-determine if a type on a class is declared as a nested class during __new__.
-For enums with properties we can distinguish declared classes because values
-must be tuples.
+On enums that inherit from Enum_ in python < 3.13 nested classes become
+enumeration values because types may be values and a quirk of Python makes it
+difficult to determine if a type on a class is declared as a nested class
+during __new__. For enums with properties we can distinguish declared classes
+because values must be tuples.
 
 Using :py:class:`~enum_properties.EnumProperties` this is possible:
 

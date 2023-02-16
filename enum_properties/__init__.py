@@ -320,6 +320,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                         len(class_dict._member_names) > before and
                         # base class lets nested classes through! see:
                         # https://github.com/bckohan/enum-properties/issues/29
+                        # todo remove below when minimum python >= 3.13
                         not isinstance(value, type)
                     ):
                         try:
@@ -354,9 +355,17 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     super().__setitem__(key, value)
 
                     if remove:
+                        # todo remove when minimum python >= 3.13
                         # base class lets nested classes through! see:
                         # https://github.com/bckohan/enum-properties/issues/29
-                        self._member_names.remove(key)
+                        if isinstance(
+                            self._member_names,
+                            list
+                        ):  # pragma: no cover
+                            self._member_names.remove(key)
+                        else:  # pragma: no cover
+                            # >= python 3.11
+                            del self._member_names[key]
                 else:
                     super().__setitem__(key, value)
 
