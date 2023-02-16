@@ -1,5 +1,7 @@
+import pickle
 from collections.abc import Hashable
 from enum import Enum, auto
+from io import BytesIO
 from unittest import TestCase
 
 from enum_properties import (
@@ -11,8 +13,6 @@ from enum_properties import (
     p,
     s,
 )
-from io import BytesIO
-import pickle
 
 
 class Unhashable:
@@ -1078,7 +1078,7 @@ class TestPickle(TestCase):
         return ipt is opt
 
     def test_pickle(self):
-        from enum_properties.tests.pickle_enums import PriorityEx, Color
+        from enum_properties.tests.pickle_enums import Color, PriorityEx
         self.assertTrue(self.do_pickle_test(PriorityEx.ONE))
         self.assertTrue(self.do_pickle_test(PriorityEx.TWO))
         self.assertTrue(self.do_pickle_test(PriorityEx.THREE))
@@ -1092,7 +1092,7 @@ class TestPickle(TestCase):
         self.assertTrue(self.do_pickle_test(Color.BLUE))
 
     def test_flag_pickle(self):
-        from enum_properties.tests.pickle_enums import Perm, IntPerm
+        from enum_properties.tests.pickle_enums import IntPerm, Perm
         self.assertTrue(self.do_pickle_test(Perm.R))
         self.assertTrue(self.do_pickle_test(Perm.W))
         self.assertTrue(self.do_pickle_test(Perm.X))
@@ -1113,6 +1113,49 @@ class TestNestedClassOnEnum(TestCase):
     Should be able to nest classes on Enumerations!
     """
 
+    def test_enum_can_be_types(self):
+
+        class Type1:
+            pass
+
+        class Type2:
+            pass
+
+        class Type3:
+            pass
+
+        class TestEnum(EnumProperties, s('label')):
+
+            VALUE1 = Type1, 'value1'
+            VALUE2 = Type2, 'value2'
+            VALUE3 = Type3, 'value3'
+
+        self.assertEqual(
+            [en for en in TestEnum],
+            [TestEnum.VALUE1, TestEnum.VALUE2, TestEnum.VALUE3]
+        )
+
+        self.assertEqual(
+            [en.label for en in TestEnum],
+            [
+                TestEnum.VALUE1.label,
+                TestEnum.VALUE2.label,
+                TestEnum.VALUE3.label
+            ]
+        )
+        self.assertEqual(
+            [en for en in TestEnum],
+            [TestEnum('value1'), TestEnum('value2'), TestEnum('value3')]
+        )
+        self.assertEqual(
+            [en for en in TestEnum],
+            [TestEnum(Type1), TestEnum(Type2), TestEnum(Type3)]
+        )
+        self.assertEqual(
+            [en.value for en in TestEnum],
+            [Type1, Type2, Type3]
+        )
+
     def test_nested_classes(self):
 
         class TestEnum(EnumProperties, s('label')):
@@ -1121,12 +1164,28 @@ class TestNestedClassOnEnum(TestCase):
             VALUE2 = auto(), 'value2'
             VALUE3 = auto(), 'value3'
 
+            def function(self):
+                return self.value
+
+            @classmethod
+            def default(cls):
+                return cls.VALUE1
+
+            @staticmethod
+            def static_property():
+                return 'static_prop'
+
             class NestedClass:
 
                 @property
                 def prop(self):
                     return 'nested'
 
+        self.assertEqual(TestEnum.VALUE1.function(), TestEnum.VALUE1.value)
+        self.assertEqual(TestEnum.VALUE2.function(), TestEnum.VALUE2.value)
+        self.assertEqual(TestEnum.VALUE3.function(), TestEnum.VALUE3.value)
+        self.assertEqual(TestEnum.default(), TestEnum.VALUE1)
+        self.assertEqual(TestEnum.static_property(), 'static_prop')
         self.assertEqual(TestEnum.NestedClass().prop, 'nested')
         self.assertEqual(
             [en for en in TestEnum],
@@ -1144,3 +1203,109 @@ class TestNestedClassOnEnum(TestCase):
             [en for en in TestEnum],
             [TestEnum('value1'), TestEnum('value2'), TestEnum('value3')]
         )
+
+    def test_nested_classes_as_values(self):
+
+        class TestEnum(EnumProperties, s('label')):
+
+            class Type1:
+                pass
+
+            class Type2:
+                pass
+
+            class Type3:
+                pass
+
+            VALUE1 = Type1, 'value1'
+            VALUE2 = Type2, 'value2'
+            VALUE3 = Type3, 'value3'
+
+        self.assertEqual(
+            [en for en in TestEnum],
+            [TestEnum.VALUE1, TestEnum.VALUE2, TestEnum.VALUE3]
+        )
+
+        self.assertEqual(
+            [en.label for en in TestEnum],
+            [
+                TestEnum.VALUE1.label,
+                TestEnum.VALUE2.label,
+                TestEnum.VALUE3.label
+            ]
+        )
+        self.assertEqual(
+            [en for en in TestEnum],
+            [TestEnum('value1'), TestEnum('value2'), TestEnum('value3')]
+        )
+        self.assertEqual(
+            [en for en in TestEnum],
+            [
+                TestEnum(TestEnum.Type1),
+                TestEnum(TestEnum.Type2),
+                TestEnum(TestEnum.Type3)
+            ]
+        )
+        self.assertEqual(
+            [en.value for en in TestEnum],
+            [TestEnum.Type1, TestEnum.Type2, TestEnum.Type3]
+        )
+
+    def test_nested_classes_as_values_no_props(self):
+
+        class TestEnum(EnumProperties):
+
+            class Type1:
+                pass
+
+            class Type2:
+                pass
+
+            class Type3:
+                pass
+
+            VALUE1 = Type1
+            VALUE2 = Type2
+            VALUE3 = Type3
+
+        self.assertEqual(
+            [en for en in TestEnum],
+            [TestEnum.VALUE1, TestEnum.VALUE2, TestEnum.VALUE3]
+        )
+        self.assertEqual(
+            [en for en in TestEnum],
+            [
+                TestEnum(TestEnum.Type1),
+                TestEnum(TestEnum.Type2),
+                TestEnum(TestEnum.Type3)
+            ]
+        )
+        self.assertEqual(
+            [en.value for en in TestEnum],
+            [TestEnum.Type1, TestEnum.Type2, TestEnum.Type3]
+        )
+
+    def test_example(self):
+
+        class MyEnum(EnumProperties, p('label')):
+            class Type1:
+                pass
+
+            class Type2:
+                pass
+
+            class Type3:
+                pass
+
+            VALUE1 = Type1, 'label1'
+            VALUE2 = Type2, 'label2'
+            VALUE3 = Type3, 'label3'
+
+        # nested classes are usable like normal
+        self.assertEqual(MyEnum.Type1, MyEnum.VALUE1.value)
+        self.assertEqual(MyEnum.Type2, MyEnum.VALUE2.value)
+        self.assertEqual(MyEnum.Type3, MyEnum.VALUE3.value)
+        self.assertEqual(len(MyEnum), 3)
+        self.assertTrue(MyEnum.Type1().__class__ is MyEnum.Type1)
+        self.assertTrue(MyEnum.Type2().__class__ is MyEnum.Type2)
+        self.assertTrue(MyEnum.Type3().__class__ is MyEnum.Type3)

@@ -254,3 +254,49 @@ values or symmetric values.
             metaclass=EnumPropertiesMeta
         ):
             ...
+
+
+Nested Classes
+--------------
+
+.. note::
+
+    Nested classes behave normally on enums that inherit from
+    :py:class:`~enum_properties.EnumProperties` and that specify at least one
+    property.
+
+On enums that inherit from Enum_ nested classes become enumeration values
+because types may be values and a quirk of Python makes it difficult to
+determine if a type on a class is declared as a nested class during __new__.
+For enums with properties we can distinguish declared classes because values
+must be tuples.
+
+Using :py:class:`~enum_properties.EnumProperties` this is possible:
+
+.. code-block:: python
+
+        class MyEnum(EnumProperties, p('label')):
+
+            class Type1:
+                pass
+
+            class Type2:
+                pass
+
+            class Type3:
+                pass
+
+            VALUE1 = Type1, 'label1'
+            VALUE2 = Type2, 'label2'
+            VALUE3 = Type3, 'label3'
+
+        # only the expected values become enumeration values
+        assert MyEnum.Type1 == MyEnum.VALUE1.value
+        assert MyEnum.Type2 == MyEnum.VALUE2.value
+        assert MyEnum.Type3 == MyEnum.VALUE3.value
+        assert len(MyEnum) == 3
+
+        # nested classes behave as expected
+        assert MyEnum.Type1().__class__ is MyEnum.Type1
+        assert MyEnum.Type2().__class__ is MyEnum.Type2
+        assert MyEnum.Type3().__class__ is MyEnum.Type3

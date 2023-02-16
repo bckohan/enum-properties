@@ -23,7 +23,6 @@ from collections.abc import (  # pylint: disable=E0611
     Hashable,
     Iterable,
 )
-from datetime import datetime
 
 try:
     from functools import cached_property
@@ -38,7 +37,7 @@ __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
 __author__ = 'Brian Kohan'
 __license__ = 'MIT'
-__copyright__ = f'Copyright 2022-{datetime.now().year} Brian Kohan'
+__copyright__ = 'Copyright 2022-2023 Brian Kohan'
 
 __all__ = [
     'VERSION',
@@ -316,7 +315,13 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     # ensures robust fidelity to Enum behavior.
                     before = len(class_dict._member_names)
                     class_dict[key] = value
-                    if len(class_dict._member_names) > before:
+                    remove = False
+                    if (
+                        len(class_dict._member_names) > before and
+                        # base class lets nested classes through! see:
+                        # https://github.com/bckohan/enum-properties/issues/29
+                        not isinstance(value, type)
+                    ):
                         try:
                             num_vals = len(value) - len(self._ep_properties_)
                             if (
@@ -342,7 +347,16 @@ class EnumPropertiesMeta(enum.EnumMeta):
                                 f'{key} must have {len(self._ep_properties_)} '
                                 f'property values.'
                             ) from type_err
+
+                    elif key in class_dict._member_names:
+                        remove = True
+
                     super().__setitem__(key, value)
+
+                    if remove:
+                        # base class lets nested classes through! see:
+                        # https://github.com/bckohan/enum-properties/issues/29
+                        self._member_names.remove(key)
                 else:
                     super().__setitem__(key, value)
 

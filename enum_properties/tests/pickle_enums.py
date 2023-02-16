@@ -1,11 +1,12 @@
+from enum import auto
+
 from enum_properties import (
     EnumProperties,
-    IntFlagProperties,
     FlagProperties,
+    IntFlagProperties,
+    p,
     s,
-    p
 )
-from enum import auto
 
 
 class IntPerm(

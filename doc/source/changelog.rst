@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v1.3.2
+======
+
+* Fixed `Nested classes are incompatible with EnumProperties. <https://github.com/bckohan/enum-properties/issues/29>`_
+
+
 v1.3.1
 ======
 
