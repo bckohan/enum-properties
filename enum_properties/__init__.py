@@ -23,6 +23,7 @@ from collections.abc import (  # pylint: disable=E0611
     Hashable,
     Iterable,
 )
+from datetime import datetime
 
 try:
     from functools import cached_property
@@ -31,13 +32,13 @@ except ImportError:  # pragma: no cover
     cached_property = property  # pylint: disable=C0103
 
 
-VERSION = (1, 3, 1)
+VERSION = (1, 3, 2)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
 __author__ = 'Brian Kohan'
 __license__ = 'MIT'
-__copyright__ = 'Copyright 2022 Brian Kohan'
+__copyright__ = f'Copyright 2022-{datetime.now().year} Brian Kohan'
 
 __all__ = [
     'VERSION',

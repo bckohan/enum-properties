@@ -1106,3 +1106,41 @@ class TestPickle(TestCase):
         self.assertTrue(self.do_pickle_test(IntPerm.RWX))
         self.assertTrue(self.do_pickle_test(IntPerm.R | IntPerm.W | IntPerm.X))
         self.assertTrue(self.do_pickle_test(IntPerm.W | IntPerm.X))
+
+
+class TestNestedClassOnEnum(TestCase):
+    """
+    Should be able to nest classes on Enumerations!
+    """
+
+    def test_nested_classes(self):
+
+        class TestEnum(EnumProperties, s('label')):
+
+            VALUE1 = auto(), 'value1'
+            VALUE2 = auto(), 'value2'
+            VALUE3 = auto(), 'value3'
+
+            class NestedClass:
+
+                @property
+                def prop(self):
+                    return 'nested'
+
+        self.assertEqual(TestEnum.NestedClass().prop, 'nested')
+        self.assertEqual(
+            [en for en in TestEnum],
+            [TestEnum.VALUE1, TestEnum.VALUE2, TestEnum.VALUE3]
+        )
+        self.assertEqual(
+            [en.label for en in TestEnum],
+            [
+                TestEnum.VALUE1.label,
+                TestEnum.VALUE2.label,
+                TestEnum.VALUE3.label
+            ]
+        )
+        self.assertEqual(
+            [en for en in TestEnum],
+            [TestEnum('value1'), TestEnum('value2'), TestEnum('value3')]
+        )
