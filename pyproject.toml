@@ -48,7 +48,7 @@ deepdiff = "^5.2.3"
 safety = "^2.0.0"
 readme-renderer = "^37.1"
 pygount = "^1.2.4"
-coverage = "^6.2"
+coverage = ">=6.2,<8.0"
 importlib-metadata = [
     { version = "<5.0", markers = "python_version <= '3.7'" },
     { version = ">=5.0", markers = "python_version > '3.7'" },
