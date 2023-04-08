@@ -14,6 +14,15 @@ from enum_properties import (
     p,
     s,
 )
+import enum
+
+
+def transparent(func):
+    return func  # pragma: no cover
+
+
+nonmember, member = (enum.nonmember, enum.member)\
+    if sys.version_info >= (3, 11) else (transparent, transparent)
 
 
 class Unhashable:
@@ -1176,6 +1185,7 @@ class TestNestedClassOnEnum(TestCase):
             def static_property():
                 return 'static_prop'
 
+            @nonmember
             class NestedClass:
 
                 @property
@@ -1209,18 +1219,21 @@ class TestNestedClassOnEnum(TestCase):
 
         class TestEnum(EnumProperties, s('label')):
 
+            @nonmember
             class Type1:
                 pass
 
+            @nonmember
             class Type2:
                 pass
 
+            @nonmember
             class Type3:
                 pass
 
-            VALUE1 = Type1, 'value1'
-            VALUE2 = Type2, 'value2'
-            VALUE3 = Type3, 'value3'
+            VALUE1 = member(Type1), 'value1'
+            VALUE2 = member(Type2), 'value2'
+            VALUE3 = member(Type3), 'value3'
 
         self.assertEqual(
             [en for en in TestEnum],
@@ -1256,18 +1269,21 @@ class TestNestedClassOnEnum(TestCase):
 
         class TestEnum(EnumProperties):
 
+            @nonmember
             class Type1:
                 pass
 
+            @nonmember
             class Type2:
                 pass
 
+            @nonmember
             class Type3:
                 pass
 
-            VALUE1 = Type1
-            VALUE2 = Type2
-            VALUE3 = Type3
+            VALUE1 = member(Type1)
+            VALUE2 = member(Type2)
+            VALUE3 = member(Type3)
 
         self.assertEqual(
             [en for en in TestEnum],
@@ -1290,18 +1306,21 @@ class TestNestedClassOnEnum(TestCase):
 
         class MyEnum(EnumProperties, p('label')):
 
+            @nonmember
             class Type1:
                 pass
 
+            @nonmember
             class Type2:
                 pass
 
+            @nonmember
             class Type3:
                 pass
 
-            VALUE1 = Type1, 'label1'
-            VALUE2 = Type2, 'label2'
-            VALUE3 = Type3, 'label3'
+            VALUE1 = member(Type1), 'label1'
+            VALUE2 = member(Type2), 'label2'
+            VALUE3 = member(Type3), 'label3'
 
         # nested classes are usable like normal
         self.assertEqual(MyEnum.Type1, MyEnum.VALUE1.value)
@@ -1314,7 +1333,6 @@ class TestNestedClassOnEnum(TestCase):
 
     if sys.version_info >= (3, 11):  # pragma: no cover
         def test_nonmember_decorator(self):
-            from enum import nonmember
 
             class MyEnum(EnumProperties, p('label')):
 
@@ -1330,9 +1348,9 @@ class TestNestedClassOnEnum(TestCase):
                 class Type3:
                     pass
 
-                VALUE1 = Type1, 'label1'
-                VALUE2 = Type2, 'label2'
-                VALUE3 = Type3, 'label3'
+                VALUE1 = member(Type1), 'label1'
+                VALUE2 = member(Type2), 'label2'
+                VALUE3 = member(Type3), 'label3'
                 VALUE4 = nonmember((Type3, 'label4'))
 
             # nested classes are usable like normal
@@ -1346,7 +1364,6 @@ class TestNestedClassOnEnum(TestCase):
             self.assertTrue(MyEnum.Type3().__class__ is MyEnum.Type3)
 
         def test_member_decorator(self):
-            from enum import member
 
             with self.assertRaises(ValueError):
                 class MyEnum(EnumProperties, p('label')):
@@ -1366,3 +1383,29 @@ class TestNestedClassOnEnum(TestCase):
                     VALUE1 = Type1, 'label1'
                     VALUE2 = Type2, 'label2'
                     VALUE3 = Type3, 'label3'
+
+    def test_3_13_member_compat(self):
+        class MyEnum(EnumProperties):
+            @member  # this is transparent on < 3.11
+            class Type1:
+                pass
+
+            @member  # this is transparent on < 3.11
+            class Type2:
+                pass
+
+            @member  # this is transparent on < 3.11
+            class Type3:
+                pass
+
+            VALUE1 = Type1, 'label1'
+            VALUE2 = Type2, 'label2'
+            VALUE3 = Type3, 'label3'
+
+        self.assertEqual(MyEnum.Type1.value, MyEnum.VALUE1.value[0])
+        self.assertEqual(MyEnum.Type2.value, MyEnum.VALUE2.value[0])
+        self.assertEqual(MyEnum.Type3.value, MyEnum.VALUE3.value[0])
+        self.assertEqual(len(MyEnum), 6)
+        self.assertTrue(MyEnum.Type1.value().__class__ is MyEnum.Type1.value)
+        self.assertTrue(MyEnum.Type2.value().__class__ is MyEnum.Type2.value)
+        self.assertTrue(MyEnum.Type3.value().__class__ is MyEnum.Type3.value)

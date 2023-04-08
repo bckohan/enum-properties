@@ -350,7 +350,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                             ) from type_err
 
                     elif key in class_dict._member_names:
-                        remove = True
+                        remove = True  # pragma: no cover
 
                     super().__setitem__(key, value)
 
