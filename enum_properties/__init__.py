@@ -7,8 +7,8 @@ r"""
                                    /_/
 *******************************************************************************
 
-Metaprogramming and mixin tools that implement property tuple support for
-python enumeration classes.
+Metaprogramming and mixin tools that implement property tuple and method
+specialization support for python enumeration classes.
 
 .. todo::
     Given how dynamic the typing is in this module, static type checking is

@@ -1210,6 +1210,30 @@ class TestFlags(TestCase):
             self.assertEqual(Color.BLUE | Color.NEON, Color(['blue', 'neon']))
 
 
+    if sys.version_info >= (3, 11):  # pragma: no cover
+        def test_enum_property(self):
+            from enum import property as enum_property
+
+            class Color(EnumProperties, s('label')):
+                RED = 1, 'red'
+                GREEN = 2, 'green'
+                BLUE = 3, 'blue'
+
+                @enum_property
+                def blue(self):
+                    return 'whatever'
+
+                # the below behavior is undefined, we list it here just to
+                # notice if it changes or starts throwing errors - might should
+                # consider throwing an error
+                @enum_property
+                def label(self):
+                    return 'label'
+
+            self.assertEqual(Color.BLUE.blue, 'whatever')
+            self.assertEqual(Color.blue, Color.BLUE)
+
+
 class TestPickle(TestCase):
 
     def do_pickle_test(self, ipt):
