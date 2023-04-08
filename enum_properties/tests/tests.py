@@ -1077,6 +1077,66 @@ class TestFlags(TestCase):
             []
         )
 
+    if sys.version_info >= (3, 11):  # pragma: no cover
+        def test_flag_boundary_enum(self):
+            """
+            Test the boundary functionality introduced in 3.11
+            """
+            from enum import STRICT, CONFORM, EJECT, KEEP
+
+            class StrictFlag(IntFlagProperties, p('label'), boundary=STRICT):
+                RED = auto(), 'red'
+                GREEN = auto(), 'green'
+                BLUE = auto(), 'blue'
+
+            with self.assertRaises(ValueError):
+                StrictFlag(2 ** 2 + 2 ** 4)
+
+            self.assertEqual(StrictFlag.BLUE.label, 'blue')
+            self.assertEqual(StrictFlag.RED.label, 'red')
+            self.assertEqual(StrictFlag.GREEN.label, 'green')
+            self.assertEqual((StrictFlag.BLUE | StrictFlag.RED).label, None)
+
+            class ConformFlag(FlagProperties, s('label'), boundary=CONFORM):
+                RED = auto(), 'red'
+                GREEN = auto(), 'green'
+                BLUE = auto(), 'blue'
+
+            self.assertEqual(ConformFlag.BLUE, ConformFlag(2 ** 2 + 2 ** 4))
+            self.assertEqual(ConformFlag(2 ** 2 + 2 ** 4).label, 'blue')
+            self.assertEqual(
+                ConformFlag(2 ** 2 + 2 ** 4).label,
+                ConformFlag('blue')
+            )
+
+            class EjectFlag(IntFlagProperties, s('label'), boundary=EJECT):
+                RED = auto(), 'red'
+                GREEN = auto(), 'green'
+                BLUE = auto(), 'blue'
+
+            self.assertEqual(EjectFlag(2 ** 2 + 2 ** 4), 20)
+            self.assertFalse(hasattr(EjectFlag(2 ** 2 + 2 ** 4), 'label'))
+            self.assertEqual(EjectFlag.GREEN, EjectFlag('green'))
+            self.assertEqual(
+                (EjectFlag.GREEN | EjectFlag.BLUE),
+                EjectFlag(['blue', 'green'])
+            )
+
+            class KeepFlag(
+                FlagProperties, s('label'),  p('hex'), boundary=KEEP
+            ):
+                RED = auto(), 'red', 0xFF0000
+                GREEN = auto(), 'green', 0x00FF00
+                BLUE = auto(), 'blue', 0x0000FF
+
+            self.assertEqual(KeepFlag(2**2 + 2**4).value, 20)
+            self.assertTrue(KeepFlag.BLUE in KeepFlag(2**2 + 2**4))
+            self.assertEqual(KeepFlag(2**2 + 2**4).label, None)
+            self.assertEqual(
+                [flg.label for flg in KeepFlag(2**2 + 2**4)],
+                ['blue']
+            )
+
 
 class TestPickle(TestCase):
 

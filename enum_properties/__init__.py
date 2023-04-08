@@ -31,7 +31,7 @@ except ImportError:  # pragma: no cover
     cached_property = property  # pylint: disable=C0103
 
 
-VERSION = (1, 3, 3)
+VERSION = (1, 4, 0)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -256,7 +256,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
     ]
 
     @classmethod
-    def __prepare__(mcs, cls, bases):  # pylint: disable=W0221
+    def __prepare__(mcs, cls, bases, **kwargs):  # pylint: disable=W0221
         """
         Strip properties out of inheritance and record them on our class
         dictionary for per-value based assignment in ``__new__``.
@@ -282,7 +282,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             else:
                 real_bases.append(base)
 
-        class_dict = super().__prepare__(cls, tuple(real_bases))
+        class_dict = super().__prepare__(cls, tuple(real_bases), **kwargs)
 
         class _PropertyEnumDict(class_dict.__class__):
             """
@@ -375,7 +375,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
             mcs,
             classname,
             bases,
-            classdict
+            classdict,
+            **kwargs
     ):
         """
         Enumeration class construction runs in the following stages:
@@ -394,7 +395,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
             mcs,
             classname,
             tuple(base for base in bases if not issubclass(base, _Prop)),
-            classdict
+            classdict,
+            **kwargs
         )
         cls._ep_coerce_types_ = []
         cls._ep_symmetric_map_ = cls._member_map_

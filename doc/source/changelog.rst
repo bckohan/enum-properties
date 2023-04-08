@@ -2,6 +2,14 @@
 Change Log
 ==========
 
+v1.4.0
+======
+
+* Implemented `Provide a decorator to provide function overrides per enum value. <https://github.com/bckohan/enum-properties/issues/36>`_
+* Fixed `Address python 3.11+ deprecation warnings. <https://github.com/bckohan/enum-properties/issues/38>`_
+* Fixed `New flag behavior modifiers break IntFlagProperties in python 3.11+ <https://github.com/bckohan/enum-properties/issues/38>`_
+
+
 v1.3.3
 ======
 
