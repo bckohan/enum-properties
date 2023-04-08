@@ -204,6 +204,81 @@ insensitive we might:
     Color('red') == Color.RED
 
 
+Specializing Member Functions
+-----------------------------
+
+Provide specialized implementations of member functions using the specialize
+decorator. For example:
+
+.. code-block:: python
+
+        class SpecializedEnum(EnumProperties):
+
+            ONE   = 1
+            TWO   = 2
+            THREE = 3
+
+            @specialize(ONE)
+            def method(self):
+                return 'method_one()'
+
+            @specialize(TWO)
+            def method(self):
+                return 'method_two()'
+
+            @specialize(THREE)
+            def method(self):
+                return 'method_three()'
+
+        assert SpecializedEnum.ONE.method() == 'method_one()'
+        assert SpecializedEnum.TWO.method() == 'method_two()'
+        assert SpecializedEnum.THREE.method() == 'method_three()'
+
+The @specialize decorator works on @classmethods and @staticmethods as well,
+but it must be the outermost decorator.
+
+The undecorated method will apply to all members that lack a specialization:
+
+.. code-block:: python
+
+    class SpecializedEnum(EnumProperties):
+
+        ONE   = 1
+        TWO   = 2
+        THREE = 3
+
+        def method(self):
+            return 'generic()'
+
+        @specialize(THREE)
+        def method(self):
+            return 'method_three()'
+
+    assert SpecializedEnum.ONE.method() == 'generic()'
+    assert SpecializedEnum.TWO.method() == 'generic()'
+    assert SpecializedEnum.THREE.method() == 'method_three()'
+
+
+If no undecorated method or specialization for a value is found that value will
+lack the method.
+
+.. code-block:: python
+
+    class SpecializedEnum(EnumProperties):
+
+        ONE   = 1
+        TWO   = 2
+        THREE = 3
+
+        @specialize(THREE)
+        def method(self):
+            return 'method_three()'
+
+    assert not hasattr(SpecializedEnum.ONE, 'method')
+    assert not hasattr(SpecializedEnum.TWO, 'method')
+    assert SpecializedEnum.THREE.method() == 'method_three()'
+
+
 Flags
 -----
 

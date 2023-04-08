@@ -48,6 +48,7 @@ __all__ = [
     'EnumPropertiesMeta',
     'SymmetricMixin',
     'DecomposeMixin',
+    'specialize',
     'p',
     's'
 ]
@@ -106,6 +107,33 @@ def p(prop_name):  # pylint: disable=C0103
     :return: a named property class
     """
     return type(prop_name, (_Prop,), {'symmetric': False})
+
+
+class _Specialized:  # pylint: disable=R0903
+    """
+    A member specialization identifier class - private. Used to wrap
+    specialized member functions and tag them with their enum values so the
+    Enum classdict can identify them.
+
+    :param wrapped: The wrapped member function
+    :param value: The value to specialize for
+    """
+    def __init__(self, wrapped, value):
+        self.wrapped = wrapped
+        self.value = value
+
+
+def specialize(value):
+    """
+    A decorator to specialize a method for a given enumeration value.
+
+    :param value: The enumeration value to specialize
+    :return: A decorated specialized member method
+    """
+    def specialize_decorator(method):
+        return _Specialized(method, value)
+
+    return specialize_decorator
 
 
 class SymmetricMixin:  # pylint: disable=R0903
@@ -256,7 +284,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
     ]
 
     @classmethod
-    def __prepare__(mcs, cls, bases, **kwargs):  # pylint: disable=W0221
+    def __prepare__(mcs, cls, bases, **kwargs):  # pylint: disable=W0221,R0915
         """
         Strip properties out of inheritance and record them on our class
         dictionary for per-value based assignment in ``__new__``.
@@ -295,6 +323,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
 
             _ep_properties_ = properties
             _ep_symmetric_properties = symmetric_properties
+            _specialized_ = {}
 
             def __init__(self):
                 super().__init__()
@@ -304,7 +333,9 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     self[item] = value
 
             def __setitem__(self, key, value):
-                if key in EnumPropertiesMeta.EXPECTED:
+                if isinstance(value, _Specialized):
+                    self._specialized_.setdefault(value.value, {})[key] = value
+                elif key in EnumPropertiesMeta.EXPECTED:
                     dict.__setitem__(self, key, value)
                 elif key in EnumPropertiesMeta.RESERVED:
                     raise ValueError(f'{key} is reserved.')
@@ -382,10 +413,11 @@ class EnumPropertiesMeta(enum.EnumMeta):
         Enumeration class construction runs in the following stages:
 
         1) pass up the inheritance tree to build the initial enumeration class.
-        2) Add property value to enumeration value maps for each property and
+        2) Add method specializations to each class
+        3) Add property value to enumeration value maps for each property and
             the property accessors that use them
-        3) Add casefolded symmetric maps for any symmetric properties
-        4) Add any symmetric builtin properties to our symmetric maps
+        4) Add casefolded symmetric maps for any symmetric properties
+        5) Add any symmetric builtin properties to our symmetric maps
 
         :raises ValueError: if ``_symmetric_builtins_`` is specified
             incorrectly, or if non-hashable values are provided for a
@@ -402,6 +434,17 @@ class EnumPropertiesMeta(enum.EnumMeta):
         cls._ep_symmetric_map_ = cls._member_map_
         cls._ep_isymmetric_map_ = {}
         cls.enum_properties = list(classdict._ep_properties_.keys())
+
+        for val in cls:
+            for member_name, specialization in classdict._specialized_.get(
+                    val.value, {}
+            ).items():
+                # use descriptor binding
+                setattr(
+                    val,
+                    member_name,
+                    specialization.wrapped.__get__(val)
+                )
 
         def add_sym_lookup(prop, p_val, enum_inst):
             if not isinstance(p_val, Hashable):

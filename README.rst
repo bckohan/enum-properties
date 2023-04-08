@@ -84,6 +84,36 @@ s() values:
 
     Color.RED.hex == 'ff0000'
 
+
+Member functions may also be specialized to each enumeration value, using the
+@specialize decorator.
+
+.. code:: python
+
+    from enum_properties import EnumProperties, specialize
+
+    class SpecializedEnum(EnumProperties):
+
+        ONE   = 1
+        TWO   = 2
+        THREE = 3
+
+        @specialize(ONE)
+        def method(self):
+            return 'method_one()'
+
+        @specialize(TWO)
+        def method(self):
+            return 'method_two()'
+
+        @specialize(THREE)
+        def method(self):
+            return 'method_three()'
+
+    SpecializedEnum.ONE.method() == 'method_one()'
+    SpecializedEnum.TWO.method() == 'method_two()'
+    SpecializedEnum.THREE.method() == 'method_three()'
+
 Please report bugs and discuss features on the
 `issues page <https://github.com/bckohan/enum-properties/issues>`_.
 
