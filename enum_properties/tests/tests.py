@@ -1,3 +1,4 @@
+import enum
 import pickle
 import sys
 from collections.abc import Hashable
@@ -14,7 +15,6 @@ from enum_properties import (
     p,
     s,
 )
-import enum
 
 
 def transparent(func):
@@ -1082,7 +1082,7 @@ class TestFlags(TestCase):
             """
             Test the boundary functionality introduced in 3.11
             """
-            from enum import STRICT, CONFORM, EJECT, KEEP
+            from enum import CONFORM, EJECT, KEEP, STRICT
 
             class StrictFlag(IntFlagProperties, p('label'), boundary=STRICT):
                 RED = auto(), 'red'

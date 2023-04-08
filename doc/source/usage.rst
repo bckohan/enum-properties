@@ -241,7 +241,7 @@ values or symmetric values.
 
 .. note::
 
-    Iterable behavior on flags is added using the
+    Iterable instantiation on flags is added using the
     :py:class:`~enum_properties.DecomposeMixin`. To create a flag enumeration
     without the iterable extensions we can simply declare it manually without
     the mixin:
@@ -254,6 +254,28 @@ values or symmetric values.
             metaclass=EnumPropertiesMeta
         ):
             ...
+
+As of Python 3.11 `boundary values <https://docs.python.org/3/library/enum.html#enum.FlagBoundary>`_
+are supported on flags. Boundary specifiers must be supplied as named arguments
+after the properties:
+
+.. code-block:: python
+
+    from enum_properties import IntFlagProperties, s
+    from enum import STRICT
+
+        class Perm(
+            IntFlagProperties,
+            s('label', case_fold=True),
+            boundary=STRICT
+        ):
+
+            R = 1, 'read'
+            W = 2, 'write'
+            X = 4, 'execute'
+            RWX = 7, 'all'
+
+    Perm(8)  # raises ValueError
 
 
 Nested Classes
