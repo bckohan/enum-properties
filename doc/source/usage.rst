@@ -123,6 +123,24 @@ enumeration from it and perform equality comparisons:
     Color.RED == '0xFF0000'
 
 
+.. warning::
+
+    Using symmetric properties with @verify(UNIQUE) will raise an error:
+
+    .. code:: python
+
+        from enum_properties import EnumProperties, s
+        from enum import verify, UNIQUE
+
+        @verify(UNIQUE)
+        class Color(EnumProperties, s('label')):
+            RED = 1, 'red'
+            GREEN = 2, 'green'
+            BLUE = 3, 'blue'
+
+        # ValueError: aliases found in <enum 'Color'>: blue -> BLUE,
+        # green -> GREEN, red -> RED
+
 Conflicts and Precedence
 ########################
 

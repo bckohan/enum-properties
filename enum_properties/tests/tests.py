@@ -994,6 +994,11 @@ class TestFlags(TestCase):
         self.assertEqual(Perm({}), Perm(0))
         self.assertEqual(Perm((item for item in [])), Perm(0))
 
+        if sys.version_info >= (3, 11):  # pragma: no cover
+            from enum import show_flag_values
+            self.assertEqual(show_flag_values(Perm.R | Perm.X), [1, 4])
+            self.assertEqual(show_flag_values(Perm.RWX), [1, 2, 4])
+
     def test_flag(self):
 
         class Perm(
@@ -1136,6 +1141,73 @@ class TestFlags(TestCase):
                 [flg.label for flg in KeepFlag(2**2 + 2**4)],
                 ['blue']
             )
+
+    if sys.version_info >= (3, 11):  # pragma: no cover
+        def test_enum_verify(self):
+            from enum import verify, UNIQUE, CONTINUOUS, NAMED_FLAGS
+
+            with self.assertRaises(ValueError):
+
+                @verify(UNIQUE)
+                class Color(EnumProperties, s('label')):
+                    RED = 1, 'red'
+                    GREEN = 2, 'green'
+                    BLUE = 3, 'blue'
+                    CRIMSON = 1, 'crimson'
+
+            @verify(UNIQUE)
+            class Color(EnumProperties, p('label')):
+                RED = 1, 'red'
+                GREEN = 2, 'green'
+                BLUE = 3, 'blue'
+                CRIMSON = 4, 'crimson'
+
+            self.assertEqual(Color.GREEN.label, 'green')
+            self.assertEqual(Color.CRIMSON.label, 'crimson')
+
+            with self.assertRaises(ValueError):
+                # this throws an error if label is symmetric!
+                @verify(UNIQUE)
+                class Color(EnumProperties, s('label')):
+                    RED = 1, 'red'
+                    GREEN = 2, 'green'
+                    BLUE = 3, 'blue'
+                    CRIMSON = 4, 'crimson'
+
+            with self.assertRaises(ValueError):
+                @verify(CONTINUOUS)
+                class Color(IntEnumProperties, s('label')):
+                    RED = 1, 'red'
+                    GREEN = 2, 'green'
+                    BLUE = 5, 'blue'
+
+            @verify(CONTINUOUS)
+            class Color(IntEnumProperties, s('label')):
+                RED = 1, 'red'
+                GREEN = 2, 'green'
+                BLUE = 3, 'blue'
+
+            self.assertEqual(Color.BLUE.label, 'blue')
+            self.assertEqual(Color.RED, Color('red'))
+
+            with self.assertRaises(ValueError):
+                @verify(NAMED_FLAGS)
+                class Color(IntFlagProperties, s('label')):
+                    RED = 1, 'red'
+                    GREEN = 2, 'green'
+                    BLUE = 4, 'blue'
+                    WHITE = 15, 'white'
+                    NEON = 31, 'neon'
+
+            @verify(NAMED_FLAGS)
+            class Color(IntFlagProperties, s('label')):
+                RED = 1, 'red'
+                GREEN = 2, 'green'
+                BLUE = 4, 'blue'
+                WHITE = 16, 'white'
+                NEON = 32, 'neon'
+
+            self.assertEqual(Color.BLUE | Color.NEON, Color(['blue', 'neon']))
 
 
 class TestPickle(TestCase):
