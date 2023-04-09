@@ -277,7 +277,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
 
     # members reserved for use by EnumProperties
     RESERVED = [
-        'enum_properties',
+        '_properties_',
         '_ep_coerce_types_',
         '_ep_symmetric_map_',
         '_ep_isymmetric_map_'
@@ -433,7 +433,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
         cls._ep_coerce_types_ = []
         cls._ep_symmetric_map_ = cls._member_map_
         cls._ep_isymmetric_map_ = {}
-        cls.enum_properties = list(classdict._ep_properties_.keys())
+        cls._properties_ = list(classdict._ep_properties_.keys())
 
         for val in cls:
             for member_name, specialization in classdict._specialized_.get(
@@ -478,7 +478,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
 
         # we reverse to maintain precedence order for symmetric lookups
         for prop in reversed([
-            prop for prop in cls.enum_properties if prop.symmetric
+            prop for prop in cls._properties_ if prop.symmetric
         ]):
             for idx, val in enumerate(
                 reversed(classdict._ep_properties_[prop])

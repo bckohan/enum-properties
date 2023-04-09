@@ -205,12 +205,12 @@ class TestEnums(TestCase):
             BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
 
         self.assertEqual(
-            [prop for prop in Color.enum_properties if prop.symmetric],
+            [prop for prop in Color._properties_ if prop.symmetric],
             ['rgb', 'hex']
         )
 
         self.assertEqual(
-            Color.enum_properties,
+            Color._properties_,
             ['spanish', 'rgb', 'hex']
         )
 
@@ -809,13 +809,13 @@ class TestEnums(TestCase):
         """ enum_properties is reserved - test that we get an exception """
 
         with self.assertRaises(ValueError):
-            class PropConflict(EnumProperties, p('enum_properties')):
+            class PropConflict(EnumProperties, p('_properties_')):
                 ONE = auto(), (1, 2, 3)  # pragma: no cover
                 TWO = auto(), (3, 4, 5)  # pragma: no cover
 
         with self.assertRaises(ValueError):
             class PropConflict(EnumProperties, p('prop')):
-                enum_properties = None
+                _properties_ = None
 
                 ONE = auto(), (1, 2, 3)  # pragma: no cover
                 TWO = auto(), (3, 4, 5)  # pragma: no cover
