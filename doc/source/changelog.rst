@@ -5,6 +5,21 @@ Change Log
 v1.4.0
 ======
 
+There are some breaking changes in the 1.4.0 release:
+
+* The `enum_properties` attribute that lists property names has been changed to
+  the sunder name `_properties_`.
+
+* Properties on combinations of flag enumerations that are not specified in
+  the members list instead of being None, no longer exist. Accessing them will
+  result in an AttributeError.
+
+The 1.4.0 release includes some significant performance improvements. Property
+access speed has been improved by over 5x and the memory footprint has
+been reduced by about 1/3.
+
+* Fixed `All utility members added by EnumProperties should be sunder names. <https://github.com/bckohan/enum-properties/issues/41>`_
+* Fixed `auto() broken for flag enums that declare combinations as members of the enum. <https://github.com/bckohan/enum-properties/issues/40>`_
 * Implemented `Performance improvements <https://github.com/bckohan/enum-properties/issues/39>`_
 * Implemented `Provide a decorator to provide function overrides per enum value. <https://github.com/bckohan/enum-properties/issues/36>`_
 * Fixed `Address python 3.11+ deprecation warnings. <https://github.com/bckohan/enum-properties/issues/38>`_
