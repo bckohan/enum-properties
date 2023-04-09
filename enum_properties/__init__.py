@@ -467,21 +467,14 @@ class EnumPropertiesMeta(enum.EnumMeta):
         for val in cls:
             add_coerce_type(type(val.value))
 
-        for prop in cls.enum_properties:
-            values = classdict._ep_properties_[prop]
-            setattr(
-                cls,
-                f'_value2{prop}_map_',
-                dict(zip(cls._value2member_map_, values))
-            )
-            setattr(
-                cls,
-                prop,
-                property(
-                    lambda self, prop=prop:
-                    getattr(cls, f'_value2{prop}_map_').get(self.value)
+        # set properties onto the members
+        for idx, member in enumerate(cls.__members__.values()):
+            for prop, values in classdict._ep_properties_.items():
+                setattr(
+                    member,
+                    prop,
+                    values[idx]
                 )
-            )
 
         # we reverse to maintain precedence order for symmetric lookups
         for prop in reversed([
@@ -625,6 +618,19 @@ class FlagProperties(
     A Flag that supports properties
     """
 
+    def _generate_next_value_(name, start, count, last_values):
+        """
+        Intermixed property tuples can corrupt the last_values list with
+        tuples. This method ensures only ints are present in last_values and
+        delegates to the super class.
+        """
+        return enum.Flag._generate_next_value_(
+            name,
+            start,
+            count,
+            [val[0] if isinstance(val, tuple) else val for val in last_values]
+        )
+
 
 class IntFlagProperties(
     DecomposeMixin,
@@ -635,3 +641,16 @@ class IntFlagProperties(
     """
     An IntFlag that supports properties.
     """
+
+    def _generate_next_value_(name, start, count, last_values):
+        """
+        Intermixed property tuples can corrupt the last_values list with
+        tuples. This method ensures only ints are present in last_values and
+        delegates to the super class.
+        """
+        return enum.IntFlag._generate_next_value_(
+            name,
+            start,
+            count,
+            [val[0] if isinstance(val, tuple) else val for val in last_values]
+        )

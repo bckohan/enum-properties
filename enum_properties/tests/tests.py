@@ -974,12 +974,12 @@ class TestFlags(TestCase):
             'all'
         )
 
-        self.assertIsNone((Perm.R | Perm.W).label)
-        self.assertIsNone((Perm.W | Perm.X).label)
-        self.assertIsNone((Perm.R | Perm.X).label)
+        self.assertFalse(hasattr((Perm.R | Perm.W), 'label'))
+        self.assertFalse(hasattr((Perm.W | Perm.X), 'label'))
+        self.assertFalse(hasattr((Perm.R | Perm.X), 'label'))
 
         self.assertFalse(bool(Perm.R & Perm.X))
-        self.assertIsNone((Perm.R & Perm.X).label)
+        self.assertFalse(hasattr((Perm.R & Perm.X), 'label'))
 
         self.assertCountEqual((Perm.R | Perm.W).flagged, [Perm.R, Perm.W])
         self.assertCountEqual(Perm.RWX.flagged, [Perm.R, Perm.W, Perm.X])
@@ -1016,9 +1016,11 @@ class TestFlags(TestCase):
             def custom_prop(self):
                 return self.label.upper()
 
+
         self.assertEqual(Perm.R.label, 'read')
         self.assertEqual(Perm.W.label, 'write')
         self.assertEqual(Perm.X.label, 'execute')
+
         self.assertEqual(Perm.RWX.label, 'all')
 
         self.assertTrue(Perm.R is Perm('read'))
@@ -1042,12 +1044,12 @@ class TestFlags(TestCase):
             'all'
         )
 
-        self.assertIsNone((Perm.R | Perm.W).label)
-        self.assertIsNone((Perm.W | Perm.X).label)
-        self.assertIsNone((Perm.R | Perm.X).label)
+        self.assertFalse(hasattr((Perm.R | Perm.W), 'label'))
+        self.assertFalse(hasattr((Perm.W | Perm.X), 'label'))
+        self.assertFalse(hasattr((Perm.R | Perm.X), 'label'))
 
         self.assertFalse(bool(Perm.R & Perm.X))
-        self.assertIsNone((Perm.R & Perm.X).label)
+        self.assertFalse(hasattr((Perm.R & Perm.X), 'label'))
 
         self.assertCountEqual((Perm.R | Perm.W).flagged, [Perm.R, Perm.W])
         self.assertCountEqual(Perm.RWX.flagged, [Perm.R, Perm.W, Perm.X])
@@ -1083,6 +1085,108 @@ class TestFlags(TestCase):
             []
         )
 
+    def test_flag_def_order(self):
+
+        from enum import IntFlag
+
+        class PermNative(IntFlag):
+
+            R = auto()
+            W = auto()
+            RW = R | W
+            X = auto()
+            RWX = R | W | X
+
+        self.assertEqual(PermNative.R.value, 1)
+        self.assertEqual(PermNative.W.value, 2)
+        self.assertEqual(PermNative.RW.value, 3)
+        self.assertEqual(PermNative.X.value, 4)
+        self.assertEqual(PermNative.RWX.value, 7)
+
+        class PermProperties(FlagProperties, s('label', case_fold=True)):
+
+            R = auto(), 'read'
+            W = auto(), 'write'
+            RW = R | W, 'read/write'
+            X = auto(), 'execute'
+            RWX = R | W | X, 'all'
+
+        self.assertEqual(PermProperties.R.value, 1)
+        self.assertEqual(PermProperties.W.value, 2)
+        self.assertEqual(PermProperties.RW.value, 3)
+        self.assertEqual(PermProperties.X.value, 4)
+        self.assertEqual(PermProperties.RWX.value, 7)
+
+        self.assertEqual(
+            (PermProperties.R | PermProperties.W).label,
+            'read/write'
+        )
+        self.assertFalse(
+            hasattr((PermProperties.W | PermProperties.X), 'label')
+        )
+        self.assertFalse(
+            hasattr((PermProperties.R | PermProperties.X), 'label')
+        )
+        self.assertEqual(
+            (PermProperties.R | PermProperties.W | PermProperties.X).label,
+            'all'
+        )
+        self.assertEqual(PermProperties.R.label, 'read')
+        self.assertEqual(PermProperties.W.label, 'write')
+
+        self.assertEqual(PermProperties.RW, PermProperties('read/write'))
+        self.assertEqual(PermProperties.RW, PermProperties(['read', 'write']))
+        self.assertEqual(
+            (PermProperties.W | PermProperties.X),
+            PermProperties(['write', 'execute'])
+        )
+        self.assertEqual(PermProperties.R, PermProperties('read'))
+        self.assertEqual(PermProperties.W, PermProperties('write'))
+        self.assertEqual(PermProperties.X, PermProperties('execute'))
+        self.assertEqual(PermProperties.RWX, PermProperties('all'))
+
+        class IntPermProperties(IntFlagProperties, s('label', case_fold=True)):
+            R = auto(), 'read'
+            W = auto(), 'write'
+            RW = R | W, 'read/write'
+            X = auto(), 'execute'
+            RWX = R | W | X, 'all'
+
+        self.assertEqual(IntPermProperties.R.value, 1)
+        self.assertEqual(IntPermProperties.W.value, 2)
+        self.assertEqual(IntPermProperties.RW.value, 3)
+        self.assertEqual(IntPermProperties.X.value, 4)
+        self.assertEqual(IntPermProperties.RWX.value, 7)
+
+        self.assertEqual(
+            (IntPermProperties.R | IntPermProperties.W).label,
+            'read/write'
+        )
+        self.assertFalse(
+            hasattr((IntPermProperties.W | IntPermProperties.X), 'label')
+        )
+        self.assertFalse(
+            hasattr((IntPermProperties.R | IntPermProperties.X), 'label')
+        )
+        self.assertEqual(
+            (IntPermProperties.R | IntPermProperties.W | IntPermProperties.X).label,
+            'all'
+        )
+        self.assertEqual(IntPermProperties.R.label, 'read')
+        self.assertEqual(IntPermProperties.W.label, 'write')
+
+        self.assertEqual(IntPermProperties.RW, IntPermProperties('read/write'))
+        self.assertEqual(IntPermProperties.RW, IntPermProperties(['read', 'write']))
+        self.assertEqual(
+            (IntPermProperties.W | IntPermProperties.X),
+            IntPermProperties(['write', 'execute'])
+        )
+        self.assertEqual(IntPermProperties.R, IntPermProperties('read'))
+        self.assertEqual(IntPermProperties.W, IntPermProperties('write'))
+        self.assertEqual(IntPermProperties.X, IntPermProperties('execute'))
+        self.assertEqual(IntPermProperties.RWX, IntPermProperties('all'))
+
+
     if sys.version_info >= (3, 11):  # pragma: no cover
         def test_flag_boundary_enum(self):
             """
@@ -1101,7 +1205,7 @@ class TestFlags(TestCase):
             self.assertEqual(StrictFlag.BLUE.label, 'blue')
             self.assertEqual(StrictFlag.RED.label, 'red')
             self.assertEqual(StrictFlag.GREEN.label, 'green')
-            self.assertEqual((StrictFlag.BLUE | StrictFlag.RED).label, None)
+            self.assertFalse(hasattr((StrictFlag.BLUE | StrictFlag.RED), 'label'))
 
             class ConformFlag(FlagProperties, s('label'), boundary=CONFORM):
                 RED = auto(), 'red'
@@ -1137,7 +1241,7 @@ class TestFlags(TestCase):
 
             self.assertEqual(KeepFlag(2**2 + 2**4).value, 20)
             self.assertTrue(KeepFlag.BLUE in KeepFlag(2**2 + 2**4))
-            self.assertEqual(KeepFlag(2**2 + 2**4).label, None)
+            self.assertFalse(hasattr(KeepFlag(2**2 + 2**4), 'label'))
             self.assertEqual(
                 [flg.label for flg in KeepFlag(2**2 + 2**4)],
                 ['blue']
@@ -1210,7 +1314,6 @@ class TestFlags(TestCase):
 
             self.assertEqual(Color.BLUE | Color.NEON, Color(['blue', 'neon']))
 
-
     if sys.version_info >= (3, 11):  # pragma: no cover
         def test_enum_property(self):
             from enum import property as enum_property
@@ -1224,15 +1327,20 @@ class TestFlags(TestCase):
                 def blue(self):
                     return 'whatever'
 
-                # the below behavior is undefined, we list it here just to
-                # notice if it changes or starts throwing errors - might should
-                # consider throwing an error
-                @enum_property
-                def label(self):
-                    return 'label'
-
             self.assertEqual(Color.BLUE.blue, 'whatever')
             self.assertEqual(Color.blue, Color.BLUE)
+
+            # attempting to assign an enum_property to a class as an existing
+            # property name should raise an AttributeError
+            with self.assertRaises(AttributeError):
+                class Color(EnumProperties, s('label')):
+                    RED = 1, 'red'
+                    GREEN = 2, 'green'
+                    BLUE = 3, 'blue'
+
+                    @enum_property
+                    def label(self):
+                        return 'label'
 
 
 class TestPickle(TestCase):
@@ -1718,3 +1826,49 @@ class TestSpecialize(TestCase):
         self.assertEqual(SpecializedEnum.TWO.test(), 'twotwo')
         self.assertEqual(SpecializedEnum.THREE.test(), 'threethreethree')
         self.assertEqual(SpecializedEnum('two').test(count=1), 'two')
+
+
+class PerformanceAndMemoryChecks(TestCase):
+
+    from enum_properties.tests.big_enum import ISOCountry
+
+    def test_check_big_enum_size(self):
+        """
+        Memory benchmarks:
+
+        v1.3.3 ISOCountry: 151966 bytes
+        v1.4.0 ISOCountry: 105046 bytes
+        """
+
+        seen = {}
+        total_size = 0
+        for name, attr in vars(self.ISOCountry).items():
+            total_size += sys.getsizeof(attr)
+            seen[(id(attr))] = (name, sys.getsizeof(attr))
+
+        for val in self.ISOCountry:
+            for name, attr in vars(self.ISOCountry).items():
+                if id(attr) not in seen:  # pragma: no cover
+                    total_size += sys.getsizeof(attr)
+                    seen[(id(attr))] = (name, sys.getsizeof(attr))
+
+        print(
+            'Total Memory footprint of ISOCountry: {} bytes'.format(total_size)
+        )
+
+    def test_property_access_time(self):
+        """
+        Access benchmarks:
+
+        v1.3.3 ISOCountry: ~1.05 seconds (macbook M1 Pro)
+        v1.4.0 ISOCountry: ~0.196 seconds (macbook M1 Pro) (5.3x faster)
+        """
+
+        # use perf counter to time the length of a for loop execution
+        from time import perf_counter
+        for_loop_time = perf_counter()
+        for i in range(1000000):
+            self.ISOCountry.US.full_name
+
+        for_loop_time = perf_counter() - for_loop_time
+        print('for loop time: {}'.format(for_loop_time))
