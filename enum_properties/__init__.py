@@ -618,7 +618,12 @@ class FlagProperties(
     A Flag that supports properties
     """
 
-    def _generate_next_value_(name, start, count, last_values):
+    def _generate_next_value_(
+            name,
+            start,
+            count,
+            last_values
+    ):  # pylint: disable=E0213
         """
         Intermixed property tuples can corrupt the last_values list with
         tuples. This method ensures only ints are present in last_values and
@@ -642,7 +647,12 @@ class IntFlagProperties(
     An IntFlag that supports properties.
     """
 
-    def _generate_next_value_(name, start, count, last_values):
+    def _generate_next_value_(
+            name,
+            start,
+            count,
+            last_values
+    ):  # pylint: disable=E0213
         """
         Intermixed property tuples can corrupt the last_values list with
         tuples. This method ensures only ints are present in last_values and
