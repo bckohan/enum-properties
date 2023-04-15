@@ -259,6 +259,72 @@ class TestEnums(TestCase):
                 GREEN = 2, 'Verde', (0, 1, 0), '00ff00'
                 BLUE = 3, 'Azul', (0, 0, 1), '0000ff'
 
+    def test_symmetric_match_none_parameter(self):
+
+        # test default behavior
+        class ColorDefault(
+            EnumProperties,
+            p('spanish'),
+            s('rgb'),
+            s('hex')
+        ):
+
+            RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+            GREEN = 2, 'Verde', (0, 1, 0), None
+            BLUE = 3, 'Azul', (0, 0, 1), None
+
+        self.assertEqual(ColorDefault.RED, 'ff0000')
+        self.assertNotEqual(ColorDefault.GREEN, None)
+        self.assertNotEqual(ColorDefault.BLUE, None)
+        self.assertRaises(ValueError, ColorDefault, None)
+        self.assertRaises(ValueError, ColorDefault, 'FF0000')
+        self.assertEqual(ColorDefault('ff0000'), ColorDefault.RED)
+        self.assertEqual(ColorDefault((1, 0, 0)), ColorDefault.RED)
+        self.assertEqual(ColorDefault((0, 1, 0)), ColorDefault.GREEN)
+        self.assertEqual(ColorDefault((0, 0, 1)), ColorDefault.BLUE)
+
+        class ColorNoMatchNone(
+            EnumProperties,
+            p('spanish'),
+            s('rgb'),
+            s('hex', case_fold=True, match_none=False)
+        ):
+
+            RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+            GREEN = 2, 'Verde', (0, 1, 0), None
+            BLUE = 3, 'Azul', (0, 0, 1), None
+
+        self.assertEqual(ColorNoMatchNone.RED, 'fF0000')
+        self.assertNotEqual(ColorNoMatchNone.GREEN, None)
+        self.assertNotEqual(ColorNoMatchNone.BLUE, None)
+        self.assertRaises(ValueError, ColorNoMatchNone, None)
+        self.assertEqual(ColorNoMatchNone('Ff0000'), ColorNoMatchNone.RED)
+        self.assertEqual(ColorNoMatchNone((1, 0, 0)), ColorNoMatchNone.RED)
+        self.assertEqual(ColorNoMatchNone((0, 1, 0)), ColorNoMatchNone.GREEN)
+        self.assertEqual(ColorNoMatchNone((0, 0, 1)), ColorNoMatchNone.BLUE)
+
+        class ColorMatchNone(
+            EnumProperties,
+            p('spanish'),
+            s('rgb'),
+            s('hex', match_none=True)
+        ):
+
+            RED = 1, 'Roja', (1, 0, 0), 'ff0000'
+            GREEN = 2, 'Verde', (0, 1, 0), None
+            BLUE = 3, 'Azul', (0, 0, 1), None
+
+        self.assertNotEqual(ColorMatchNone.RED, 'FF0000')
+        self.assertEqual(ColorMatchNone.RED, 'ff0000')
+        self.assertEqual(ColorMatchNone.GREEN, None)
+        self.assertNotEqual(ColorMatchNone.BLUE, None)
+        self.assertEqual(ColorMatchNone(None), ColorMatchNone.GREEN)
+        self.assertEqual(ColorMatchNone('ff0000'), ColorMatchNone.RED)
+        self.assertRaises(ValueError, ColorMatchNone, 'FF0000')
+        self.assertEqual(ColorMatchNone((1, 0, 0)), ColorMatchNone.RED)
+        self.assertEqual(ColorMatchNone((0, 1, 0)), ColorMatchNone.GREEN)
+        self.assertEqual(ColorMatchNone((0, 0, 1)), ColorMatchNone.BLUE)
+
     def test_properties_no_symmetry(self):
         """
         Tests that absence of SymmetricMixin works but w/o symmetric
@@ -546,7 +612,7 @@ class TestEnums(TestCase):
             EnumProperties,
             p('spanish'),
             s('rgb'),
-            s('hex', case_fold=True)
+            s('hex', case_fold=True, match_none=True)
         ):
             RED = 1, 'Roja', (1, 0, 0), 'ff0000'
             GREEN = 2, None, (0, 1, 0), '00ff00'
@@ -1676,6 +1742,26 @@ class TestNestedClassOnEnum(TestCase):
         self.assertTrue(MyEnum.Type3.value().__class__ is MyEnum.Type3.value)
 
 
+class TestGiantFlags(TestCase):
+
+    def test_over64_flags(self):
+
+        class BigFlags(IntFlagProperties, p('label')):
+
+            ONE = 2**0, 'one'
+            MIDDLE = 2**64, 'middle'
+            MIXED = ONE | MIDDLE, 'mixed'
+            LAST = 2**128, 'last'
+
+        self.assertEqual((BigFlags.ONE | BigFlags.LAST).value, 2**128 + 1)
+        self.assertEqual(
+            (BigFlags.MIDDLE | BigFlags.LAST).value, 2**128 + 2**64
+        )
+        self.assertEqual(
+            (BigFlags.MIDDLE | BigFlags.ONE).label, 'mixed'
+        )
+
+
 class TestSpecialize(TestCase):
     """
     Test the specialize decorator
@@ -1869,6 +1955,25 @@ class PerformanceAndMemoryChecks(TestCase):
         for_loop_time = perf_counter()
         for i in range(1000000):
             self.ISOCountry.US.full_name
+
+        for_loop_time = perf_counter() - for_loop_time
+        print('for loop time: {}'.format(for_loop_time))
+
+    def test_symmetric_mapping(self):
+        """
+        Symmetric mapping benchmarks
+
+        v1.4.0 ISOCountry: ~3 seconds (macbook M1 Pro)
+        v1.4.1 ISOCountry: ~ seconds (macbook M1 Pro) (x faster)
+        """
+        self.assertEqual(
+            self.ISOCountry(self.ISOCountry.US.full_name.lower()),
+            self.ISOCountry.US
+        )
+        from time import perf_counter
+        for_loop_time = perf_counter()
+        for i in range(1000000):
+            self.ISOCountry(self.ISOCountry.US.full_name.lower())
 
         for_loop_time = perf_counter() - for_loop_time
         print('for loop time: {}'.format(for_loop_time))

@@ -2,6 +2,20 @@
 Change Log
 ==========
 
+v1.5.0
+======
+
+There is one minimally impactful breaking change in the 1.5.0 release:
+
+* Symmetric properties that are None will not map back to the enumeration value
+  by default. To replicate the previous behavior, pass True as the `match_none`
+  argument when instantiating the property with s().
+
+The 1.5.0 release includes two feature improvements:
+
+* Implemented `Configurable behavior for matching none on symmetric fields <https://github.com/bckohan/enum-properties/issues/44>`_
+
+
 v1.4.0
 ======
 

@@ -76,8 +76,10 @@ property symmetry. To mark a property as symmetric, use
     Color.RED == Color((1, 0, 0)) == Color('0xFF0000') == Color('0xff0000')
 
 Symmetric string properties are by default case sensitive. To mark a property
-as case insensitive, use the `case_fold=True` parameter on the
-:py:meth:`~enum_properties.s` value.
+as case insensitive, use the ``case_fold=True`` parameter on the
+:py:meth:`~enum_properties.s` value. By default, none values for symmetric
+properties will not be symmetric. To change this behavior pass:
+``match_none=True`` to :py:meth:`~enum_properties.s`.
 
 Symmetric property support is added through the
 :py:class:`~enum_properties.SymmetricMixin` class which is included in the

@@ -31,7 +31,7 @@ except ImportError:  # pragma: no cover
     cached_property = property  # pylint: disable=C0103
 
 
-VERSION = (1, 4, 0)
+VERSION = (1, 5, 0)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -77,7 +77,8 @@ class _SProp(_Prop):
 
 def s(  # pylint: disable=C0103
     prop_name,
-    case_fold=False
+    case_fold=False,
+    match_none=False
 ):
     """
     Add a symmetric property. Enumeration values will be coercible from this
@@ -86,12 +87,15 @@ def s(  # pylint: disable=C0103
     :param prop_name: The name of the property
     :param case_fold: If False, symmetric lookup will be
         case sensitive (default)
+    :param match_none: If True, none values will be symmetric, if False
+        (default), none values for symmetric properties will not map back to
+        the enumeration value.
     :return: a named symmetric property class
     """
     return type(
         prop_name,
         (_SProp,),
-        {'symmetric': True, 'case_fold': case_fold}
+        {'symmetric': True, 'case_fold': case_fold, 'match_none': match_none}
     )
 
 
@@ -447,6 +451,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
                 )
 
         def add_sym_lookup(prop, p_val, enum_inst):
+            if p_val is None and not prop.match_none:
+                return
             if not isinstance(p_val, Hashable):
                 raise ValueError(
                     f'{cls}.{prop}:{p_val} is not hashable. Symmetrical '
