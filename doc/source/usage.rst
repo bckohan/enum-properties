@@ -236,8 +236,8 @@ decorator. For example:
         assert SpecializedEnum.TWO.method() == 'method_two()'
         assert SpecializedEnum.THREE.method() == 'method_three()'
 
-The :py:meth:`~enum_properties.specialize` decorator works on @classmethods and @staticmethods as well,
-but it must be the outermost decorator.
+The :py:meth:`~enum_properties.specialize` decorator works on @classmethods and
+@staticmethods as well, but it must be the outermost decorator.
 
 The undecorated method will apply to all members that lack a specialization:
 
