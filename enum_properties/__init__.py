@@ -338,8 +338,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
 
             def __setitem__(self, key, value):
                 if isinstance(value, _Specialized):
-                    for en in value.values:
-                        self._specialized_.setdefault(en, {})[key] = value
+                    for en_val in value.values:
+                        self._specialized_.setdefault(en_val, {})[key] = value
                 elif key in EnumPropertiesMeta.EXPECTED:
                     dict.__setitem__(self, key, value)
                 elif key in EnumPropertiesMeta.RESERVED:
