@@ -14,7 +14,7 @@ There is one minimally impactful breaking change in the 1.5.0 release:
 The 1.5.0 release includes two feature improvements:
 
 * Implemented `Configurable behavior for matching none on symmetric fields <https://github.com/bckohan/enum-properties/issues/44>`_
-
+* Implemented `Allow @specialize to accept a list of enumeration values. <https://github.com/bckohan/enum-properties/issues/43>`_
 
 v1.4.0
 ======

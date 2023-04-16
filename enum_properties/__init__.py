@@ -122,20 +122,20 @@ class _Specialized:  # pylint: disable=R0903
     :param wrapped: The wrapped member function
     :param value: The value to specialize for
     """
-    def __init__(self, wrapped, value):
+    def __init__(self, wrapped, values):
         self.wrapped = wrapped
-        self.value = value
+        self.values = values
 
 
-def specialize(value):
+def specialize(*values):
     """
     A decorator to specialize a method for a given enumeration value.
 
-    :param value: The enumeration value to specialize
+    :param values: The enumeration value(s) to specialize
     :return: A decorated specialized member method
     """
     def specialize_decorator(method):
-        return _Specialized(method, value)
+        return _Specialized(method, values)
 
     return specialize_decorator
 
@@ -338,7 +338,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
 
             def __setitem__(self, key, value):
                 if isinstance(value, _Specialized):
-                    self._specialized_.setdefault(value.value, {})[key] = value
+                    for en in value.values:
+                        self._specialized_.setdefault(en, {})[key] = value
                 elif key in EnumPropertiesMeta.EXPECTED:
                     dict.__setitem__(self, key, value)
                 elif key in EnumPropertiesMeta.RESERVED:

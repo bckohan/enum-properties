@@ -1913,6 +1913,25 @@ class TestSpecialize(TestCase):
         self.assertEqual(SpecializedEnum.THREE.test(), 'threethreethree')
         self.assertEqual(SpecializedEnum('two').test(count=1), 'two')
 
+    def test_specialize_multiple_lists(self):
+
+        class SpecializedEnum(EnumProperties, s('label')):
+            ONE = 1, 'one'
+            TWO = 2, 'two'
+            THREE = 3, 'three'
+
+            @specialize(ONE)
+            def test(self, count=1):
+                return self.label * count
+
+            @specialize(TWO, THREE)
+            def test(self, count=2):
+                return self.label * count
+
+        self.assertEqual(SpecializedEnum.ONE.test(), 'one')
+        self.assertEqual(SpecializedEnum.TWO.test(), 'twotwo')
+        self.assertEqual(SpecializedEnum.THREE.test(), 'threethree')
+
 
 class PerformanceAndMemoryChecks(TestCase):
 

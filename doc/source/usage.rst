@@ -236,7 +236,7 @@ decorator. For example:
         assert SpecializedEnum.TWO.method() == 'method_two()'
         assert SpecializedEnum.THREE.method() == 'method_three()'
 
-The @specialize decorator works on @classmethods and @staticmethods as well,
+The :py:meth:`~enum_properties.specialize` decorator works on @classmethods and @staticmethods as well,
 but it must be the outermost decorator.
 
 The undecorated method will apply to all members that lack a specialization:
@@ -279,6 +279,26 @@ lack the method.
     assert not hasattr(SpecializedEnum.ONE, 'method')
     assert not hasattr(SpecializedEnum.TWO, 'method')
     assert SpecializedEnum.THREE.method() == 'method_three()'
+
+
+:py:meth:`~enum_properties.specialize` will also accept a list so that
+multiple enumeration values can share the same specialization.
+
+.. code-block:: python
+
+    class SpecializedEnum(EnumProperties):
+
+        ONE   = 1
+        TWO   = 2
+        THREE = 3
+
+        @specialize(TWO, THREE)
+        def method(self):
+            return 'shared()'
+
+    assert not hasattr(SpecializedEnum.ONE, 'method')
+    assert SpecializedEnum.TWO.method() == 'shared()'
+    assert SpecializedEnum.THREE.method() == 'shared()'
 
 
 Flags
