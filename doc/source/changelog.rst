@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.5.1
+======
+
+* Fixed `Symmetric string 'none' values enable coercion from None despite match_none=False <https://github.com/bckohan/enum-properties/issues/45>`_
+
 v1.5.0
 ======
 

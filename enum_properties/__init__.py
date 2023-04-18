@@ -31,7 +31,7 @@ except ImportError:  # pragma: no cover
     cached_property = property  # pylint: disable=C0103
 
 
-VERSION = (1, 5, 0)
+VERSION = (1, 5, 1)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -218,24 +218,25 @@ class SymmetricMixin:  # pylint: disable=R0903
             except KeyError:
                 pass
 
-        for coerce_to in cls._ep_coerce_types_:
-            try:
-                val = coerce_to(value)
+        if value is not None:
+            for coerce_to in cls._ep_coerce_types_:
                 try:
-                    return cls._value2member_map_[val]
-                except KeyError:
+                    val = coerce_to(value)
+                    try:
+                        return cls._value2member_map_[val]
+                    except KeyError:
+                        pass
+
+                    try:
+                        return cls._ep_symmetric_map_[val]
+                    except KeyError:
+                        pass
+
+                    if isinstance(val, str):
+                        return cls._ep_isymmetric_map_[_do_casenorm(val)]
+
+                except (KeyError, TypeError, ValueError):
                     pass
-
-                try:
-                    return cls._ep_symmetric_map_[val]
-                except KeyError:
-                    pass
-
-                if isinstance(val, str):
-                    return cls._ep_isymmetric_map_[_do_casenorm(val)]
-
-            except (KeyError, TypeError, ValueError):
-                pass
 
         return super()._missing_(value)
 
