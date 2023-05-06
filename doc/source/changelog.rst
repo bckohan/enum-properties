@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.5.2
+======
+
+* Fixed `_missing_ allows exceptions through that are not ValueError, TypeError or KeyError <https://github.com/bckohan/enum-properties/issues/47>`_
+
 v1.5.1
 ======
 
