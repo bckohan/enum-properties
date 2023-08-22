@@ -31,7 +31,7 @@ except ImportError:  # pragma: no cover
     cached_property = property  # pylint: disable=C0103
 
 
-VERSION = (1, 5, 2)
+VERSION = (1, 6, 0)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -124,7 +124,11 @@ class _Specialized:  # pylint: disable=R0903
     """
     def __init__(self, wrapped, values):
         self.wrapped = wrapped
-        self.values = values
+        # map to ids, because in some corner cases values might get
+        # permuted (dataclasses) or not otherwise be hashable
+        # this is a little bit hocus pocus but CI will catch it
+        # if it breaks
+        self.ids = [id(value) for value in values]
 
 
 def specialize(*values):
@@ -329,6 +333,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             _ep_properties_ = properties
             _ep_symmetric_properties = symmetric_properties
             _specialized_ = {}
+            _ids_ = {}
 
             def __init__(self):
                 super().__init__()
@@ -339,8 +344,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
 
             def __setitem__(self, key, value):
                 if isinstance(value, _Specialized):
-                    for en_val in value.values:
-                        self._specialized_.setdefault(en_val, {})[key] = value
+                    for en_val in value.ids:
+                        self._specialized_.setdefault(self._ids_[en_val], {})[key] = value
                 elif key in EnumPropertiesMeta.EXPECTED:
                     dict.__setitem__(self, key, value)
                 elif key in EnumPropertiesMeta.RESERVED:
@@ -380,6 +385,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                                 value = value[0]
                             else:
                                 value = value[0:num_vals]
+
                         except TypeError as type_err:
                             raise ValueError(
                                 f'{key} must have {len(self._ep_properties_)} '
@@ -389,6 +395,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     elif key in class_dict._member_names:
                         remove = True  # pragma: no cover
 
+                    self._ids_[id(value)] = key
                     super().__setitem__(key, value)
 
                     if remove:
@@ -404,6 +411,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                             # >= python 3.11
                             del self._member_names[key]
                 else:
+                    self._ids_[id(value)] = key
                     super().__setitem__(key, value)
 
         return _PropertyEnumDict()
@@ -441,16 +449,17 @@ class EnumPropertiesMeta(enum.EnumMeta):
         cls._ep_isymmetric_map_ = {}
         cls._properties_ = list(classdict._ep_properties_.keys())
 
-        for val in cls:
-            for member_name, specialization in classdict._specialized_.get(
-                    val.value, {}
-            ).items():
-                # use descriptor binding
-                setattr(
-                    val,
-                    member_name,
-                    specialization.wrapped.__get__(val)
-                )
+        if classdict._specialized_:
+            for val in cls:
+                for member_name, specialization in classdict._specialized_.get(
+                    val._name_, {}
+                ).items():
+                    # use descriptor binding
+                    setattr(
+                        val,
+                        member_name,
+                        specialization.wrapped.__get__(val)
+                    )
 
         def add_sym_lookup(prop, p_val, enum_inst):
             if p_val is None and not prop.match_none:
@@ -485,15 +494,14 @@ class EnumPropertiesMeta(enum.EnumMeta):
                 )
 
         # we reverse to maintain precedence order for symmetric lookups
+        member_values = list(cls._value2member_map_.values() or cls.__members__.values())
         for prop in reversed([
             prop for prop in cls._properties_ if prop.symmetric
         ]):
             for idx, val in enumerate(
                 reversed(classdict._ep_properties_[prop])
             ):
-                enum_cls = list(cls._value2member_map_.values())[
-                    len(cls._value2member_map_)-1-idx
-                ]
+                enum_cls = member_values[len(member_values)-1-idx]
                 if isinstance(val, (set, list)):
                     for val_item in val:
                         add_coerce_type(type(val_item))

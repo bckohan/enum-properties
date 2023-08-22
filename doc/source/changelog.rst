@@ -2,6 +2,10 @@
 Change Log
 ==========
 
+v1.6.0
+======
+* Implemented `Support dataclasses in enums along with Python 3.12 <https://github.com/bckohan/enum-properties/issues/52>`_
+
 v1.5.2
 ======
 

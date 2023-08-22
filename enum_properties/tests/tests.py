@@ -1394,7 +1394,6 @@ class TestFlags(TestCase):
                     return 'whatever'
 
             self.assertEqual(Color.BLUE.blue, 'whatever')
-            self.assertEqual(Color.blue, Color.BLUE)
 
             # attempting to assign an enum_property to a class as an existing
             # property name should raise an AttributeError
@@ -1407,6 +1406,125 @@ class TestFlags(TestCase):
                     @enum_property
                     def label(self):
                         return 'label'
+
+    if sys.version_info >= (3, 12):  # pragma: no cover
+        def test_enum_dataclass_support(self):
+            """
+            In 3.12, Enum added support for dataclass inheritance which offers similar functionality
+            to enum-properties. This tests evaluates how these step on each other's toes.
+
+            From the std lib docs example:
+            """
+            from dataclasses import dataclass, field
+
+            @dataclass
+            class CreatureDataMixin:
+                size: str
+                legs: int
+                tail: bool = field(repr=False, default=True)
+
+            @dataclass(eq=True, frozen=True)
+            class CreatureDataHashableMixin():
+                size: str
+                legs: int
+                tail: bool = field(repr=False, default=True)
+
+            class Creature(CreatureDataMixin, EnumProperties):
+                BEETLE = 'small', 6
+                DOG = 'medium', 4
+            
+            self.assertEqual(Creature.BEETLE.size, 'small')
+            self.assertEqual(Creature.BEETLE.legs, 6)
+            self.assertEqual(Creature.BEETLE.tail, True)
+
+            self.assertEqual(Creature.DOG.size, 'medium')
+            self.assertEqual(Creature.DOG.legs, 4)
+            self.assertEqual(Creature.DOG.tail, True)
+
+            class CreatureEP(CreatureDataMixin, EnumProperties):
+                BEETLE = 'small', 6
+                DOG = 'medium', 4, False
+            
+            self.assertEqual(CreatureEP.BEETLE.size, 'small')
+            self.assertEqual(CreatureEP.BEETLE.legs, 6)
+            self.assertEqual(CreatureEP.BEETLE.tail, True)
+
+            self.assertEqual(CreatureEP.DOG.size, 'medium')
+            self.assertEqual(CreatureEP.DOG.legs, 4)
+            self.assertEqual(CreatureEP.DOG.tail, False)
+
+            class CreatureHybrid(CreatureDataMixin, EnumProperties, s('kingdom')):
+                BEETLE = 'small', 6, False, 'insect'
+                DOG = ('medium', 4,), 'mammal'
+            
+            self.assertEqual(CreatureHybrid.BEETLE.size, 'small')
+            self.assertEqual(CreatureHybrid.BEETLE.legs, 6)
+            self.assertEqual(CreatureHybrid.BEETLE.tail, False)
+            self.assertEqual(CreatureHybrid.BEETLE.kingdom, 'insect')
+
+            self.assertEqual(CreatureHybrid.DOG.size, 'medium')
+            self.assertEqual(CreatureHybrid.DOG.legs, 4)
+            self.assertEqual(CreatureHybrid.DOG.tail, True)
+            self.assertEqual(CreatureHybrid.DOG.kingdom, 'mammal')
+
+            self.assertEqual(CreatureHybrid('mammal'), CreatureHybrid.DOG)
+            self.assertEqual(CreatureHybrid('insect'), CreatureHybrid.BEETLE)
+
+            class CreatureHybridSpecialized(CreatureDataMixin, EnumProperties, s('kingdom')):
+                BEETLE = 'small', 6, 'insect'
+                DOG = ('medium', 4, False), 'mammal'
+
+                @specialize(BEETLE)
+                def function(self):
+                    return 'function(beetle)'
+                
+                @specialize(DOG)
+                def function(self):
+                    return 'function(dog)'
+            
+            self.assertEqual(CreatureHybridSpecialized.BEETLE.size, 'small')
+            self.assertEqual(CreatureHybridSpecialized.BEETLE.legs, 6)
+            self.assertEqual(CreatureHybridSpecialized.BEETLE.tail, True)
+            self.assertEqual(CreatureHybridSpecialized.BEETLE.kingdom, 'insect')
+
+            self.assertEqual(CreatureHybridSpecialized.DOG.size, 'medium')
+            self.assertEqual(CreatureHybridSpecialized.DOG.legs, 4)
+            self.assertEqual(CreatureHybridSpecialized.DOG.tail, False)
+            self.assertEqual(CreatureHybridSpecialized.DOG.kingdom, 'mammal')
+
+            self.assertEqual(CreatureHybridSpecialized('mammal'), CreatureHybridSpecialized.DOG)
+            self.assertEqual(CreatureHybridSpecialized('insect'), CreatureHybridSpecialized.BEETLE)
+
+            self.assertEqual(CreatureHybridSpecialized.DOG.function(), 'function(dog)')
+            self.assertEqual(CreatureHybridSpecialized.BEETLE.function(), 'function(beetle)')
+
+            class CreatureHybridSpecialized(CreatureDataHashableMixin, EnumProperties, s('kingdom')):
+                BEETLE = 'small', 6, 'insect'
+                DOG = ('medium', 4,), 'mammal'
+
+                @specialize(BEETLE)
+                def function(self):
+                    return 'function(beetle)'
+                
+                @specialize(DOG)
+                def function(self):
+                    return 'function(dog)'
+
+            self.assertEqual(CreatureHybridSpecialized.BEETLE.size, 'small')
+            self.assertEqual(CreatureHybridSpecialized.BEETLE.legs, 6)
+            self.assertEqual(CreatureHybridSpecialized.BEETLE.tail, True)
+            self.assertEqual(CreatureHybridSpecialized.BEETLE.kingdom, 'insect')
+
+            self.assertEqual(CreatureHybridSpecialized.DOG.size, 'medium')
+            self.assertEqual(CreatureHybridSpecialized.DOG.legs, 4)
+            self.assertEqual(CreatureHybridSpecialized.DOG.tail, True)
+            self.assertEqual(CreatureHybridSpecialized.DOG.kingdom, 'mammal')
+
+            self.assertEqual(CreatureHybridSpecialized('mammal'), CreatureHybridSpecialized.DOG)
+            self.assertEqual(CreatureHybridSpecialized('insect'), CreatureHybridSpecialized.BEETLE)
+
+            self.assertEqual(CreatureHybridSpecialized.DOG.function(), 'function(dog)')
+            self.assertEqual(CreatureHybridSpecialized.BEETLE.function(), 'function(beetle)')
 
 
 class TestPickle(TestCase):

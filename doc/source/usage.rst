@@ -438,3 +438,78 @@ Using :py:class:`~enum_properties.EnumProperties` this is possible:
         assert MyEnum.Type1().__class__ is MyEnum.Type1
         assert MyEnum.Type2().__class__ is MyEnum.Type2
         assert MyEnum.Type3().__class__ is MyEnum.Type3
+
+
+Dataclasses
+-----------
+
+As of Python 3.12, `Enum values can be <https://docs.python.org/3.12/howto/enum.html#enum-dataclass-support>`_
+Dataclasses_. At first glance this enables some behavior that is similar
+to adding properties. For example:
+
+.. code-block:: python
+
+    @dataclass
+    class CreatureDataMixin:
+        size: str
+        legs: int
+        tail: bool = field(repr=False, default=True)
+
+    class Creature(CreatureDataMixin, Enum):
+        BEETLE = 'small', 6
+        DOG = 'medium', 4
+
+    # you can now access the dataclass fields on the enumeration values
+    # as with enum properties:
+    assert Creature.BEETLE.size == 'small'
+    assert Creature.BEETLE.legs == 6
+    assert Creature.BEETLE.tail is True
+
+**We still recommend EnumProperties as the preferred way to add
+additional attributes to a Python enumeration for the following
+reasons:**
+
+- The value of BEETLE and DOG in the above example are instances
+  of the CreatureDataMixin dataclass. This can complicate interfacing
+  with other systems (like databases) where it is more natural for the
+  enumeration value to be a small primitive type like a character or
+  integer.
+
+
+- The dataclass method requires two classes where a single EnumProperties
+  class will suffice.
+
+
+- Dataclasses_ are not hashable by default which can complicate equality
+  testing and marshalling external data into enumeration values.
+
+
+.. note::
+
+    EnumProperties also integrates with Enum's dataclass support!
+    For example we can add a symmetric property to the Creature
+    enumeration like so:
+
+.. code-block:: python
+
+    @dataclass
+    class CreatureDataMixin:
+        size: str
+        legs: int
+        tail: bool = field(repr=False, default=True)
+
+    class Creature(CreatureDataMixin, EnumProperties, s('kingdom')):
+        BEETLE = 'small', 6, False, 'insect'
+        DOG = 'medium', 4, 'animal'
+
+    # you can now access the dataclass fields on the enumeration values
+    # as with enum properties:
+    assert Creature.BEETLE.size == 'small'
+    assert Creature.BEETLE.legs == 6
+    assert Creature.BEETLE.tail is False
+    assert Creature.BEETLE.kingdom == 'insect'
+
+    # adding symmetric properties onto a dataclass enum can help with
+    # marshalling external data into the enum classes!
+    assert Creature('insect') is Creature.BEETLE
+
