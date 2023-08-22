@@ -63,7 +63,6 @@ justified is acceptable:
     poetry run doc8 -q doc
     poetry check
     poetry run pip check
-    poetry run safety check --full-report
     poetry run python -m readme_renderer ./README.rst
 
 
