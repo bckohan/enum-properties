@@ -513,3 +513,49 @@ reasons:**
     # marshalling external data into the enum classes!
     assert Creature('insect') is Creature.BEETLE
 
+
+Hash Equivalency
+----------------
+
+The Enum_ types that inherit from primitive types IntEnum_ and StrEnum_ are hash equivalent
+to their primitive types. This means that they can be used interchangeably in collections that
+use hashing:
+
+.. code-block:: python
+
+    class MyIntEnum(IntEnum):
+
+        ONE = 1
+        TWO = 2
+        THREE = 3
+
+    assert {1: 'Found me!'}[IntEnum.ONE] == 'Found me!'
+
+:py:class:`~enum_properties.IntEnumProperties`, :py:class:`~enum_properties.StrEnumProperties` and
+:py:class:`~enum_properties.IntFlagProperties` also honor this hash equivalency. When defining your
+own symmetric enumeration types if you want to keep hash equivalency to the value type you will
+you will have to implement this yourself. For example, if you wanted your color enumeration to also
+be an rgb tuple:
+
+
+.. code-block:: python
+
+    from enum_properties import EnumPropertiesMeta, SymmetricMixin, s
+    from enum import Enum
+
+    class Color(
+        SymmetricMixin,
+        tuple,
+        Enum,
+        s('hex', case_fold=True),
+        metaclass=EnumPropertiesMeta
+    ):
+        # name   value (rgb)    hex
+        RED    = (1, 0, 0), '0xff0000'
+        GREEN  = (0, 1, 0), '0x00ff00'
+        BLUE   = (0, 0, 1), '0x0000ff'
+
+        def __hash__(self):  # you must add this!
+            return tuple.__hash__(self)
+
+    assert {(1, 0, 0): 'Found me!'}[Color.RED] == 'Found me!'

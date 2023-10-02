@@ -2,7 +2,7 @@ import enum
 import pickle
 import sys
 from collections.abc import Hashable
-from enum import Enum, auto
+from enum import Enum, IntEnum, auto
 from io import BytesIO
 from unittest import TestCase
 
@@ -11,6 +11,7 @@ from enum_properties import (
     FlagProperties,
     IntEnumProperties,
     IntFlagProperties,
+    StrEnumProperties,
     SymmetricMixin,
     p,
     s,
@@ -944,52 +945,52 @@ class TestEnums(TestCase):
     def test_hashable_enums(self):
 
         class HashableEnum1(Enum):
-            VAL0 = 0
-            VAL1 = 1
-            VAL2 = 2
+            VAL0_1 = 0
+            VAL1_1 = 1
+            VAL2_1 = 2
 
         class HashableEnum2(Enum):
-            VAL0 = 0
-            VAL1 = 1
-            VAL2 = 2
+            VAL0_2 = 0
+            VAL1_2 = 1
+            VAL2_2 = 2
 
-        self.assertTrue(isinstance(HashableEnum1.VAL0, Hashable))
-        self.assertTrue(isinstance(HashableEnum2.VAL1, Hashable))
+        self.assertTrue(isinstance(HashableEnum1.VAL0_1, Hashable))
+        self.assertTrue(isinstance(HashableEnum2.VAL1_2, Hashable))
 
         class TransitiveEnum(EnumProperties, p('label'), s('pos')):
-            VAL0 = 0, 'Value 0', HashableEnum1.VAL0
-            VAL1 = 1, 'Value 1', HashableEnum1.VAL1
-            VAL2 = 2, 'Value 2', HashableEnum2.VAL2
+            VAL0 = 0, 'Value 0', HashableEnum1.VAL0_1
+            VAL1 = 1, 'Value 1', HashableEnum1.VAL1_1
+            VAL2 = 2, 'Value 2', HashableEnum2.VAL2_2
 
         self.assertTrue(isinstance(TransitiveEnum.VAL2, Hashable))
 
-        self.assertEqual(TransitiveEnum(HashableEnum1.VAL0), TransitiveEnum.VAL0)
-        self.assertEqual(TransitiveEnum(HashableEnum1.VAL1), TransitiveEnum.VAL1)
-        self.assertEqual(TransitiveEnum(HashableEnum2.VAL2), TransitiveEnum.VAL2)
+        self.assertEqual(TransitiveEnum(HashableEnum1.VAL0_1), TransitiveEnum.VAL0)
+        self.assertEqual(TransitiveEnum(HashableEnum1.VAL1_1), TransitiveEnum.VAL1)
+        self.assertEqual(TransitiveEnum(HashableEnum2.VAL2_2), TransitiveEnum.VAL2)
 
-        self.assertRaises(ValueError, TransitiveEnum, HashableEnum1.VAL2)
-        self.assertRaises(ValueError, TransitiveEnum, HashableEnum2.VAL0)
-        self.assertRaises(ValueError, TransitiveEnum, HashableEnum2.VAL1)
+        self.assertRaises(ValueError, TransitiveEnum, HashableEnum1.VAL2_1)
+        self.assertRaises(ValueError, TransitiveEnum, HashableEnum2.VAL0_2)
+        self.assertRaises(ValueError, TransitiveEnum, HashableEnum2.VAL1_2)
 
         test_dict = {
-            HashableEnum1.VAL0: 'Zero',
-            HashableEnum1.VAL1: 'One',
-            HashableEnum1.VAL2: 'Two',
-            HashableEnum2.VAL0: 'zero',
-            HashableEnum2.VAL1: 'one',
-            HashableEnum2.VAL2: 'two',
+            HashableEnum1.VAL0_1: 'Zero',
+            HashableEnum1.VAL1_1: 'One',
+            HashableEnum1.VAL2_1: 'Two',
+            HashableEnum2.VAL0_2: 'zero',
+            HashableEnum2.VAL1_2: 'one',
+            HashableEnum2.VAL2_2: 'two',
             TransitiveEnum.VAL0: 'ZERO',
             TransitiveEnum.VAL1: 'ONE',
             TransitiveEnum.VAL2: 'TWO',
         }
 
-        self.assertEqual(test_dict[HashableEnum1.VAL0], 'Zero')
-        self.assertEqual(test_dict[HashableEnum1.VAL1], 'One')
-        self.assertEqual(test_dict[HashableEnum1.VAL2], 'Two')
+        self.assertEqual(test_dict[HashableEnum1.VAL0_1], 'Zero')
+        self.assertEqual(test_dict[HashableEnum1.VAL1_1], 'One')
+        self.assertEqual(test_dict[HashableEnum1.VAL2_1], 'Two')
 
-        self.assertEqual(test_dict[HashableEnum2.VAL0], 'zero')
-        self.assertEqual(test_dict[HashableEnum2.VAL1], 'one')
-        self.assertEqual(test_dict[HashableEnum2.VAL2], 'two')
+        self.assertEqual(test_dict[HashableEnum2.VAL0_2], 'zero')
+        self.assertEqual(test_dict[HashableEnum2.VAL1_2], 'one')
+        self.assertEqual(test_dict[HashableEnum2.VAL2_2], 'two')
 
         self.assertEqual(test_dict[TransitiveEnum.VAL0], 'ZERO')
         self.assertEqual(test_dict[TransitiveEnum.VAL1], 'ONE')
@@ -2173,3 +2174,205 @@ class PerformanceAndMemoryChecks(TestCase):
 
         for_loop_time = perf_counter() - for_loop_time
         print('for loop time: {}'.format(for_loop_time))
+
+
+class TestInterfaceEquivalency(TestCase):
+    """
+    Enums should hash the same as their values.
+    """
+    def test_operators(self):
+
+        class MyIntEnum(Enum):
+            ONE = 1
+            TWO = 2
+            THREE = 3
+
+        self.assertNotEqual(MyIntEnum.ONE, 1)
+
+        class MyIntEnum(IntEnum):
+            ONE = 1
+            TWO = 2
+            THREE = 3
+
+        self.assertTrue(MyIntEnum.ONE == 1)
+        self.assertTrue(MyIntEnum.ONE != 2)
+
+        self.assertTrue(1 == MyIntEnum.ONE)
+        self.assertTrue(2 != MyIntEnum.ONE)
+
+        self.assertTrue(MyIntEnum.ONE < 2)
+        self.assertTrue(2 < MyIntEnum.THREE)
+        self.assertTrue(MyIntEnum.ONE < 2)
+        self.assertTrue(2 < MyIntEnum.THREE)
+        self.assertTrue(MyIntEnum.TWO <= 2)
+        self.assertTrue(2 <= MyIntEnum.TWO)
+
+        self.assertTrue(MyIntEnum.TWO > 1)
+        self.assertTrue(3 > MyIntEnum.TWO)
+        self.assertTrue(MyIntEnum.TWO > 1)
+        self.assertTrue(2 > MyIntEnum.ONE)
+        self.assertTrue(MyIntEnum.THREE >= 2)
+        self.assertTrue(3 >= MyIntEnum.TWO)
+
+        self.assertTrue(MyIntEnum.TWO % 2 == 0)
+        self.assertTrue(MyIntEnum.TWO % 3 == 2)
+
+        class MyIntEnum(IntEnumProperties):
+            ONE = 1
+            TWO = 2
+            THREE = 3
+
+        self.assertTrue(MyIntEnum.ONE == 1)
+        self.assertTrue(MyIntEnum.ONE != 2)
+
+        self.assertTrue(1 == MyIntEnum.ONE)
+        self.assertTrue(2 != MyIntEnum.ONE)
+
+        self.assertTrue(MyIntEnum.ONE < 2)
+        self.assertTrue(2 < MyIntEnum.THREE)
+        self.assertTrue(MyIntEnum.ONE < 2)
+        self.assertTrue(2 < MyIntEnum.THREE)
+        self.assertTrue(MyIntEnum.TWO <= 2)
+        self.assertTrue(2 <= MyIntEnum.TWO)
+
+        self.assertTrue(MyIntEnum.TWO > 1)
+        self.assertTrue(3 > MyIntEnum.TWO)
+        self.assertTrue(MyIntEnum.TWO > 1)
+        self.assertTrue(2 > MyIntEnum.ONE)
+        self.assertTrue(MyIntEnum.THREE >= 2)
+        self.assertTrue(3 >= MyIntEnum.TWO)
+
+        self.assertTrue(MyIntEnum.TWO % 2 == 0)
+        self.assertTrue(MyIntEnum.TWO % 3 == 2)
+
+    def test_hashing_issue_53(self):
+
+        class MyIntEnum(IntEnum):
+            ONE = 1
+            TWO = 2
+            THREE = 3
+
+        class MyStrEnum(str, Enum):
+            A = 'a'
+            B = 'b'
+            C = 'c'
+        
+        # self.assertEqual(hash(MyIntEnum.ONE), hash(1))
+        # self.assertEqual(hash(MyStrEnum.C), hash('c'))
+
+        test_dict = {
+            1: 'One',
+            2: 'Two',
+            MyIntEnum.THREE: 'Three'
+        }
+
+        self.assertIn(MyIntEnum.ONE, test_dict)
+        self.assertEqual(test_dict[MyIntEnum.ONE], 'One')
+        self.assertIn(3, test_dict)
+
+        test_dict = {
+            'a': 'A',
+            'b': 'B',
+            MyStrEnum.C: 'C'
+        }
+
+        self.assertIn(MyStrEnum.B, test_dict)
+        self.assertEqual(test_dict[MyStrEnum.A], 'A')
+        self.assertIn('c', test_dict)
+
+        self.assertIn(MyIntEnum.ONE, {1, 2, 3})
+        self.assertIn(MyStrEnum.A, {'a', 'b', 'c'})
+        self.assertIn(1, {MyIntEnum.ONE, MyIntEnum.TWO, MyIntEnum.THREE})
+        self.assertIn(3, {MyIntEnum.ONE, MyIntEnum.TWO, MyIntEnum.THREE})
+        self.assertIn('a', {MyStrEnum.A, MyStrEnum.B, MyStrEnum.C})
+
+        class MyIntEnum(IntEnumProperties):
+            ONE = 1
+            TWO = 2
+            THREE = 3
+
+        class MyStrEnum(StrEnumProperties):
+            A = 'a'
+            B = 'b'
+            C = 'c'
+
+        test_dict = {
+            1: 'One',
+            2: 'Two',
+            MyIntEnum.THREE: 'Three'
+        }
+
+        self.assertIn(MyIntEnum.ONE, test_dict)
+        self.assertEqual(test_dict[MyIntEnum.ONE], 'One')
+        self.assertIn(3, test_dict)
+
+        test_dict = {
+            'a': 'A',
+            'b': 'B',
+            MyStrEnum.C: 'C'
+        }
+
+        self.assertIn(MyStrEnum.B, test_dict)
+        self.assertEqual(test_dict[MyStrEnum.A], 'A')
+        self.assertIn('c', test_dict)
+
+        self.assertIn(MyIntEnum.ONE, {1, 2, 3})
+        self.assertIn(MyStrEnum.A, {'a', 'b', 'c'})
+        self.assertIn(1, {MyIntEnum.ONE, MyIntEnum.TWO, MyIntEnum.THREE})
+        self.assertIn(3, {MyIntEnum.ONE, MyIntEnum.TWO, MyIntEnum.THREE})
+        self.assertIn('a', {MyStrEnum.A, MyStrEnum.B, MyStrEnum.C})
+
+        class MyIntFlagEnum(IntFlagProperties):
+            ONE = 1
+            TWO = 2
+            THREE = 4
+        
+        test_dict = {
+            1: 'One',
+            2: 'Two',
+            MyIntFlagEnum.THREE: 'Three'
+        }
+        
+        self.assertIn(MyIntFlagEnum.ONE, test_dict)
+        self.assertEqual(test_dict[MyIntFlagEnum.ONE], 'One')
+        self.assertIn(4, test_dict)
+
+    def test_hashing_example(self):
+        from enum import Enum
+
+        from enum_properties import EnumPropertiesMeta, SymmetricMixin, s
+
+        class Color(
+            SymmetricMixin,
+            tuple,
+            Enum,
+            s('hex', case_fold=True),
+            metaclass=EnumPropertiesMeta
+        ):
+            # name   value      rgb       hex
+            RED    = (1, 0, 0), '0xff0000'
+            GREEN  = (0, 1, 0), '0x00ff00'
+            BLUE   = (0, 0, 1), '0x0000ff'
+
+            def __hash__(self):
+                return tuple.__hash__(self)
+
+        assert {(1, 0, 0): 'Found me!'}[Color.RED] == 'Found me!'
+
+
+class TestMultiPrimitives(TestCase):
+
+    def test_multiple_primitive_types(self):
+        from datetime import date
+
+        class MyEnum(EnumProperties):
+
+            V1 = None
+            V2 = 5
+            V3 = 'label'
+            V4 = date(year=1970, month=1, day=1)
+
+        self.assertEqual(MyEnum.V1, None)
+        self.assertEqual(MyEnum.V2, 5)
+        self.assertEqual(MyEnum.V3, 'label')
+        self.assertEqual(MyEnum.V4, date(year=1970, month=1, day=1))

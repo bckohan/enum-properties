@@ -31,7 +31,7 @@ except ImportError:  # pragma: no cover
     cached_property = property  # pylint: disable=C0103
 
 
-VERSION = (1, 6, 0)
+VERSION = (1, 7, 0)
 
 __title__ = 'Enum Properties'
 __version__ = '.'.join(str(i) for i in VERSION)
@@ -174,15 +174,6 @@ class SymmetricMixin:  # pylint: disable=R0903
     def __ne__(self, value):
         """Symmetric inequality is the inverse of symmetric equality"""
         return not self.__eq__(value)
-
-    def __hash__(self):
-        """
-        Providing a logical __eq__ requires a __hash__ implementation to keep
-        SymetricMixin enums hashable. Some objects will compare equal to enum
-        values but will have different hash functions. This is ok, so long as
-        Enumeration value instances always have the same hashes.
-        """
-        return hash((self.__class__, self._value_))
 
     @classmethod
     def _missing_(cls, value):  # pylint: disable=R0911
@@ -573,6 +564,9 @@ class EnumProperties(SymmetricMixin, enum.Enum, metaclass=EnumPropertiesMeta):
     See :ref:`usage` for more details.
     """
 
+    def __hash__(self):
+        return enum.Enum.__hash__(self)
+
 
 class IntEnumProperties(
     SymmetricMixin,
@@ -581,7 +575,29 @@ class IntEnumProperties(
 ):
     """
     An IntEnum that supports properties.
+
+    .. note::
+        Because SymmetricMixin implements __eq__ we also need an implementation
+        of __hash__ on our class to keep it hashable. We walk the mro to find the
+        first implementation of __hash__ and use it - this keeps our implementation
+        hash equivalent to Enum/IntEnum behavior
     """
+
+    def __hash__(self):
+        return enum.IntEnum.__hash__(self)
+
+
+class StrEnumProperties(  # pylint: disable=R0903
+    SymmetricMixin,
+    *((enum.StrEnum,) if hasattr(enum, 'StrEnum') else (str, enum.Enum)),
+    metaclass=EnumPropertiesMeta
+):
+    """
+    An StrEnum that supports properties.
+    """
+
+    def __hash__(self):
+        return getattr(enum, 'StrEnum', str).__hash__(self)
 
 
 class DecomposeMixin:
@@ -652,6 +668,9 @@ class FlagProperties(
             [val[0] if isinstance(val, tuple) else val for val in last_values]
         )
 
+    def __hash__(self):
+        return enum.Flag.__hash__(self)
+
 
 class IntFlagProperties(
     DecomposeMixin,
@@ -680,3 +699,6 @@ class IntFlagProperties(
             count,
             [val[0] if isinstance(val, tuple) else val for val in last_values]
         )
+
+    def __hash__(self):
+        return enum.IntFlag.__hash__(self)
