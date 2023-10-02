@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v1.7.0
+======
+* Implemented `Add a StrEnumProperties type to match StrEnum. <https://github.com/bckohan/enum-properties/issues/54>`_
+* Fixed `Hash equivalency between values and enums is broken. <https://github.com/bckohan/enum-properties/issues/53>`_
+* Implemented `Test mixed primitive type values. <https://github.com/bckohan/enum-properties/issues/46>`_
+
 v1.6.0
 ======
 * Implemented `Support dataclasses in enums along with Python 3.12 <https://github.com/bckohan/enum-properties/issues/52>`_
