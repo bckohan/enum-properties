@@ -336,7 +336,10 @@ class EnumPropertiesMeta(enum.EnumMeta):
             def __setitem__(self, key, value):
                 if isinstance(value, _Specialized):
                     for en_val in value.ids:
-                        self._specialized_.setdefault(self._ids_[en_val], {})[key] = value
+                        self._specialized_.setdefault(
+                            self._ids_[en_val],
+                            {}
+                        )[key] = value
                 elif key in EnumPropertiesMeta.EXPECTED:
                     dict.__setitem__(self, key, value)
                 elif key in EnumPropertiesMeta.RESERVED:
@@ -485,7 +488,11 @@ class EnumPropertiesMeta(enum.EnumMeta):
                 )
 
         # we reverse to maintain precedence order for symmetric lookups
-        member_values = list(cls._value2member_map_.values() or cls.__members__.values())
+        member_values = list(
+            cls._value2member_map_.values()
+            or
+            cls.__members__.values()
+        )
         for prop in reversed([
             prop for prop in cls._properties_ if prop.symmetric
         ]):
@@ -577,10 +584,11 @@ class IntEnumProperties(
     An IntEnum that supports properties.
 
     .. note::
-        Because SymmetricMixin implements __eq__ we also need an implementation
-        of __hash__ on our class to keep it hashable. We walk the mro to find the
-        first implementation of __hash__ and use it - this keeps our implementation
-        hash equivalent to Enum/IntEnum behavior
+        Because SymmetricMixin implements __eq__ we also need an
+        implementation of __hash__ on our class to keep it hashable
+        We walk the mro to find the first implementation of __hash__
+        and use it - this keeps our implementation hash equivalent
+        to Enum/IntEnum behavior
     """
 
     def __hash__(self):
