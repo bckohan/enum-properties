@@ -16,13 +16,10 @@ specialization support for python enumeration classes.
 
 """
 import enum
+
 # pylint: disable=protected-access
 import unicodedata
-from collections.abc import (  # pylint: disable=E0611
-    Generator,
-    Hashable,
-    Iterable,
-)
+from collections.abc import Generator, Hashable, Iterable  # pylint: disable=E0611
 
 try:
     from functools import cached_property
@@ -33,30 +30,30 @@ except ImportError:  # pragma: no cover
 
 VERSION = (1, 7, 0)
 
-__title__ = 'Enum Properties'
-__version__ = '.'.join(str(i) for i in VERSION)
-__author__ = 'Brian Kohan'
-__license__ = 'MIT'
-__copyright__ = 'Copyright 2022-2023 Brian Kohan'
+__title__ = "Enum Properties"
+__version__ = ".".join(str(i) for i in VERSION)
+__author__ = "Brian Kohan"
+__license__ = "MIT"
+__copyright__ = "Copyright 2022-2023 Brian Kohan"
 
 __all__ = [
-    'VERSION',
-    'EnumProperties',
-    'IntEnumProperties',
-    'FlagProperties',
-    'IntFlagProperties',
-    'EnumPropertiesMeta',
-    'SymmetricMixin',
-    'DecomposeMixin',
-    'specialize',
-    'p',
-    's'
+    "VERSION",
+    "EnumProperties",
+    "IntEnumProperties",
+    "FlagProperties",
+    "IntFlagProperties",
+    "EnumPropertiesMeta",
+    "SymmetricMixin",
+    "DecomposeMixin",
+    "specialize",
+    "p",
+    "s",
 ]
 
 
 def _do_casenorm(text):
     """Normalize unicode text to be case agnostic."""
-    return unicodedata.normalize('NFKD', text.casefold())
+    return unicodedata.normalize("NFKD", text.casefold())
 
 
 class _Prop(str):
@@ -67,7 +64,7 @@ class _Prop(str):
 
     @classmethod
     def name(cls):
-        """ the name of a property is its class name """
+        """the name of a property is its class name"""
         return cls.__name__
 
 
@@ -75,11 +72,7 @@ class _SProp(_Prop):
     """Symmetric property interface - private"""
 
 
-def s(  # pylint: disable=C0103
-    prop_name,
-    case_fold=False,
-    match_none=False
-):
+def s(prop_name, case_fold=False, match_none=False):  # pylint: disable=C0103
     """
     Add a symmetric property. Enumeration values will be coercible from this
     property's values.
@@ -95,7 +88,7 @@ def s(  # pylint: disable=C0103
     return type(
         prop_name,
         (_SProp,),
-        {'symmetric': True, 'case_fold': case_fold, 'match_none': match_none}
+        {"symmetric": True, "case_fold": case_fold, "match_none": match_none},
     )
 
 
@@ -110,7 +103,7 @@ def p(prop_name):  # pylint: disable=C0103
     :param prop_name: The name of the property
     :return: a named property class
     """
-    return type(prop_name, (_Prop,), {'symmetric': False})
+    return type(prop_name, (_Prop,), {"symmetric": False})
 
 
 class _Specialized:  # pylint: disable=R0903
@@ -122,6 +115,7 @@ class _Specialized:  # pylint: disable=R0903
     :param wrapped: The wrapped member function
     :param value: The value to specialize for
     """
+
     def __init__(self, wrapped, values):
         self.wrapped = wrapped
         # map to ids, because in some corner cases values might get
@@ -138,6 +132,7 @@ def specialize(*values):
     :param values: The enumeration value(s) to specialize
     :return: A decorated specialized member method
     """
+
     def specialize_decorator(method):
         return _Specialized(method, values)
 
@@ -188,8 +183,8 @@ class SymmetricMixin:  # pylint: disable=R0903
         :return: A valid instance of this enumeration
         """
         if (
-            issubclass(cls, enum.Flag) and
-            (not isinstance(value, Hashable) and isinstance(value, Iterable))
+            issubclass(cls, enum.Flag)
+            and (not isinstance(value, Hashable) and isinstance(value, Iterable))
             or isinstance(value, Generator)
         ):
             composite = None
@@ -273,14 +268,14 @@ class EnumPropertiesMeta(enum.EnumMeta):
     """
 
     # members expected to be supplied by inheriting classes
-    EXPECTED = ['_symmetric_builtins_']
+    EXPECTED = ["_symmetric_builtins_"]
 
     # members reserved for use by EnumProperties
     RESERVED = [
-        '_properties_',
-        '_ep_coerce_types_',
-        '_ep_symmetric_map_',
-        '_ep_isymmetric_map_'
+        "_properties_",
+        "_ep_coerce_types_",
+        "_ep_symmetric_map_",
+        "_ep_isymmetric_map_",
     ]
 
     @classmethod
@@ -302,10 +297,10 @@ class EnumPropertiesMeta(enum.EnumMeta):
         for base in bases:
             if issubclass(base, _Prop):
                 if (
-                    base.name() in EnumPropertiesMeta.RESERVED +
-                    EnumPropertiesMeta.EXPECTED
+                    base.name()
+                    in EnumPropertiesMeta.RESERVED + EnumPropertiesMeta.EXPECTED
                 ):
-                    raise ValueError(f'{base.name()} is reserved.')
+                    raise ValueError(f"{base.name()} is reserved.")
                 properties[base()] = []
             else:
                 real_bases.append(base)
@@ -336,14 +331,13 @@ class EnumPropertiesMeta(enum.EnumMeta):
             def __setitem__(self, key, value):
                 if isinstance(value, _Specialized):
                     for en_val in value.ids:
-                        self._specialized_.setdefault(
-                            self._ids_[en_val],
-                            {}
-                        )[key] = value
+                        self._specialized_.setdefault(self._ids_[en_val], {})[
+                            key
+                        ] = value
                 elif key in EnumPropertiesMeta.EXPECTED:
                     dict.__setitem__(self, key, value)
                 elif key in EnumPropertiesMeta.RESERVED:
-                    raise ValueError(f'{key} is reserved.')
+                    raise ValueError(f"{key} is reserved.")
                 elif self._ep_properties_:
                     # are we an enum value? - just kick this up to parent class
                     # logic, this code runs once on load - its fine that it's
@@ -353,7 +347,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     class_dict[key] = value
                     remove = False
                     if (
-                        len(class_dict._member_names) > before and
+                        len(class_dict._member_names) > before
+                        and
                         # base class lets nested classes through! see:
                         # https://github.com/bckohan/enum-properties/issues/29
                         # todo remove below when minimum python >= 3.13
@@ -361,15 +356,13 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     ):
                         try:
                             num_vals = len(value) - len(self._ep_properties_)
-                            if (
-                                num_vals < 1 or
-                                len(self._ep_properties_) !=
-                                len(value[num_vals:])
+                            if num_vals < 1 or len(self._ep_properties_) != len(
+                                value[num_vals:]
                             ):
                                 raise ValueError(
-                                    f'{key} must have '
-                                    f'{len(self._ep_properties_)} property '
-                                    f'values.'
+                                    f"{key} must have "
+                                    f"{len(self._ep_properties_)} property "
+                                    f"values."
                                 )
                             idx = num_vals
                             for values in self._ep_properties_.values():
@@ -382,8 +375,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
 
                         except TypeError as type_err:
                             raise ValueError(
-                                f'{key} must have {len(self._ep_properties_)} '
-                                f'property values.'
+                                f"{key} must have {len(self._ep_properties_)} "
+                                f"property values."
                             ) from type_err
 
                     elif key in class_dict._member_names:
@@ -396,10 +389,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                         # todo remove when minimum python >= 3.13
                         # base class lets nested classes through! see:
                         # https://github.com/bckohan/enum-properties/issues/29
-                        if isinstance(
-                            self._member_names,
-                            list
-                        ):  # pragma: no cover
+                        if isinstance(self._member_names, list):  # pragma: no cover
                             self._member_names.remove(key)
                         else:  # pragma: no cover
                             # >= python 3.11
@@ -410,13 +400,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
 
         return _PropertyEnumDict()
 
-    def __new__(  # pylint: disable=W0221
-            mcs,
-            classname,
-            bases,
-            classdict,
-            **kwargs
-    ):
+    def __new__(mcs, classname, bases, classdict, **kwargs):  # pylint: disable=W0221
         """
         Enumeration class construction runs in the following stages:
 
@@ -436,7 +420,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             classname,
             tuple(base for base in bases if not issubclass(base, _Prop)),
             classdict,
-            **kwargs
+            **kwargs,
         )
         cls._ep_coerce_types_ = []
         cls._ep_symmetric_map_ = cls._member_map_
@@ -449,20 +433,16 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     val._name_, {}
                 ).items():
                     # use descriptor binding
-                    setattr(
-                        val,
-                        member_name,
-                        specialization.wrapped.__get__(val)
-                    )
+                    setattr(val, member_name, specialization.wrapped.__get__(val))
 
         def add_sym_lookup(prop, p_val, enum_inst):
             if p_val is None and not prop.match_none:
                 return
             if not isinstance(p_val, Hashable):
                 raise ValueError(
-                    f'{cls}.{prop}:{p_val} is not hashable. Symmetrical '
-                    f'enumeration properties must be hashable or a list of '
-                    f'hashable values.'
+                    f"{cls}.{prop}:{p_val} is not hashable. Symmetrical "
+                    f"enumeration properties must be hashable or a list of "
+                    f"hashable values."
                 )
             cls._ep_symmetric_map_[p_val] = enum_inst
             if prop.case_fold and isinstance(p_val, str):
@@ -470,8 +450,9 @@ class EnumPropertiesMeta(enum.EnumMeta):
 
         def add_coerce_type(typ):
             if (
-                typ not in cls._ep_coerce_types_ and
-                isinstance(typ, Hashable) and not issubclass(typ, cls)
+                typ not in cls._ep_coerce_types_
+                and isinstance(typ, Hashable)
+                and not issubclass(typ, cls)
             ):
                 cls._ep_coerce_types_.append(typ)
 
@@ -481,43 +462,25 @@ class EnumPropertiesMeta(enum.EnumMeta):
         # set properties onto the members
         for idx, member in enumerate(cls.__members__.values()):
             for prop, values in classdict._ep_properties_.items():
-                setattr(
-                    member,
-                    prop,
-                    values[idx]
-                )
+                setattr(member, prop, values[idx])
 
         # we reverse to maintain precedence order for symmetric lookups
         member_values = list(
-            cls._value2member_map_.values()
-            or
-            cls.__members__.values()
+            cls._value2member_map_.values() or cls.__members__.values()
         )
-        for prop in reversed([
-            prop for prop in cls._properties_ if prop.symmetric
-        ]):
-            for idx, val in enumerate(
-                reversed(classdict._ep_properties_[prop])
-            ):
-                enum_cls = member_values[len(member_values)-1-idx]
+        for prop in reversed([prop for prop in cls._properties_ if prop.symmetric]):
+            for idx, val in enumerate(reversed(classdict._ep_properties_[prop])):
+                enum_cls = member_values[len(member_values) - 1 - idx]
                 if isinstance(val, (set, list)):
                     for val_item in val:
                         add_coerce_type(type(val_item))
-                        add_sym_lookup(
-                            prop,
-                            val_item,
-                            enum_cls
-                        )
+                        add_sym_lookup(prop, val_item, enum_cls)
                 else:
-                    add_sym_lookup(
-                        prop,
-                        val,
-                        enum_cls
-                    )
+                    add_sym_lookup(prop, val, enum_cls)
                     add_coerce_type(type(val))
 
         # add builtin symmetries
-        for sym_builtin in reversed(getattr(cls, '_symmetric_builtins_', [])):
+        for sym_builtin in reversed(getattr(cls, "_symmetric_builtins_", [])):
             # allow simple strings for the default case
             if isinstance(sym_builtin, str):
                 sym_builtin = s(sym_builtin)()
@@ -525,21 +488,17 @@ class EnumPropertiesMeta(enum.EnumMeta):
                 sym_builtin = sym_builtin()
             else:
                 raise ValueError(
-                    f'_symmetric_builtins_ contained {type(sym_builtin)}, '
-                    f'expected string or s() property.'
+                    f"_symmetric_builtins_ contained {type(sym_builtin)}, "
+                    f"expected string or s() property."
                 )
 
             for enum_val in cls:
                 if not hasattr(enum_val, sym_builtin):
                     raise ValueError(
-                        f'{cls}.{sym_builtin} does not exist, but is listed in'
-                        f' _symmetric_builtins_.'
+                        f"{cls}.{sym_builtin} does not exist, but is listed in"
+                        f" _symmetric_builtins_."
                     )
-                add_sym_lookup(
-                    sym_builtin,
-                    getattr(enum_val, sym_builtin),
-                    enum_val
-                )
+                add_sym_lookup(sym_builtin, getattr(enum_val, sym_builtin), enum_val)
 
         return cls
 
@@ -575,11 +534,7 @@ class EnumProperties(SymmetricMixin, enum.Enum, metaclass=EnumPropertiesMeta):
         return enum.Enum.__hash__(self)
 
 
-class IntEnumProperties(
-    SymmetricMixin,
-    enum.IntEnum,
-    metaclass=EnumPropertiesMeta
-):
+class IntEnumProperties(SymmetricMixin, enum.IntEnum, metaclass=EnumPropertiesMeta):
     """
     An IntEnum that supports properties.
 
@@ -597,15 +552,15 @@ class IntEnumProperties(
 
 class StrEnumProperties(  # pylint: disable=R0903
     SymmetricMixin,
-    *((enum.StrEnum,) if hasattr(enum, 'StrEnum') else (str, enum.Enum)),
-    metaclass=EnumPropertiesMeta
+    *((enum.StrEnum,) if hasattr(enum, "StrEnum") else (str, enum.Enum)),
+    metaclass=EnumPropertiesMeta,
 ):
     """
     An StrEnum that supports properties.
     """
 
     def __hash__(self):
-        return getattr(enum, 'StrEnum', str).__hash__(self)
+        return getattr(enum, "StrEnum", str).__hash__(self)
 
 
 class DecomposeMixin:
@@ -629,13 +584,15 @@ class DecomposeMixin:
         Return a generator for the active flags.
         """
         return (
-            member for member in self.__class__
+            member
+            for member in self.__class__
             if (
-                (member.value != 0) and
+                (member.value != 0)
+                and
                 # make sure member is a power of 2, composites are included in
                 # iteration < 3.11
-                ((member.value & (member.value - 1)) == 0) and
-                (self.value & member.value == member.value)
+                ((member.value & (member.value - 1)) == 0)
+                and (self.value & member.value == member.value)
             )
         )
 
@@ -649,21 +606,13 @@ class DecomposeMixin:
 
 
 class FlagProperties(
-    DecomposeMixin,
-    SymmetricMixin,
-    enum.Flag,
-    metaclass=EnumPropertiesMeta
+    DecomposeMixin, SymmetricMixin, enum.Flag, metaclass=EnumPropertiesMeta
 ):
     """
     A Flag that supports properties
     """
 
-    def _generate_next_value_(
-            name,
-            start,
-            count,
-            last_values
-    ):  # pylint: disable=E0213
+    def _generate_next_value_(name, start, count, last_values):  # pylint: disable=E0213
         """
         Intermixed property tuples can corrupt the last_values list with
         tuples. This method ensures only ints are present in last_values and
@@ -673,7 +622,7 @@ class FlagProperties(
             name,
             start,
             count,
-            [val[0] if isinstance(val, tuple) else val for val in last_values]
+            [val[0] if isinstance(val, tuple) else val for val in last_values],
         )
 
     def __hash__(self):
@@ -681,21 +630,13 @@ class FlagProperties(
 
 
 class IntFlagProperties(
-    DecomposeMixin,
-    SymmetricMixin,
-    enum.IntFlag,
-    metaclass=EnumPropertiesMeta
+    DecomposeMixin, SymmetricMixin, enum.IntFlag, metaclass=EnumPropertiesMeta
 ):
     """
     An IntFlag that supports properties.
     """
 
-    def _generate_next_value_(
-            name,
-            start,
-            count,
-            last_values
-    ):  # pylint: disable=E0213
+    def _generate_next_value_(name, start, count, last_values):  # pylint: disable=E0213
         """
         Intermixed property tuples can corrupt the last_values list with
         tuples. This method ensures only ints are present in last_values and
@@ -705,7 +646,7 @@ class IntFlagProperties(
             name,
             start,
             count,
-            [val[0] if isinstance(val, tuple) else val for val in last_values]
+            [val[0] if isinstance(val, tuple) else val for val in last_values],
         )
 
     def __hash__(self):

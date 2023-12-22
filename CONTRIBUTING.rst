@@ -59,6 +59,7 @@ justified is acceptable:
 .. code-block::
 
     poetry run isort enum_properties
+    poetry run black enum_properties
     poetry run pylint enum_properties
     poetry run doc8 -q doc
     poetry check
