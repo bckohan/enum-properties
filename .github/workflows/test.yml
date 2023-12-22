@@ -31,6 +31,7 @@ jobs:
         poetry run pytest
     - name: Run Static Analysis
       run: |
+        poetry run black enum_properties --check
         poetry run pylint enum_properties
         poetry run doc8 -q doc
         poetry check
