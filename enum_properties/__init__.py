@@ -23,7 +23,7 @@ from collections.abc import Generator, Hashable, Iterable  # pylint: disable=E06
 
 try:
     from functools import cached_property
-except ImportError:  # pragma: no cover
+except ImportError:
     # todo remove when python 3.7 support is dropped
     cached_property = property  # pylint: disable=C0103
 
@@ -389,9 +389,9 @@ class EnumPropertiesMeta(enum.EnumMeta):
                         # todo remove when minimum python >= 3.13
                         # base class lets nested classes through! see:
                         # https://github.com/bckohan/enum-properties/issues/29
-                        if isinstance(self._member_names, list):  # pragma: no cover
+                        if isinstance(self._member_names, list):
                             self._member_names.remove(key)
-                        else:  # pragma: no cover
+                        else:
                             # >= python 3.11
                             del self._member_names[key]
                 else:
