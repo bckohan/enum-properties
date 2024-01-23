@@ -41,7 +41,7 @@ jobs:
     - name: Store coverage files
       uses: actions/upload-artifact@v4
       with:
-        name: coverage
+        name: coverage-py${{ matrix.python-version }}
         path: coverage.py${{ matrix.python-version }}.xml
 
   coverage-combine:
@@ -61,8 +61,9 @@ jobs:
       - name: Get coverage files
         uses: actions/download-artifact@v4
         with:
-          name: coverage
           path: coverage
+          pattern: coverage-*
+          merge-multiple: true
 
       - run: ls -la coverage
       - run: coverage combine coverage
