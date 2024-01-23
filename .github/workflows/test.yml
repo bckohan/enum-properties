@@ -28,7 +28,7 @@ jobs:
         poetry install
     - name: Run Unit Tests
       run: |
-        poetry run pytest
+        poetry run pytest --cov-report=xml:coverage.py${{ matrix.python-version }}.xml
     - name: Run Static Analysis
       run: |
         poetry run black enum_properties --check
@@ -37,6 +37,12 @@ jobs:
         poetry check
         poetry run pip check
         poetry run python -m readme_renderer ./README.rst -o /tmp/README.html
+
+    - name: Store coverage files
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage
+        path: coverage.py${{ matrix.python-version }}.xml
 
   coverage-combine:
     needs: [test]

@@ -107,7 +107,6 @@ addopts = [
   "--cov=enum_properties",
   "--cov-branch",
   "--cov-report=term-missing:skip-covered",
-  "--cov-report=html",
   "--cov-report=xml",
   "--cov-fail-under=98"
 ]
