@@ -74,7 +74,7 @@ jobs:
       - run: ls -la *.coverage
       - run: poetry run coverage combine *.coverage
       - run: poetry run coverage report
-      - run: poetry run coverage xml --show-contexts --title "Coverage for ${{ github.sha }}"
+      - run: poetry run coverage xml --title "Coverage for ${{ github.sha }}"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
