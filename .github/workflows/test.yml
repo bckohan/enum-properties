@@ -68,12 +68,11 @@ jobs:
       - name: Get coverage files
         uses: actions/download-artifact@v4
         with:
-          path: coverage
-          pattern: "*.coverage"
+          pattern: coverage-*
           merge-multiple: true
 
       - run: ls -la coverage
-      - run: poetry run coverage combine coverage/*.coverage
+      - run: poetry run coverage combine *.coverage
       - run: poetry run coverage report
       - run: poetry run coverage xml --show-contexts --title "Coverage for ${{ github.sha }}"
 
