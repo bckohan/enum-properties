@@ -28,7 +28,8 @@ jobs:
         poetry install
     - name: Run Unit Tests
       run: |
-        poetry run pytest --cov-report=xml:coverage.py${{ matrix.python-version }}.xml
+        poetry run pytest
+        mv .coverage py${{ matrix.python-version }}.coverage
     - name: Run Static Analysis
       run: |
         poetry run black enum_properties --check
@@ -42,7 +43,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-py${{ matrix.python-version }}
-        path: coverage.py${{ matrix.python-version }}.xml
+        path: py${{ matrix.python-version }}.coverage
 
   coverage-combine:
     needs: [test]
@@ -68,11 +69,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: coverage
-          pattern: coverage-*
+          pattern: *.coverage
           merge-multiple: true
 
       - run: ls -la coverage
-      - run: poetry run coverage combine coverage/*.xml
+      - run: poetry run coverage combine coverage/*.coverage
       - run: poetry run coverage report
       - run: poetry run coverage xml --show-contexts --title "Coverage for ${{ github.sha }}"
 
