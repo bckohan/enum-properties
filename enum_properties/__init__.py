@@ -20,13 +20,7 @@ import enum
 # pylint: disable=protected-access
 import unicodedata
 from collections.abc import Generator, Hashable, Iterable  # pylint: disable=E0611
-
-try:
-    from functools import cached_property
-except ImportError:
-    # todo remove when python 3.7 support is dropped
-    cached_property = property  # pylint: disable=C0103
-
+from functools import cached_property
 
 VERSION = (1, 7, 0)
 
