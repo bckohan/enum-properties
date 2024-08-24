@@ -15,6 +15,7 @@ specialization support for python enumeration classes.
     awkward - revisit in the future if advances warrant it.
 
 """
+
 import enum
 
 # pylint: disable=protected-access
@@ -325,9 +326,9 @@ class EnumPropertiesMeta(enum.EnumMeta):
             def __setitem__(self, key, value):
                 if isinstance(value, _Specialized):
                     for en_val in value.ids:
-                        self._specialized_.setdefault(self._ids_[en_val], {})[
-                            key
-                        ] = value
+                        self._specialized_.setdefault(self._ids_[en_val], {})[key] = (
+                            value
+                        )
                 elif key in EnumPropertiesMeta.EXPECTED:
                     dict.__setitem__(self, key, value)
                 elif key in EnumPropertiesMeta.RESERVED:

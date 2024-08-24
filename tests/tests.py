@@ -1304,9 +1304,12 @@ class TestFlags(TestCase):
             class CreatureHybrid(CreatureDataMixin, EnumProperties, s("kingdom")):
                 BEETLE = "small", 6, False, "insect"
                 DOG = (
-                    "medium",
-                    4,
-                ), "mammal"
+                    (
+                        "medium",
+                        4,
+                    ),
+                    "mammal",
+                )
 
             self.assertEqual(CreatureHybrid.BEETLE.size, "small")
             self.assertEqual(CreatureHybrid.BEETLE.legs, 6)
@@ -1362,9 +1365,12 @@ class TestFlags(TestCase):
             ):
                 BEETLE = "small", 6, "insect"
                 DOG = (
-                    "medium",
-                    4,
-                ), "mammal"
+                    (
+                        "medium",
+                        4,
+                    ),
+                    "mammal",
+                )
 
                 @specialize(BEETLE)
                 def function(self):
@@ -1406,7 +1412,7 @@ class TestPickle(TestCase):
         return ipt is opt
 
     def test_pickle(self):
-        from enum_properties.tests.pickle_enums import Color, PriorityEx
+        from tests.pickle_enums import Color, PriorityEx
 
         self.assertTrue(self.do_pickle_test(PriorityEx.ONE))
         self.assertTrue(self.do_pickle_test(PriorityEx.TWO))
@@ -1421,7 +1427,7 @@ class TestPickle(TestCase):
         self.assertTrue(self.do_pickle_test(Color.BLUE))
 
     def test_flag_pickle(self):
-        from enum_properties.tests.pickle_enums import IntPerm, Perm
+        from tests.pickle_enums import IntPerm, Perm
 
         self.assertTrue(self.do_pickle_test(Perm.R))
         self.assertTrue(self.do_pickle_test(Perm.W))
@@ -1925,7 +1931,7 @@ class NoneCoercionTests(TestCase):
 
 
 class PerformanceAndMemoryChecks(TestCase):
-    from enum_properties.tests.big_enum import ISOCountry
+    from tests.big_enum import ISOCountry
 
     def test_check_big_enum_size(self):
         """
