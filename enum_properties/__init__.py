@@ -173,8 +173,8 @@ class SymmetricMixin(with_typehint("EnumProperties")):  # type: ignore
     _symmetric_builtins_: t.List[_Prop]
     _ep_coerce_types_: t.List[t.Type[t.Any]]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, instance: t.Any):
+        super().__init__(instance)
 
     def __eq__(self, value: t.Any) -> bool:
         """Symmetric equality - try to coerce value before failure"""
