@@ -167,15 +167,6 @@ class SymmetricMixin(with_typehint("EnumProperties")):  # type: ignore
     property will be a case sensitive symmetric property.
     """
 
-    _value2member_map_: t.Dict[t.Any, t.Any]
-    _ep_symmetric_map_: t.Dict[t.Any, t.Any]
-    _ep_isymmetric_map_: t.Dict[str, t.Any]
-    _symmetric_builtins_: t.List[_Prop]
-    _ep_coerce_types_: t.List[t.Type[t.Any]]
-
-    def __init__(self, instance: t.Any):
-        super().__init__(instance)
-
     def __eq__(self, value: t.Any) -> bool:
         """Symmetric equality - try to coerce value before failure"""
         if isinstance(value, self.__class__):
@@ -297,8 +288,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
         "_ep_isymmetric_map_",
     ]
 
-    _ep_symmetric_map_: t.Dict[t.Any, t.Any]
-    _ep_isymmetric_map_: t.Dict[str, t.Any]
+    _ep_symmetric_map_: t.Dict[t.Any, enum.Enum]
+    _ep_isymmetric_map_: t.Dict[str, enum.Enum]
     _ep_coerce_types_: t.List[t.Type[t.Any]]
     _properties_: t.List[_Prop]
 
