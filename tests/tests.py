@@ -1304,9 +1304,12 @@ class TestFlags(TestCase):
             class CreatureHybrid(CreatureDataMixin, EnumProperties, s("kingdom")):
                 BEETLE = "small", 6, False, "insect"
                 DOG = (
-                    "medium",
-                    4,
-                ), "mammal"
+                    (
+                        "medium",
+                        4,
+                    ),
+                    "mammal",
+                )
 
             self.assertEqual(CreatureHybrid.BEETLE.size, "small")
             self.assertEqual(CreatureHybrid.BEETLE.legs, 6)
@@ -1362,9 +1365,12 @@ class TestFlags(TestCase):
             ):
                 BEETLE = "small", 6, "insect"
                 DOG = (
-                    "medium",
-                    4,
-                ), "mammal"
+                    (
+                        "medium",
+                        4,
+                    ),
+                    "mammal",
+                )
 
                 @specialize(BEETLE)
                 def function(self):
@@ -1406,7 +1412,7 @@ class TestPickle(TestCase):
         return ipt is opt
 
     def test_pickle(self):
-        from enum_properties.tests.pickle_enums import Color, PriorityEx
+        from tests.pickle_enums import Color, PriorityEx
 
         self.assertTrue(self.do_pickle_test(PriorityEx.ONE))
         self.assertTrue(self.do_pickle_test(PriorityEx.TWO))
@@ -1421,7 +1427,7 @@ class TestPickle(TestCase):
         self.assertTrue(self.do_pickle_test(Color.BLUE))
 
     def test_flag_pickle(self):
-        from enum_properties.tests.pickle_enums import IntPerm, Perm
+        from tests.pickle_enums import IntPerm, Perm
 
         self.assertTrue(self.do_pickle_test(Perm.R))
         self.assertTrue(self.do_pickle_test(Perm.W))
@@ -1925,7 +1931,7 @@ class NoneCoercionTests(TestCase):
 
 
 class PerformanceAndMemoryChecks(TestCase):
-    from enum_properties.tests.big_enum import ISOCountry
+    from tests.big_enum import ISOCountry
 
     def test_check_big_enum_size(self):
         """
@@ -2164,3 +2170,34 @@ class TestMultiPrimitives(TestCase):
         self.assertEqual(MyEnum.V2, 5)
         self.assertEqual(MyEnum.V3, "label")
         self.assertEqual(MyEnum.V4, date(year=1970, month=1, day=1))
+
+
+class TestTypeHints(TestCase):
+    def test_type_hints(self):
+        from typing import List, get_type_hints
+
+        class MyEnum(IntEnumProperties, s("label"), p("idx")):
+            label: str
+            idx: int
+
+            ITEM1 = 1, "item1", 0
+            ITEM2 = 2, "item2", 1
+            ITEM3 = 3, "item3", 2
+
+        self.assertEqual(MyEnum.ITEM1, 1)
+        self.assertEqual(MyEnum.ITEM1.value, 1)
+        self.assertEqual(MyEnum.ITEM1.label, "item1")
+        self.assertEqual(MyEnum.ITEM1.idx, 0)
+        self.assertEqual(get_type_hints(MyEnum.ITEM1), {"label": str, "idx": int})
+
+        self.assertEqual(MyEnum.ITEM2, 2)
+        self.assertEqual(MyEnum.ITEM2.value, 2)
+        self.assertEqual(MyEnum.ITEM2.label, "item2")
+        self.assertEqual(MyEnum.ITEM2.idx, 1)
+        self.assertEqual(get_type_hints(MyEnum.ITEM2), {"label": str, "idx": int})
+
+        self.assertEqual(MyEnum.ITEM3, 3)
+        self.assertEqual(MyEnum.ITEM3.value, 3)
+        self.assertEqual(MyEnum.ITEM3.label, "item3")
+        self.assertEqual(MyEnum.ITEM3.idx, 2)
+        self.assertEqual(get_type_hints(MyEnum.ITEM3), {"label": str, "idx": int})

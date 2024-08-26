@@ -2,6 +2,14 @@
 Change Log
 ==========
 
+v1.8.0
+======
+
+* Implemented `Drop support for Python 3.7 <https://github.com/bckohan/enum-properties/issues/59>`_
+* Implemented `Support Python 3.13 <https://github.com/bckohan/enum-properties/issues/58>`_
+* Implemented `Move to ruff for linting and formatting. <https://github.com/bckohan/enum-properties/issues/57>`_
+* Documented `Support type hinting for properties <https://github.com/bckohan/enum-properties/issues/42>`_
+
 v1.7.0
 ======
 * Implemented `Add a StrEnumProperties type to match StrEnum. <https://github.com/bckohan/enum-properties/issues/54>`_
