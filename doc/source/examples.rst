@@ -83,6 +83,10 @@ implement our style enumeration like so:
         """
         _symmetric_builtins_ = ['name', 'uri']
 
+        # type hints are optional for better dev experience
+        label: str
+        version: int
+
         # name               value                 label           version
         STREETS           = 'streets',           'Streets',           11
         OUTDOORS          = 'outdoors',          'Outdoors',          11
@@ -94,7 +98,7 @@ implement our style enumeration like so:
         NAVIGATION_NIGHT  = 'navigation-night',  'Navigation Night',   1
 
         @property
-        def uri(self):
+        def uri(self) -> str:
             return f'mapbox://styles/mapbox/{self.value}-v{self.version}'
 
         def __str__(self):

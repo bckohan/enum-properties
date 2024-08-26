@@ -37,14 +37,19 @@ Add properties to Python enumeration values with a simple declarative syntax. [E
 
 ```
 
-Properties may also be symmetrically mapped to enumeration values, using s() values:
+Properties may also be symmetrically mapped to enumeration values using s() values and type hints
+are optional for better dev experience:
 
 ```python
 
+    import typing as t
     from enum_properties import EnumProperties, s
     from enum import auto
 
     class Color(EnumProperties, s('rgb'), s('hex', case_fold=True)):
+
+        rgb: t.Tuple[int, int, int]
+        hex: str
 
         RED    = auto(), (1, 0, 0), 'ff0000'
         GREEN  = auto(), (0, 1, 0), '00ff00'
