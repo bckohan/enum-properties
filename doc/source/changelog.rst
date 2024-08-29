@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v1.8.1
+======
+
+* Fixed `Add missing py.typed <https://github.com/bckohan/enum-properties/issues/62>`_
+
 v1.8.0
 ======
 
