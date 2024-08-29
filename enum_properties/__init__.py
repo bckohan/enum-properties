@@ -23,7 +23,7 @@ import unicodedata
 from collections.abc import Generator, Hashable, Iterable
 from functools import cached_property
 
-VERSION = (1, 8, 0)
+VERSION = (1, 8, 1)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
