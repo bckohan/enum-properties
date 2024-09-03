@@ -28,7 +28,7 @@ Add properties to Python enumeration values with a simple declarative syntax. [E
         GREEN  = auto(), (0, 1, 0), '00ff00'
         BLUE   = auto(), (0, 0, 1), '0000ff'
 
-    # the named p() values in the Enum's inheritance become properties on
+    # the type hints on the Enum class become properties on
     # each value, matching the order in which they are specified
 
     Color.RED.rgb   == (1, 0, 0)
