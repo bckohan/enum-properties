@@ -24,13 +24,16 @@ enumeration. We might implement it like so:
 
 .. code-block:: python
 
-    class AddressRoute(
-        EnumProperties,
-        s('abbr', case_fold=True),
-        s('alt', case_fold=True)
-    ):
+    import typing as t
+    from enum_properties import EnumProperties, Symmetric
 
-        _symmetric_builtins_ = [s('name', case_fold=True)]
+    class AddressRoute(EnumProperties):
+
+        # name is a builtin property of Enum, we can override its case insensitivity
+        name: t.Annotated[str, Symmetric(case_fold=True)]
+
+        abbr: t.Annotated[str, Symmetric(case_fold=True)]
+        alt: t.Annotated[t.List[str], Symmetric(case_fold=True)]
 
         # name  value    abbr         alt
         ALLEY   = 1,    'ALY', ['ALLEE', 'ALLY']
@@ -73,18 +76,20 @@ implement our style enumeration like so:
 
 .. code-block:: python
 
-    class MapBoxStyle(
-        EnumProperties,
-        s('label', case_fold=True),
-        p('version')
-    ):
+    import typing as t
+    from enum_properties import EnumProperties, s, Symmetric
+
+    class MapBoxStyle(EnumProperties):
         """
         https://docs.mapbox.com/api/maps/styles/
         """
-        _symmetric_builtins_ = ['name', 'uri']
+
+        # we may mark builtins and normal properties as symmetric using
+        # the _symmetric_builtins_ attribute
+        _symmetric_builtins_ = [s('name', case_fold=True), 'uri']
 
         # type hints are optional for better dev experience
-        label: str
+        label: t.Annotated[str, Symmetric(case_fold=True)]
         version: int
 
         # name               value                 label           version

@@ -21,9 +21,10 @@ import sys
 import typing as t
 import unicodedata
 from collections.abc import Generator, Hashable, Iterable
+from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (1, 8, 1)
+VERSION = (2, 0, 0)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -63,10 +64,25 @@ def _do_casenorm(text: str) -> str:
     return unicodedata.normalize("NFKD", text.casefold())
 
 
+@dataclass
+class Symmetric:
+    case_fold: bool = False
+    """
+    If False, symmetric lookup will be case sensitive (default)
+    """
+
+    match_none: bool = False
+    """
+    If True, none values will be symmetric, if False (default), 
+    none values for symmetric properties will not map back to
+    the enumeration value.
+    """
+
+
 class _Prop(str):
     """Property interface - private"""
 
-    symmetric: bool
+    symmetric: bool = False
 
     def __new__(cls):
         return super().__new__(cls, cls.name())  # type: ignore[no-untyped-call]
@@ -80,6 +96,7 @@ class _Prop(str):
 class _SProp(_Prop):
     """Symmetric property interface - private"""
 
+    symmetric: bool = True
     case_fold: bool
     match_none: bool
 
@@ -102,7 +119,7 @@ def s(
     return type(
         prop_name,
         (_SProp,),
-        {"symmetric": True, "case_fold": case_fold, "match_none": match_none},
+        {"case_fold": case_fold, "match_none": match_none},
     )
 
 
@@ -117,7 +134,7 @@ def p(prop_name: str) -> t.Type[_Prop]:
     :param prop_name: The name of the property
     :return: a named property class
     """
-    return type(prop_name, (_Prop,), {"symmetric": False})
+    return type(prop_name, (_Prop,), {})
 
 
 class _Specialized:
@@ -309,8 +326,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
         for base in bases:
             if issubclass(base, _Prop):
                 if (
-                    base.name()
-                    in EnumPropertiesMeta.RESERVED + EnumPropertiesMeta.EXPECTED
+                    base.name() in EnumPropertiesMeta.RESERVED
+                    or base.name() in EnumPropertiesMeta.EXPECTED
                 ):
                     raise ValueError(f"{base.name()} is reserved.")
                 properties[base()] = []
@@ -329,10 +346,51 @@ class EnumPropertiesMeta(enum.EnumMeta):
             """
 
             _ep_properties_ = properties
-            _ep_symmetric_properties = []
             _specialized_: t.Dict[str, t.Dict[str, _Specialized]] = {}
             _ids_: t.Dict[int, str] = {}
             _member_names: t.Union[t.List[str], t.Dict[str, t.Any]]
+            _create_properties_: bool = False
+
+            class AnnotationPropertyRecorder(dict):
+                class_dict: "_PropertyEnumDict"
+                create_properties: bool
+
+                def __init__(self, class_dict: "_PropertyEnumDict"):
+                    self.class_dict = class_dict
+                    # we only use annotations to create properties if p/s value
+                    # inheritance is not used
+                    super().__init__()
+
+                def __setitem__(self, key, value):
+                    if self.class_dict._create_properties_:
+                        if (
+                            key not in EnumPropertiesMeta.RESERVED
+                            and key not in EnumPropertiesMeta.EXPECTED
+                        ):
+                            prop: t.Type[_Prop]
+                            if getattr(value, "__metadata__", None) and isinstance(
+                                value.__metadata__[0], Symmetric
+                            ):
+                                prop = s(
+                                    key,
+                                    case_fold=value.__metadata__[0].case_fold,
+                                    match_none=value.__metadata__[0].match_none,
+                                )
+                            else:
+                                prop = p(key)
+                            if key == "name" or key == "value":
+                                if issubclass(prop, _SProp):
+                                    if self.class_dict.__contains__(
+                                        "_symmetric_builtins_"
+                                    ):
+                                        self.class_dict["_symmetric_builtins_"].append(
+                                            prop
+                                        )
+                                    else:
+                                        self.class_dict["_symmetric_builtins_"] = [prop]
+                            else:
+                                self.class_dict._ep_properties_[prop()] = []
+                    super().__setitem__(key, value)
 
             def __init__(self):
                 super().__init__()
@@ -340,6 +398,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     setattr(self, attr, getattr(class_dict, attr))
                 for item, value in class_dict.items():
                     self[item] = value
+                self._create_properties_ = not self._ep_properties_
 
             def __setitem__(self, key, value):
                 if isinstance(value, _Specialized):
@@ -359,6 +418,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     # ensures robust fidelity to Enum behavior.
                     before = len(member_names)
                     class_dict[key] = value
+                    self._create_properties_ = False  # we're done with annotations
                     remove = False
                     if (
                         len(member_names) > before
@@ -410,7 +470,12 @@ class EnumPropertiesMeta(enum.EnumMeta):
                             del self._member_names[key]
                 else:
                     self._ids_[id(value)] = key
+                    if key == "__annotations__":
+                        value = self.AnnotationPropertyRecorder(self)
+                    before = len(self._member_names)
                     super().__setitem__(key, value)
+                    if len(self._member_names) > before:
+                        self._create_properties_ = False
 
         return _PropertyEnumDict()  # type: ignore[no-untyped-call]
 

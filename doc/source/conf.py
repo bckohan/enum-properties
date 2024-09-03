@@ -40,7 +40,6 @@ release = enum_properties.__version__
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinxarg.ext',
     'sphinx.ext.todo'
 ]
 

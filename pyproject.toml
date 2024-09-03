@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "enum-properties"
-version = "1.8.1"
+version = "2.0.0"
 description = "Add properties and method specializations to Python enumeration values with a simple declarative syntax."
 authors = ["Brian Kohan <bckohan@gmail.com>"]
 license = "MIT"
@@ -85,7 +85,7 @@ sphinx = true
 
 
 [tool.pytest.ini_options]
-python_files = "tests.py"
+python_files = "test*.py"
 norecursedirs = "*.egg .eggs dist build docs .tox .git __pycache__"
 
 addopts = [
