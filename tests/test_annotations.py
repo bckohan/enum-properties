@@ -614,7 +614,9 @@ class TestEnumsTypeAnnotations(TestCase):
 
             # we can mark builtins and normal properties as symmetric using
             # this special attribute
-            _symmetric_builtins_ = [s("name", case_fold=True), "uri"]
+            _symmetric_builtins_ = ["uri"]
+
+            name: Annotated[str, Symmetric(case_fold=True)]
 
             # type hints are optional for better dev experience
             label: Annotated[str, Symmetric(case_fold=True)]
