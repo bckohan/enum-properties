@@ -15,7 +15,7 @@ Add properties to Python enumeration values with a simple declarative syntax. [E
 ```python
 
     import typing as t
-    from enum_properties import EnumProperties, p
+    from enum_properties import EnumProperties
     from enum import auto
 
     class Color(EnumProperties):

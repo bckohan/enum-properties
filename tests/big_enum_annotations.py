@@ -1,6 +1,6 @@
 """The standard enum type for ISO 3166-1 common countrys"""
 
-import typing as t
+from typing_extensions import Annotated
 from enum_properties import EnumProperties, Symmetric
 
 
@@ -9,11 +9,11 @@ class ISOCountry(EnumProperties):
     An enumeration for ISO 3166-1 Country codes.
     """
 
-    alpha2: t.Annotated[str, Symmetric(case_fold=True)]
-    alpha3: t.Annotated[str, Symmetric(case_fold=True)]
+    alpha2: Annotated[str, Symmetric(case_fold=True)]
+    alpha3: Annotated[str, Symmetric(case_fold=True)]
     independent: bool
-    short_name: t.Annotated[str, Symmetric(case_fold=True)]
-    full_name: t.Annotated[str, Symmetric(case_fold=True)]
+    short_name: Annotated[str, Symmetric(case_fold=True)]
+    full_name: Annotated[str, Symmetric(case_fold=True)]
 
     # pylint: disable=C0303
     AD = 20, "AD", "AND", True, "Andorra", "the Principality of Andorra"
