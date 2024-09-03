@@ -1622,6 +1622,8 @@ class TestNestedClassOnEnum(TestCase):
 
     def test_example(self):
         class MyEnum(EnumProperties):
+            label: str
+
             @nonmember
             class Type1:
                 pass
@@ -1633,8 +1635,6 @@ class TestNestedClassOnEnum(TestCase):
             @nonmember
             class Type3:
                 pass
-
-            label: str
 
             VALUE1 = member(Type1), "label1"
             VALUE2 = member(Type2), "label2"
@@ -2068,16 +2068,31 @@ class TestTypeHints(TestCase):
         self.assertEqual(MyEnum.ITEM1.value, 1)
         self.assertEqual(MyEnum.ITEM1.label, "item1")
         self.assertEqual(MyEnum.ITEM1.idx, 0)
-        self.assertEqual(get_type_hints(MyEnum.ITEM1), {"label": str, "idx": int})
+
+        if sys.version_info >= (3, 9):
+            self.assertEqual(get_type_hints(MyEnum.ITEM1), {"label": str, "idx": int})
+        else:
+            self.assertEqual(get_type_hints(MyEnum.ITEM1)["label"].__origin__, str)
+            self.assertEqual(get_type_hints(MyEnum.ITEM1)["idx"], int)
 
         self.assertEqual(MyEnum.ITEM2, 2)
         self.assertEqual(MyEnum.ITEM2.value, 2)
         self.assertEqual(MyEnum.ITEM2.label, "item2")
         self.assertEqual(MyEnum.ITEM2.idx, 1)
-        self.assertEqual(get_type_hints(MyEnum.ITEM2), {"label": str, "idx": int})
+
+        if sys.version_info >= (3, 9):
+            self.assertEqual(get_type_hints(MyEnum.ITEM2), {"label": str, "idx": int})
+        else:
+            self.assertEqual(get_type_hints(MyEnum.ITEM2)["label"].__origin__, str)
+            self.assertEqual(get_type_hints(MyEnum.ITEM2)["idx"], int)
 
         self.assertEqual(MyEnum.ITEM3, 3)
         self.assertEqual(MyEnum.ITEM3.value, 3)
         self.assertEqual(MyEnum.ITEM3.label, "item3")
         self.assertEqual(MyEnum.ITEM3.idx, 2)
-        self.assertEqual(get_type_hints(MyEnum.ITEM3), {"label": str, "idx": int})
+
+        if sys.version_info >= (3, 9):
+            self.assertEqual(get_type_hints(MyEnum.ITEM3), {"label": str, "idx": int})
+        else:
+            self.assertEqual(get_type_hints(MyEnum.ITEM3)["label"].__origin__, str)
+            self.assertEqual(get_type_hints(MyEnum.ITEM3)["idx"], int)
