@@ -114,7 +114,7 @@ Please report bugs and discuss features on the [issues page](https://github.com/
 
 ## Installation
 
-1. Clone enum-properties from GitHub_ or install a release off PyPI_ :
+1. Clone enum-properties from [GitHub](https://github.com/bckohan/enum-properties) or install a release off [PyPI](https://pypi.org/project/enum-properties/):
 
 ```bash
        pip install enum-properties
