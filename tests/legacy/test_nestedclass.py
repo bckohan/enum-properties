@@ -279,4 +279,3 @@ class TestNestedClassOnEnum(TestCase):
         self.assertTrue(MyEnum.Type1.value().__class__ is MyEnum.Type1.value)
         self.assertTrue(MyEnum.Type2.value().__class__ is MyEnum.Type2.value)
         self.assertTrue(MyEnum.Type3.value().__class__ is MyEnum.Type3.value)
-

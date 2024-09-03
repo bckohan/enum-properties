@@ -1,25 +1,23 @@
 import sys
 from enum import auto
 from unittest import TestCase
+from typing_extensions import Annotated
 
 from enum_properties import (
     EnumProperties,
     FlagProperties,
     IntEnumProperties,
     IntFlagProperties,
-    p,
-    s,
+    Symmetric,
     specialize,
 )
 
 
-
 class TestFlags(TestCase):
     def test_int_flag(self):
-        class Perm(
-            IntFlagProperties,
-            s("label", case_fold=True),
-        ):
+        class Perm(IntFlagProperties):
+            label: Annotated[str, Symmetric(case_fold=True)]
+
             R = 1, "read"
             W = 2, "write"
             X = 4, "execute"
@@ -78,10 +76,9 @@ class TestFlags(TestCase):
             self.assertEqual(show_flag_values(Perm.RWX), [1, 2, 4])
 
     def test_flag(self):
-        class Perm(
-            FlagProperties,
-            s("label", case_fold=True),
-        ):
+        class Perm(FlagProperties):
+            label: Annotated[str, Symmetric(case_fold=True)]
+
             R = auto(), "read"
             W = auto(), "write"
             X = auto(), "execute"
@@ -158,7 +155,9 @@ class TestFlags(TestCase):
         self.assertEqual(PermNative.X.value, 4)
         self.assertEqual(PermNative.RWX.value, 7)
 
-        class PermProperties(FlagProperties, s("label", case_fold=True)):
+        class PermProperties(FlagProperties):
+            label: Annotated[str, Symmetric(case_fold=True)]
+
             R = auto(), "read"
             W = auto(), "write"
             RW = R | W, "read/write"
@@ -190,7 +189,9 @@ class TestFlags(TestCase):
         self.assertEqual(PermProperties.X, PermProperties("execute"))
         self.assertEqual(PermProperties.RWX, PermProperties("all"))
 
-        class IntPermProperties(IntFlagProperties, s("label", case_fold=True)):
+        class IntPermProperties(IntFlagProperties):
+            label: Annotated[str, Symmetric(case_fold=True)]
+
             R = auto(), "read"
             W = auto(), "write"
             RW = R | W, "read/write"
@@ -234,7 +235,9 @@ class TestFlags(TestCase):
             """
             from enum import CONFORM, EJECT, KEEP, STRICT
 
-            class StrictFlag(IntFlagProperties, p("label"), boundary=STRICT):
+            class StrictFlag(IntFlagProperties, boundary=STRICT):
+                label: str
+
                 RED = auto(), "red"
                 GREEN = auto(), "green"
                 BLUE = auto(), "blue"
@@ -247,7 +250,9 @@ class TestFlags(TestCase):
             self.assertEqual(StrictFlag.GREEN.label, "green")
             self.assertFalse(hasattr((StrictFlag.BLUE | StrictFlag.RED), "label"))
 
-            class ConformFlag(FlagProperties, s("label"), boundary=CONFORM):
+            class ConformFlag(FlagProperties, boundary=CONFORM):
+                label: Annotated[str, Symmetric()]
+
                 RED = auto(), "red"
                 GREEN = auto(), "green"
                 BLUE = auto(), "blue"
@@ -256,7 +261,9 @@ class TestFlags(TestCase):
             self.assertEqual(ConformFlag(2**2 + 2**4).label, "blue")
             self.assertEqual(ConformFlag(2**2 + 2**4).label, ConformFlag("blue"))
 
-            class EjectFlag(IntFlagProperties, s("label"), boundary=EJECT):
+            class EjectFlag(IntFlagProperties, boundary=EJECT):
+                label: Annotated[str, Symmetric()]
+
                 RED = auto(), "red"
                 GREEN = auto(), "green"
                 BLUE = auto(), "blue"
@@ -268,7 +275,10 @@ class TestFlags(TestCase):
                 (EjectFlag.GREEN | EjectFlag.BLUE), EjectFlag(["blue", "green"])
             )
 
-            class KeepFlag(FlagProperties, s("label"), p("hex"), boundary=KEEP):
+            class KeepFlag(FlagProperties, boundary=KEEP):
+                label: Annotated[str, Symmetric()]
+                hex: int
+
                 RED = auto(), "red", 0xFF0000
                 GREEN = auto(), "green", 0x00FF00
                 BLUE = auto(), "blue", 0x0000FF
@@ -286,14 +296,18 @@ class TestFlags(TestCase):
             with self.assertRaises(ValueError):
 
                 @verify(UNIQUE)
-                class Color(EnumProperties, s("label")):
+                class Color(EnumProperties):
+                    label: Annotated[str, Symmetric()]
+
                     RED = 1, "red"
                     GREEN = 2, "green"
                     BLUE = 3, "blue"
                     CRIMSON = 1, "crimson"
 
             @verify(UNIQUE)
-            class Color(EnumProperties, p("label")):
+            class Color(EnumProperties):
+                label: str
+
                 RED = 1, "red"
                 GREEN = 2, "green"
                 BLUE = 3, "blue"
@@ -305,7 +319,9 @@ class TestFlags(TestCase):
             with self.assertRaises(ValueError):
                 # this throws an error if label is symmetric!
                 @verify(UNIQUE)
-                class Color(EnumProperties, s("label")):
+                class Color(EnumProperties):
+                    label: Annotated[str, Symmetric()]
+
                     RED = 1, "red"
                     GREEN = 2, "green"
                     BLUE = 3, "blue"
@@ -314,13 +330,17 @@ class TestFlags(TestCase):
             with self.assertRaises(ValueError):
 
                 @verify(CONTINUOUS)
-                class Color(IntEnumProperties, s("label")):
+                class Color(IntEnumProperties):
+                    label: Annotated[str, Symmetric()]
+
                     RED = 1, "red"
                     GREEN = 2, "green"
                     BLUE = 5, "blue"
 
             @verify(CONTINUOUS)
-            class Color(IntEnumProperties, s("label")):
+            class Color(IntEnumProperties):
+                label: Annotated[str, Symmetric()]
+
                 RED = 1, "red"
                 GREEN = 2, "green"
                 BLUE = 3, "blue"
@@ -331,7 +351,9 @@ class TestFlags(TestCase):
             with self.assertRaises(ValueError):
 
                 @verify(NAMED_FLAGS)
-                class Color(IntFlagProperties, s("label")):
+                class Color(IntFlagProperties):
+                    label: Annotated[str, Symmetric()]
+
                     RED = 1, "red"
                     GREEN = 2, "green"
                     BLUE = 4, "blue"
@@ -339,7 +361,9 @@ class TestFlags(TestCase):
                     NEON = 31, "neon"
 
             @verify(NAMED_FLAGS)
-            class Color(IntFlagProperties, s("label")):
+            class Color(IntFlagProperties):
+                label: Annotated[str, Symmetric()]
+
                 RED = 1, "red"
                 GREEN = 2, "green"
                 BLUE = 4, "blue"
@@ -353,7 +377,9 @@ class TestFlags(TestCase):
         def test_enum_property(self):
             from enum import property as enum_property
 
-            class Color(EnumProperties, s("label")):
+            class Color(EnumProperties):
+                label: Annotated[str, Symmetric()]
+
                 RED = 1, "red"
                 GREEN = 2, "green"
                 BLUE = 3, "blue"
@@ -368,7 +394,9 @@ class TestFlags(TestCase):
             # property name should raise an AttributeError
             with self.assertRaises(AttributeError):
 
-                class Color(EnumProperties, s("label")):
+                class Color(EnumProperties):
+                    label: Annotated[str, Symmetric()]
+
                     RED = 1, "red"
                     GREEN = 2, "green"
                     BLUE = 3, "blue"
@@ -400,31 +428,9 @@ class TestFlags(TestCase):
                 legs: int
                 tail: bool = field(repr=False, default=True)
 
-            class Creature(CreatureDataMixin, EnumProperties):
-                BEETLE = "small", 6
-                DOG = "medium", 4
+            class CreatureHybrid(CreatureDataMixin, EnumProperties):
+                kingdom: Annotated[str, Symmetric()]
 
-            self.assertEqual(Creature.BEETLE.size, "small")
-            self.assertEqual(Creature.BEETLE.legs, 6)
-            self.assertEqual(Creature.BEETLE.tail, True)
-
-            self.assertEqual(Creature.DOG.size, "medium")
-            self.assertEqual(Creature.DOG.legs, 4)
-            self.assertEqual(Creature.DOG.tail, True)
-
-            class CreatureEP(CreatureDataMixin, EnumProperties):
-                BEETLE = "small", 6
-                DOG = "medium", 4, False
-
-            self.assertEqual(CreatureEP.BEETLE.size, "small")
-            self.assertEqual(CreatureEP.BEETLE.legs, 6)
-            self.assertEqual(CreatureEP.BEETLE.tail, True)
-
-            self.assertEqual(CreatureEP.DOG.size, "medium")
-            self.assertEqual(CreatureEP.DOG.legs, 4)
-            self.assertEqual(CreatureEP.DOG.tail, False)
-
-            class CreatureHybrid(CreatureDataMixin, EnumProperties, s("kingdom")):
                 BEETLE = "small", 6, False, "insect"
                 DOG = (
                     (
@@ -447,9 +453,9 @@ class TestFlags(TestCase):
             self.assertEqual(CreatureHybrid("mammal"), CreatureHybrid.DOG)
             self.assertEqual(CreatureHybrid("insect"), CreatureHybrid.BEETLE)
 
-            class CreatureHybridSpecialized(
-                CreatureDataMixin, EnumProperties, s("kingdom")
-            ):
+            class CreatureHybridSpecialized(CreatureDataMixin, EnumProperties):
+                kingdom: Annotated[str, Symmetric()]
+
                 BEETLE = "small", 6, "insect"
                 DOG = ("medium", 4, False), "mammal"
 
@@ -483,9 +489,9 @@ class TestFlags(TestCase):
                 CreatureHybridSpecialized.BEETLE.function(), "function(beetle)"
             )
 
-            class CreatureHybridSpecialized(
-                CreatureDataHashableMixin, EnumProperties, s("kingdom")
-            ):
+            class CreatureHybridSpecialized(CreatureDataHashableMixin, EnumProperties):
+                kingdom: Annotated[str, Symmetric()]
+
                 BEETLE = "small", 6, "insect"
                 DOG = (
                     (
@@ -528,7 +534,9 @@ class TestFlags(TestCase):
 
 class TestGiantFlags(TestCase):
     def test_over64_flags(self):
-        class BigFlags(IntFlagProperties, p("label")):
+        class BigFlags(IntFlagProperties):
+            label: str
+
             ONE = 2**0, "one"
             MIDDLE = 2**64, "middle"
             MIXED = ONE | MIDDLE, "mixed"

@@ -12,7 +12,7 @@ class TestPickle(TestCase):
         return ipt is opt
 
     def test_pickle(self):
-        from tests.pickle_enums import Color, PriorityEx
+        from tests.pickle_enums_annotations import Color, PriorityEx
 
         self.assertTrue(self.do_pickle_test(PriorityEx.ONE))
         self.assertTrue(self.do_pickle_test(PriorityEx.TWO))
@@ -27,7 +27,7 @@ class TestPickle(TestCase):
         self.assertTrue(self.do_pickle_test(Color.BLUE))
 
     def test_flag_pickle(self):
-        from tests.pickle_enums import IntPerm, Perm
+        from tests.pickle_enums_annotations import IntPerm, Perm
 
         self.assertTrue(self.do_pickle_test(Perm.R))
         self.assertTrue(self.do_pickle_test(Perm.W))
@@ -42,4 +42,3 @@ class TestPickle(TestCase):
         self.assertTrue(self.do_pickle_test(IntPerm.RWX))
         self.assertTrue(self.do_pickle_test(IntPerm.R | IntPerm.W | IntPerm.X))
         self.assertTrue(self.do_pickle_test(IntPerm.W | IntPerm.X))
-

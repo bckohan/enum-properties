@@ -17,4 +17,3 @@ class TestMultiPrimitives(TestCase):
         self.assertEqual(MyEnum.V2, 5)
         self.assertEqual(MyEnum.V3, "label")
         self.assertEqual(MyEnum.V4, date(year=1970, month=1, day=1))
-

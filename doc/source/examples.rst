@@ -117,7 +117,7 @@ persisted values are re-instantiated as ``MapBoxStyle`` enumerations.
 
 The last property we've added is the ``uri`` property. We've added it as concrete property on the
 class because it can be created from the slug and version. We could have specified it in the value
-tuple but that would be very verbose and less 
+tuple but that would be very verbose and less
 `DRY <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_. To make this property symmetric we
 added it to the ``_symmetric_builtins_`` list.
 

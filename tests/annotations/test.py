@@ -1,58 +1,19 @@
+import typing as t
 from collections.abc import Hashable
 from enum import Enum, auto
 from unittest import TestCase
+from typing_extensions import Annotated
 
 from enum_properties import (
     EnumProperties,
     IntEnumProperties,
     SymmetricMixin,
-    p,
-    s
+    Symmetric,
+    s,
 )
 
 
 class TestEnums(TestCase):
-    def test_p(self):
-        from enum_properties import _Prop
-
-        prop1 = p("prop1")
-        prop2 = s("prop2")
-        prop3 = s("prop3", case_fold=True)
-        prop4 = p("prop4")
-
-        self.assertTrue(issubclass(prop1, _Prop))
-        self.assertTrue(issubclass(prop2, _Prop))
-        self.assertTrue(issubclass(prop3, _Prop))
-        self.assertTrue(issubclass(prop4, _Prop))
-        self.assertEqual(prop1.name(), "prop1")
-        self.assertEqual(prop2.name(), "prop2")
-        self.assertEqual(prop3.name(), "prop3")
-        self.assertEqual(prop4.name(), "prop4")
-        self.assertEqual(prop1(), "prop1")
-        self.assertEqual(prop2(), "prop2")
-        self.assertEqual(prop3(), "prop3")
-        self.assertEqual(prop4(), "prop4")
-
-        self.assertFalse(prop1.symmetric)
-        self.assertTrue(prop2.symmetric)
-        self.assertTrue(prop3.symmetric)
-        self.assertFalse(prop4.symmetric)
-
-        self.assertFalse(prop1().symmetric)
-        self.assertTrue(prop2().symmetric)
-        self.assertTrue(prop3().symmetric)
-        self.assertFalse(prop4().symmetric)
-
-        self.assertFalse(hasattr(prop1, "case_fold"))
-        self.assertFalse(prop2.case_fold)
-        self.assertTrue(prop3.case_fold)
-        self.assertFalse(hasattr(prop4, "case_fold"))
-
-        self.assertFalse(hasattr(prop1(), "case_fold"))
-        self.assertFalse(prop2().case_fold)
-        self.assertTrue(prop3().case_fold)
-        self.assertFalse(hasattr(prop4(), "case_fold"))
-
     def test_unhashable_symmetry(self):
         """
         Tests that a value error is thrown when an unhashable type is used as
@@ -60,12 +21,16 @@ class TestEnums(TestCase):
         """
         with self.assertRaises(ValueError):
 
-            class BadEnum(EnumProperties, s("bad_prop")):
+            class BadEnum(EnumProperties):
+                bad_prop: Annotated[str, Symmetric()]
+
                 VAL1 = "E1", "E1 Label", "Good prop"
                 VAL2 = "E2", "E2 Label", {"hashable": False}
 
     def test_unicode_casefold(self):
-        class CaseAgnostic(EnumProperties, s("label", case_fold=True)):
+        class CaseAgnostic(EnumProperties):
+            label: Annotated[str, Symmetric(case_fold=True)]
+
             ONE = 1, "ß"
             TWO = 2, "Σίσυφος"
 
@@ -73,7 +38,9 @@ class TestEnums(TestCase):
         self.assertEqual(CaseAgnostic.TWO, CaseAgnostic("ΣΊΣΥΦΟΣ"))
 
         # test that closest case matches first
-        class CaseFirstMatch(EnumProperties, s("label", case_fold=True)):
+        class CaseFirstMatch(EnumProperties):
+            label: Annotated[str, Symmetric(case_fold=True)]
+
             ONE = 1, "ß"
             TWO = 2, "Σίσυφος"
             THREE = 3, "ss"
@@ -83,9 +50,12 @@ class TestEnums(TestCase):
         self.assertEqual(CaseFirstMatch.TWO, CaseFirstMatch("ΣΊΣΥΦΟΣ"))
 
     def test_properties_and_symmetry(self):
-        class Color(
-            IntEnumProperties, p("spanish"), s("rgb"), s("hex", case_fold=True)
-        ):
+        class Color(IntEnumProperties):
+            value: int
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True)]
+
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
             BLUE = 3, "Azul", (0, 0, 1), "0000ff"
@@ -169,20 +139,28 @@ class TestEnums(TestCase):
         self.assertNotEqual(Color.BLUE, (0, 1, 1))
 
     def test_property_lists(self):
-        class Color(EnumProperties, p("spanish"), s("rgb"), s("hex", case_fold=True)):
+        class Color(EnumProperties):
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True)]
+
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
             BLUE = 3, "Azul", (0, 0, 1), "0000ff"
 
         self.assertEqual(
-            [prop for prop in Color._properties_ if prop.symmetric], ["rgb", "hex"]
+            [prop for prop in Color._properties_ if getattr(prop, "symmetric", False)],
+            ["rgb", "hex"],
         )
 
         self.assertEqual(Color._properties_, ["spanish", "rgb", "hex"])
 
     def test_symmetric_builtin_override(self):
-        class Color(EnumProperties, p("spanish"), s("rgb"), s("hex", case_fold=True)):
-            _symmetric_builtins_ = [s("name", case_fold=True)]
+        class Color(EnumProperties):
+            name: Annotated[str, Symmetric(case_fold=True)]
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True)]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
@@ -192,25 +170,31 @@ class TestEnums(TestCase):
         self.assertEqual(Color.GREEN, Color("gREen"))
         self.assertEqual(Color.BLUE, Color("Blue"))
 
-    def test_symmetric_builtin_override_wrongtype(self):
-        with self.assertRaises(ValueError):
+    def test_symmetric_builtin_override_mix(self):
+        class Color(EnumProperties):
+            _symmetric_builtins_ = [s("name", case_fold=True)]
 
-            class Color(
-                EnumProperties, p("spanish"), s("rgb"), s("hex", case_fold=True)
-            ):
-                _symmetric_builtins_ = [p("name")]
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True)]
 
-                RED = 1, "Roja", (1, 0, 0), "ff0000"
-                GREEN = 2, "Verde", (0, 1, 0), "00ff00"
-                BLUE = 3, "Azul", (0, 0, 1), "0000ff"
+            RED = 1, "Roja", (1, 0, 0), "ff0000"
+            GREEN = 2, "Verde", (0, 1, 0), "00ff00"
+            BLUE = 3, "Azul", (0, 0, 1), "0000ff"
+
+        self.assertEqual(Color.RED, Color("red"))
+        self.assertEqual(Color.GREEN, Color("gREen"))
+        self.assertEqual(Color.BLUE, Color("Blue"))
 
     def test_symmetric_builtin_override_missing(self):
         with self.assertRaises(ValueError):
 
-            class Color(
-                EnumProperties, p("spanish"), s("rgb"), s("hex", case_fold=True)
-            ):
+            class Color(EnumProperties):
                 _symmetric_builtins_ = [s("does_not_exist")]
+
+                spanish: str
+                rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+                hex: Annotated[str, Symmetric()]
 
                 RED = 1, "Roja", (1, 0, 0), "ff0000"
                 GREEN = 2, "Verde", (0, 1, 0), "00ff00"
@@ -218,7 +202,11 @@ class TestEnums(TestCase):
 
     def test_symmetric_match_none_parameter(self):
         # test default behavior
-        class ColorDefault(EnumProperties, p("spanish"), s("rgb"), s("hex")):
+        class ColorDefault(EnumProperties):
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric()]
+
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), None
             BLUE = 3, "Azul", (0, 0, 1), None
@@ -233,12 +221,11 @@ class TestEnums(TestCase):
         self.assertEqual(ColorDefault((0, 1, 0)), ColorDefault.GREEN)
         self.assertEqual(ColorDefault((0, 0, 1)), ColorDefault.BLUE)
 
-        class ColorNoMatchNone(
-            EnumProperties,
-            p("spanish"),
-            s("rgb"),
-            s("hex", case_fold=True, match_none=False),
-        ):
+        class ColorNoMatchNone(EnumProperties):
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True, match_none=False)]
+
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), None
             BLUE = 3, "Azul", (0, 0, 1), None
@@ -252,9 +239,11 @@ class TestEnums(TestCase):
         self.assertEqual(ColorNoMatchNone((0, 1, 0)), ColorNoMatchNone.GREEN)
         self.assertEqual(ColorNoMatchNone((0, 0, 1)), ColorNoMatchNone.BLUE)
 
-        class ColorMatchNone(
-            EnumProperties, p("spanish"), s("rgb"), s("hex", match_none=True)
-        ):
+        class ColorMatchNone(EnumProperties):
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(match_none=True)]
+
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), None
             BLUE = 3, "Azul", (0, 0, 1), None
@@ -281,13 +270,11 @@ class TestEnums(TestCase):
             def _missing_(cls, value):
                 return Enum._missing_(value)
 
-        class Color(
-            DisableSymmetryMixin,
-            EnumProperties,
-            p("spanish"),
-            s("rgb"),
-            s("hex", case_fold=True),
-        ):
+        class Color(DisableSymmetryMixin, EnumProperties):
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True)]
+
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
             BLUE = 3, "Azul", (0, 0, 1), "0000ff"
@@ -329,7 +316,10 @@ class TestEnums(TestCase):
         self.assertRaises(ValueError, Color, "Blue")
 
     def test_symmetry_priorities(self):
-        class Priority(EnumProperties, s("prop1"), s("prop2")):
+        class Priority(EnumProperties):
+            prop1: Annotated[str, Symmetric()]
+            prop2: Annotated[int, Symmetric()]
+
             FIRST = 1, "3", 3
             SECOND = 2, "2", 2
             THIRD = 3, "1", 1
@@ -342,7 +332,10 @@ class TestEnums(TestCase):
         self.assertEqual(Priority.THIRD, Priority("1"))
 
     def test_symmetry_tuples(self):
-        class Priority(EnumProperties, s("prop1"), s("prop2")):
+        class Priority(EnumProperties):
+            prop1: Annotated[str, Symmetric()]
+            prop2: Annotated[t.List[t.Union[float, str]], Symmetric()]
+
             FIRST = 1, "3", [2.1, "2.3"]
             SECOND = 2, "2", [2.2, "2.2"]
             THIRD = 3, "1", [2.3, "2.1"]
@@ -362,24 +355,11 @@ class TestEnums(TestCase):
         self.assertEqual(Priority.THIRD, Priority("2.1"))
 
     def test_auto(self):
-        class ColorAuto(EnumProperties):
-            def _generate_next_value_(name, start, count, last_values):
-                return name.title()
+        class ColorAutoSym(EnumProperties):
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True)]
 
-            RED = auto()
-            GREEN = auto()
-            BLUE = auto()
-
-        self.assertEqual(ColorAuto.RED, ColorAuto("Red"))
-        self.assertEqual(ColorAuto.GREEN, ColorAuto("Green"))
-        self.assertEqual(ColorAuto.BLUE, ColorAuto("Blue"))
-        self.assertEqual(ColorAuto.RED, ColorAuto["RED"])
-        self.assertEqual(ColorAuto.GREEN, ColorAuto["GREEN"])
-        self.assertEqual(ColorAuto.BLUE, ColorAuto["BLUE"])
-
-        class ColorAutoSym(
-            EnumProperties, p("spanish"), s("rgb"), s("hex", case_fold=True)
-        ):
             def _generate_next_value_(name, start, count, last_values):
                 return name.title()
 
@@ -424,9 +404,11 @@ class TestEnums(TestCase):
         self.assertEqual(ColorAutoSym.BLUE.hex, "0000ff")
         self.assertRaises(ValueError, ColorAutoSym, "Azul")
 
-        class ColorAutoIntSym(
-            EnumProperties, p("spanish"), s("rgb"), s("hex", case_fold=True)
-        ):
+        class ColorAutoIntSym(EnumProperties):
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True)]
+
             RED = auto(), "Roja", (1, 0, 0), "ff0000"
             GREEN = auto(), "Verde", (0, 1, 0), "00ff00"
             BLUE = auto(), "Azul", (0, 0, 1), "0000ff"
@@ -472,7 +454,11 @@ class TestEnums(TestCase):
         self.assertRaises(ValueError, ColorAutoIntSym, "Azul")
 
     def test_ignore(self):
-        class Color(EnumProperties, p("spanish"), s("rgb"), s("hex", case_fold=True)):
+        class Color(EnumProperties):
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True)]
+
             _ignore_ = ["BLACK", "NOT_ENOUGH_PROPS"]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
@@ -486,47 +472,32 @@ class TestEnums(TestCase):
         self.assertRaises(ValueError, Color, (1, 1, 1))
         self.assertRaises(ValueError, Color, "ffffff")
 
-    def test_no_props(self):
-        class Color(EnumProperties):
-            RED = 1, 0, 0
-            GREEN = 0, 1, 0
-            BLUE = 0, 0, 1
-
-        self.assertEqual(Color.RED.value, (1, 0, 0))
-        self.assertEqual(Color.GREEN.value, (0, 1, 0))
-        self.assertEqual(Color.BLUE.value, (0, 0, 1))
-
-        class Color2(EnumProperties):
-            RED = 1
-            GREEN = 2
-            BLUE = 3
-
-        self.assertEqual(Color2.RED.value, 1)
-        self.assertEqual(Color2.GREEN.value, 2)
-        self.assertEqual(Color2.BLUE.value, 3)
-
     def test_not_enough_props(self):
         with self.assertRaises(ValueError):
 
-            class Color(EnumProperties, p("prop1"), p("prop2")):
+            class Color(EnumProperties):
+                prop1: str
+                prop2: str
+
                 RED = 1, "p1.1", "p2.1"
                 GREEN = 2, "p1.2", "p2.2"
                 BLUE = 3, "p1.3"
 
         with self.assertRaises(ValueError):
 
-            class Color2(EnumProperties, p("prop1")):
+            class Color2(EnumProperties):
+                prop1: str
+
                 RED = 1, "p1.1"
                 GREEN = 2
                 BLUE = 3, "p1.3"  # pragma: no cover
 
     def test_null_props(self):
-        class Color(
-            EnumProperties,
-            p("spanish"),
-            s("rgb"),
-            s("hex", case_fold=True, match_none=True),
-        ):
+        class Color(EnumProperties):
+            spanish: str
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True, match_none=True)]
+
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, None, (0, 1, 0), "00ff00"
             BLUE = 3, "Azul", (0, 0, 1), "0000ff"
@@ -566,7 +537,10 @@ class TestEnums(TestCase):
         todo way to make this dry? sphinx plugin?
         """
 
-        class Color(EnumProperties, p("rgb"), p("hex")):
+        class Color(EnumProperties):
+            rgb: t.Tuple[int, int, int]
+            hex: str
+
             RED = auto(), (1, 0, 0), "ff0000"
             GREEN = auto(), (0, 1, 0), "00ff00"
             BLUE = auto(), (0, 0, 1), "0000ff"
@@ -579,7 +553,10 @@ class TestEnums(TestCase):
         self.assertEqual(Color.GREEN.hex, "00ff00")
         self.assertEqual(Color.BLUE.hex, "0000ff")
 
-        class Color(EnumProperties, s("rgb"), s("hex", case_fold=True)):
+        class Color(EnumProperties):
+            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: Annotated[str, Symmetric(case_fold=True)]
+
             RED = auto(), (1, 0, 0), "0xff0000"
             GREEN = auto(), (0, 1, 0), "0x00ff00"
             BLUE = auto(), (0, 0, 1), "0x0000ff"
@@ -606,13 +583,22 @@ class TestEnums(TestCase):
         self.assertTrue(Color.RED == "0xFF0000")
         self.assertTrue("0xFF0000" == Color.RED)
 
-        class MapBoxStyle(EnumProperties, s("label", case_fold=True), p("version")):
+        class MapBoxStyle(EnumProperties):
             """
             https://docs.mapbox.com/api/maps/styles/
             """
 
-            _symmetric_builtins_ = ["name", "uri"]
+            # we can mark builtins and normal properties as symmetric using
+            # this special attribute
+            _symmetric_builtins_ = ["uri"]
 
+            name: Annotated[str, Symmetric(case_fold=True)]
+
+            # type hints are optional for better dev experience
+            label: Annotated[str, Symmetric(case_fold=True)]
+            version: int
+
+            # name               value                 label           version
             STREETS = "streets", "Streets", 11
             OUTDOORS = "outdoors", "Outdoors", 11
             LIGHT = "light", "Light", 10
@@ -623,7 +609,7 @@ class TestEnums(TestCase):
             NAVIGATION_NIGHT = "navigation-night", "Navigation Night", 1
 
             @property
-            def uri(self):
+            def uri(self) -> str:
                 return f"mapbox://styles/mapbox/{self.value}-v{self.version}"
 
             def __str__(self):
@@ -709,10 +695,12 @@ class TestEnums(TestCase):
         self.assertEqual(MapBoxStyle.NAVIGATION_DAY, MapBoxStyle("navigation-day"))
         self.assertEqual(MapBoxStyle.NAVIGATION_NIGHT, MapBoxStyle("navigation-night"))
 
-        class AddressRoute(
-            EnumProperties, s("abbr", case_fold=True), s("alt", case_fold=True)
-        ):
-            _symmetric_builtins_ = [s("name", case_fold=True)]
+        class AddressRoute(EnumProperties):
+            # name is a builtin property of Enum, we can override its case insensitivity
+            name: Annotated[str, Symmetric(case_fold=True)]
+
+            abbr: Annotated[str, Symmetric(case_fold=True)]
+            alt: Annotated[t.List[str], Symmetric(case_fold=True)]
 
             # name  value    abbr         alt
             ALLEY = 1, "ALY", ["ALLEE", "ALLY"]
@@ -752,22 +740,20 @@ class TestEnums(TestCase):
     def test_properties_conflict(self):
         """enum_properties is reserved - test that we get an exception"""
 
-        with self.assertRaises(ValueError):
+        class PropConflict(EnumProperties):
+            _properties_: t.Tuple[int, int, int]
 
-            class PropConflict(EnumProperties, p("_properties_")):
-                ONE = auto(), (1, 2, 3)  # pragma: no cover
-                TWO = auto(), (3, 4, 5)  # pragma: no cover
+            ONE = auto(), (1, 2, 3)  # pragma: no cover
+            TWO = auto(), (3, 4, 5)  # pragma: no cover
 
-        with self.assertRaises(ValueError):
-
-            class PropConflict(EnumProperties, p("prop")):
-                _properties_ = None
-
-                ONE = auto(), (1, 2, 3)  # pragma: no cover
-                TWO = auto(), (3, 4, 5)  # pragma: no cover
+        self.assertIsInstance(PropConflict.ONE.value, tuple)
+        self.assertEqual(PropConflict.ONE.value[1], (1, 2, 3))
 
     def test_precedence(self):
-        class PriorityEx(EnumProperties, s("prop1"), s("prop2", case_fold=True)):
+        class PriorityEx(EnumProperties):
+            prop1: Annotated[str, Symmetric()]
+            prop2: Annotated[t.List[t.Union[int, str]], Symmetric()]
+
             ONE = 0, "1", [3, 4]
             TWO = 1, "2", [3, "4"]
             THREE = 2, "3", [3, 4]
@@ -801,7 +787,10 @@ class TestEnums(TestCase):
         class Type2(HashableType):
             pass
 
-        class PriorityEx(EnumProperties, s("prop1"), s("prop2")):
+        class PriorityEx(EnumProperties):
+            prop1: Annotated[Type1, Symmetric()]
+            prop2: Annotated[Type2, Symmetric()]
+
             ONE = 2, Type1(0), Type2(1)
             TWO = 3, Type2(0), Type1(1)
 
@@ -828,7 +817,10 @@ class TestEnums(TestCase):
         self.assertTrue(isinstance(HashableEnum1.VAL0_1, Hashable))
         self.assertTrue(isinstance(HashableEnum2.VAL1_2, Hashable))
 
-        class TransitiveEnum(EnumProperties, p("label"), s("pos")):
+        class TransitiveEnum(EnumProperties):
+            label: str
+            pos: Annotated[t.Union[HashableEnum1, HashableEnum2], Symmetric()]
+
             VAL0 = 0, "Value 0", HashableEnum1.VAL0_1
             VAL1 = 1, "Value 1", HashableEnum1.VAL1_1
             VAL2 = 2, "Value 2", HashableEnum2.VAL2_2
@@ -866,3 +858,54 @@ class TestEnums(TestCase):
         self.assertEqual(test_dict[TransitiveEnum.VAL0], "ZERO")
         self.assertEqual(test_dict[TransitiveEnum.VAL1], "ONE")
         self.assertEqual(test_dict[TransitiveEnum.VAL2], "TWO")
+
+    def test_hint_overrides(self):
+        from enum_properties import EnumProperties, p
+        from enum import auto
+
+        class Color(EnumProperties, p("rgb"), p("hex")):
+            extra: int  # this does not become a property
+
+            # name   value      rgb       hex
+            RED = auto(), (1, 0, 0), "ff0000"
+            GREEN = auto(), (0, 1, 0), "00ff00"
+            BLUE = auto(), (0, 0, 1), "0000ff"
+
+        self.assertEqual(Color.RED.rgb, (1, 0, 0))
+
+        with self.assertRaises(AttributeError):
+            Color.RED.extra
+
+    def test_trailing_annotations(self):
+        class MyEnum(EnumProperties):
+            # will be a property
+            label: str
+
+            VALUE1 = 0, "label1"
+            VALUE2 = 1, "label2"
+            VALUE3 = 2, "label3"
+
+        self.assertEqual(MyEnum.VALUE1.label, "label1")
+
+        class MyEnum2(EnumProperties):
+            VALUE1 = 0, "label1"
+            VALUE2 = 1, "label2"
+            VALUE3 = 2, "label3"
+
+            # should not be interpreted as a property
+            label: str
+
+        with self.assertRaises(AttributeError):
+            MyEnum2.VALUE1.label
+
+        class MyEnum3(EnumProperties):
+            VALUE1 = 0, "label1"
+
+            # should not be interpreted as a property
+            label: str
+
+            VALUE2 = 1, "label2"
+            VALUE3 = 2, "label3"
+
+        with self.assertRaises(AttributeError):
+            MyEnum3.VALUE1.label

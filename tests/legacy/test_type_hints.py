@@ -1,10 +1,7 @@
 from unittest import TestCase
 
-from enum_properties import (
-    IntEnumProperties,
-    p,
-    s
-)
+from enum_properties import IntEnumProperties, p, s
+
 
 class TestTypeHints(TestCase):
     def test_type_hints(self):
