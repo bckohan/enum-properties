@@ -31,13 +31,13 @@ Add properties to Python enumeration values with a simple declarative syntax. [E
     # the type hints on the Enum class become properties on
     # each value, matching the order in which they are specified
 
-    Color.RED.rgb   == (1, 0, 0)
-    Color.GREEN.rgb == (0, 1, 0)
-    Color.BLUE.rgb  == (0, 0, 1)
+    Color.RED.rgb   is (1, 0, 0)
+    Color.GREEN.rgb is (0, 1, 0)
+    Color.BLUE.rgb  is (0, 0, 1)
 
-    Color.RED.hex   == 'ff0000'
-    Color.GREEN.hex == '00ff00'
-    Color.BLUE.hex  == '0000ff'
+    Color.RED.hex   is 'ff0000'
+    Color.GREEN.hex is '00ff00'
+    Color.BLUE.hex  is '0000ff'
 
 ```
 
@@ -61,16 +61,16 @@ Properties may also be symmetrically mapped to enumeration values using annotate
     # Enumeration instances may be instantiated from any Symmetric property
     # values. Use case_fold for case insensitive matching
 
-    Color((1, 0, 0)) == Color.RED
-    Color((0, 1, 0)) == Color.GREEN
-    Color((0, 0, 1)) == Color.BLUE
+    Color((1, 0, 0)) is Color.RED
+    Color((0, 1, 0)) is Color.GREEN
+    Color((0, 0, 1)) is Color.BLUE
 
-    Color('ff0000') == Color.RED
-    Color('FF0000') == Color.RED  # case_fold makes mapping case insensitive
-    Color('00ff00') == Color.GREEN
-    Color('00FF00') == Color.GREEN
-    Color('0000ff') == Color.BLUE
-    Color('0000FF') == Color.BLUE
+    Color('ff0000') is Color.RED
+    Color('FF0000') is Color.RED  # case_fold makes mapping case insensitive
+    Color('00ff00') is Color.GREEN
+    Color('00FF00') is Color.GREEN
+    Color('0000ff') is Color.BLUE
+    Color('0000FF') is Color.BLUE
 
     Color.RED.hex == 'ff0000'
 
