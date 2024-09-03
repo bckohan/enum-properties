@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v2.0.1 (02-SEP-2024)
+====================
+
+* Misc readme/doc updates.
+* Fixed `Break tests into smaller files. <https://github.com/bckohan/enum-properties/issues/71>`_
+
 v2.0.0 (02-SEP-2024)
 ====================
 
