@@ -15,10 +15,10 @@ Add properties to Python enumeration values with a simple declarative syntax. [E
 ```python
 
     import typing as t
-    from enum_properties import EnumProperties
+    from enum_properties import EnumProperties as Enum
     from enum import auto
 
-    class Color(EnumProperties):
+    class Color(Enum):
 
         rgb: t.Tuple[int, int, int]
         hex: str
@@ -46,10 +46,10 @@ Properties may also be symmetrically mapped to enumeration values using annotate
 ```python
 
     import typing as t
-    from enum_properties import EnumProperties, Symmetric
+    from enum_properties import EnumProperties as Enum, Symmetric
     from enum import auto
 
-    class Color(EnumProperties):
+    class Color(Enum):
 
         rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
         hex: t.Annotated[str, Symmetric(case_fold=True)]
@@ -80,9 +80,9 @@ Member functions may also be specialized to each enumeration value, using the ``
 
 ```python
 
-    from enum_properties import EnumProperties, specialize
+    from enum_properties import EnumProperties as Enum, specialize
 
-    class SpecializedEnum(EnumProperties):
+    class SpecializedEnum(Enum):
 
         ONE   = 1
         TWO   = 2
