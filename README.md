@@ -14,10 +14,14 @@ Add properties to Python enumeration values with a simple declarative syntax. [E
 
 ```python
 
-    from enum_properties import EnumProperties, p
+    import typing as t
+    from enum_properties import EnumProperties
     from enum import auto
 
-    class Color(EnumProperties, p('rgb'), p('hex')):
+    class Color(EnumProperties):
+
+        rgb: t.Tuple[int, int, int]
+        hex: str
 
         # name   value      rgb       hex
         RED    = auto(), (1, 0, 0), 'ff0000'
@@ -37,27 +41,25 @@ Add properties to Python enumeration values with a simple declarative syntax. [E
 
 ```
 
-Properties may also be symmetrically mapped to enumeration values using s() values and type hints
-are optional for better dev experience:
+Properties may also be symmetrically mapped to enumeration values using annotated type hints:
 
 ```python
 
     import typing as t
-    from enum_properties import EnumProperties, s
+    from enum_properties import EnumProperties, Symmetric
     from enum import auto
 
-    class Color(EnumProperties, s('rgb'), s('hex', case_fold=True)):
+    class Color(EnumProperties):
 
-        rgb: t.Tuple[int, int, int]
-        hex: str
+        rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+        hex: t.Annotated[str, Symmetric(case_fold=True)]
 
         RED    = auto(), (1, 0, 0), 'ff0000'
         GREEN  = auto(), (0, 1, 0), '00ff00'
         BLUE   = auto(), (0, 0, 1), '0000ff'
 
-    # any named s() values in the Enum's inheritance become properties on
-    # each value, and the enumeration value may be instantiated from the
-    # property's value
+    # Enumeration instances may be instantiated from any Symmetric property
+    # values. Use case_fold for case insensitive matching
 
     Color((1, 0, 0)) == Color.RED
     Color((0, 1, 0)) == Color.GREEN
