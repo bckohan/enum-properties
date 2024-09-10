@@ -60,6 +60,8 @@ class TestEnums(TestCase):
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
             BLUE = 3, "Azul", (0, 0, 1), "0000ff"
 
+        self.assertEqual(list(Color), [Color.RED, Color.GREEN, Color.BLUE])
+
         self.assertEqual(Color.RED, Color((1, 0, 0)))
         self.assertEqual(Color.RED, Color("ff0000"))
         self.assertEqual(Color.RED, Color("FF0000"))
@@ -147,6 +149,8 @@ class TestEnums(TestCase):
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
             BLUE = 3, "Azul", (0, 0, 1), "0000ff"
+
+        self.assertEqual(list(Color), [Color.RED, Color.GREEN, Color.BLUE])
 
         self.assertEqual(
             [prop for prop in Color._properties_ if getattr(prop, "symmetric", False)],
@@ -909,3 +913,27 @@ class TestEnums(TestCase):
 
         with self.assertRaises(AttributeError):
             MyEnum3.VALUE1.label
+
+    def test_reference_enums(self):
+        from enum import Enum
+        from typing_extensions import Annotated
+        from enum_properties import EnumProperties, Symmetric
+
+        class IndependentEnum(Enum):
+            VALUE0 = 20
+            VALUE1 = 21
+            VALUE2 = 22
+
+        class DependentEnum(EnumProperties):
+            indep: Annotated[IndependentEnum, Symmetric()]
+
+            VALUE0 = 0, IndependentEnum.VALUE2
+            VALUE1 = 1, IndependentEnum.VALUE1
+            VALUE2 = 2, IndependentEnum.VALUE0
+
+        self.assertEqual(
+            list(DependentEnum),
+            [DependentEnum.VALUE0, DependentEnum.VALUE1, DependentEnum.VALUE2],
+        )
+
+        self.assertTrue(DependentEnum(IndependentEnum.VALUE1) is DependentEnum.VALUE1)
