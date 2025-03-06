@@ -55,16 +55,16 @@ Symmetric type annotations:
     # Enumeration instances may be instantiated from any Symmetric property
     # values. Use case_fold for case insensitive matching
 
-    Color((1, 0, 0)) == Color.RED
-    Color((0, 1, 0)) == Color.GREEN
-    Color((0, 0, 1)) == Color.BLUE
+    Color((1, 0, 0)) is Color.RED
+    Color((0, 1, 0)) is Color.GREEN
+    Color((0, 0, 1)) is Color.BLUE
 
-    Color('ff0000') == Color.RED
-    Color('FF0000') == Color.RED  # case_fold makes mapping case insensitive
-    Color('00ff00') == Color.GREEN
-    Color('00FF00') == Color.GREEN
-    Color('0000ff') == Color.BLUE
-    Color('0000FF') == Color.BLUE
+    Color('ff0000') is Color.RED
+    Color('FF0000') is Color.RED  # case_fold makes mapping case insensitive
+    Color('00ff00') is Color.GREEN
+    Color('00FF00') is Color.GREEN
+    Color('0000ff') is Color.BLUE
+    Color('0000FF') is Color.BLUE
 
     Color.RED.hex == 'ff0000'
 
