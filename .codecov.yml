@@ -1,4 +1,4 @@
 # https://github.com/codecov/codecov-python/issues/136
 coverage:
   fixes:
-    - "__init__.py::enum_properties/__init__.py"
+    - "__init__.py::src/enum_properties/__init__.py"
