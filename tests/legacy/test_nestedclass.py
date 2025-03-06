@@ -2,6 +2,7 @@ import enum
 import sys
 from enum import auto
 from unittest import TestCase
+import warnings
 
 from enum_properties import (
     EnumProperties,
@@ -279,3 +280,31 @@ class TestNestedClassOnEnum(TestCase):
         self.assertTrue(MyEnum.Type1.value().__class__ is MyEnum.Type1.value)
         self.assertTrue(MyEnum.Type2.value().__class__ is MyEnum.Type2.value)
         self.assertTrue(MyEnum.Type3.value().__class__ is MyEnum.Type3.value)
+
+    def test_unmarked_nested_classes(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+
+            class TestEnum(EnumProperties, s("label")):
+                VALUE1 = auto(), "value1"
+                VALUE2 = auto(), "value2"
+                VALUE3 = auto(), "value3"
+
+                class NestedClass:
+                    @property
+                    def prop(self):
+                        return "nested"
+
+            self.assertEqual(TestEnum.NestedClass().prop, "nested")
+            self.assertEqual(
+                [en for en in TestEnum],
+                [TestEnum.VALUE1, TestEnum.VALUE2, TestEnum.VALUE3],
+            )
+            self.assertEqual(
+                [en.label for en in TestEnum],
+                [TestEnum.VALUE1.label, TestEnum.VALUE2.label, TestEnum.VALUE3.label],
+            )
+            self.assertEqual(
+                [en for en in TestEnum],
+                [TestEnum("value1"), TestEnum("value2"), TestEnum("value3")],
+            )
