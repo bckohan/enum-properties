@@ -185,6 +185,7 @@ run +ARGS:
     uv run {{ ARGS }}
 
 # validate the given version string against the lib version
+[script]
 validate_version VERSION:
     import re
     import tomllib
