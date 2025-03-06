@@ -198,7 +198,7 @@ validate_version VERSION:
     # make sure all places the version appears agree
     assert raw_version == tomllib.load(open('pyproject.toml', 'rb'))['project']['version']
     assert raw_version == enum_properties.__version__
-    print(version)
+    print(raw_version)
 
 # issue a relase for the given semver string (e.g. 2.1.0)
 release VERSION:
