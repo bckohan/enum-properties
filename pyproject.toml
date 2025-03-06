@@ -121,3 +121,15 @@ exclude = ["tests/**/*"]
 include = [
     "src/enum_properties"
 ]
+
+[tool.coverage.run]
+omit = ["tests/**/*py"]
+branch = true
+source = ["enum_properties"]
+concurrency = ["multiprocessing"]
+parallel = true
+relative_files = true
+command_line = "-m pytest --cov=enum_properties"
+
+[tool.coverage.paths]
+source = ["enum_properties"]
