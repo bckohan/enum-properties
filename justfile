@@ -188,7 +188,7 @@ run +ARGS:
 validate_version VERSION:
     import re
     import tomllib
-    import ptm
+    import enum_properties
     from packaging.version import Version
     raw_version = "{{ VERSION }}".lstrip("v")
     version_obj = Version(raw_version)
@@ -196,7 +196,7 @@ validate_version VERSION:
     assert str(version_obj) == raw_version
     # make sure all places the version appears agree
     assert raw_version == tomllib.load(open('pyproject.toml', 'rb'))['project']['version']
-    assert raw_version == ptm.__version__
+    assert raw_version == enum_properties.__version__
     print(version)
 
 # issue a relase for the given semver string (e.g. 2.1.0)
