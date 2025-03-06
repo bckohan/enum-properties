@@ -7,8 +7,8 @@
 [![PyPI status](https://img.shields.io/pypi/status/enum-properties.svg)](https://pypi.python.org/pypi/enum-properties)
 [![Documentation Status](https://readthedocs.org/projects/enum-properties/badge/?version=latest)](http://enum-properties.readthedocs.io/?badge=latest/)
 [![Code Cov](https://codecov.io/gh/bckohan/enum-properties/branch/main/graph/badge.svg?token=0IZOKN2DYL)](https://codecov.io/gh/bckohan/enum-properties)
-[![Test Status](https://github.com/bckohan/enum-properties/workflows/Test/badge.svg?branch=main)](https://github.com/bckohan/enum-properties/actions/workflows/test.yml?query=branch:main)
-[![Lint Status](https://github.com/bckohan/enum-properties/workflows/Lint/badge.svg?branch=main)](https://github.com/bckohan/enum-properties/actions/workflows/lint.yml?query=branch:main)
+[![Test Status](https://github.com/bckohan/django-enum/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/bckohan/enum-properties/actions/workflows/test.yml?query=branch:main)
+[![Lint Status](https://github.com/bckohan/django-enum/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/bckohan/enum-properties/actions/workflows/lint.yml?query=branch:main)
 
 Add properties to Python enumeration values with a simple declarative syntax. [Enum Properties](https://enum-properties.readthedocs.io/en/latest) is a lightweight extension to [Python's Enum class](https://docs.python.org/3/library/enum.html). Example:
 
