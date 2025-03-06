@@ -35,6 +35,14 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
+[project.urls]
+"Homepage" = "https://enum-properties.readthedocs.io"
+"Documentation" = "https://enum-properties.readthedocs.io"
+"Repository" = "https://github.com/bckohan/enum-properties"
+"Issues" = "https://github.com/bckohan/enum-properties/issues"
+"Changelog" = "https://enum-properties.readthedocs.io/en/latest/changelog.html"
+"Code_of_Conduct" = "https://github.com/bckohan/enum-properties/blob/main/CODE_OF_CONDUCT.md"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/enum_properties"]
 
