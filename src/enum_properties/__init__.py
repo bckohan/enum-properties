@@ -24,13 +24,13 @@ from collections.abc import Generator, Hashable, Iterable
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 0, 1)
+VERSION = (2, 1, 0)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
 __author__ = "Brian Kohan"
 __license__ = "MIT"
-__copyright__ = "Copyright 2022-2024 Brian Kohan"
+__copyright__ = "Copyright 2022-2025 Brian Kohan"
 
 __all__ = [
     "VERSION",
@@ -219,7 +219,7 @@ class SymmetricMixin(with_typehint("EnumProperties")):  # type: ignore
                 if composite is None:
                     composite = cls(val)
                 else:
-                    composite |= cls(val)  # type: ignore[unreachable]
+                    composite |= cls(val)
             if composite is None:
                 return cls(0)
             return composite

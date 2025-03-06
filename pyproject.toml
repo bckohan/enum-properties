@@ -1,9 +1,17 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "enum-properties"
-version = "2.0.1"
+version = "2.1.0"
 description = "Add properties and method specializations to Python enumeration values with a simple declarative syntax."
-authors = ["Brian Kohan <bckohan@gmail.com>"]
+requires-python = ">=3.8,<4.0"
+authors = [
+  {name = "Brian Kohan", email = "bckohan@gmail.com"}
+]
 license = "MIT"
+license-files = [ "LICENSE" ]
 repository = "https://github.com/bckohan/enum-properties"
 homepage = "https://enum-properties.readthedocs.io"
 readme = "README.md"
@@ -26,33 +34,32 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
-packages = [
-    { include = "enum_properties" }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/enum_properties"]
+
+
+[dependency-groups]
+dev = [
+    "coverage>=7.6.1",
+    "importlib-metadata>=8.5.0",
+    "ipdb>=0.13.13",
+    "mypy>=1.14.1",
+    "packaging>=24.2",
+    "pre-commit>=3.5.0",
+    "pyright>=1.1.396",
+    "pytest>=8.3.5",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.9.9",
+    "typing-extensions>=4.12.2",
 ]
-
-[tool.poetry.dependencies]
-python = ">=3.8,<4.0"
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=7.0"
-Sphinx = ">=7.0.0"
-mypy = ">=1.8"
-doc8 = ">=1.1.0"
-pytest-cov = ">=4.1.0"
-readme-renderer = {version = ">=42", extras = ["md"]}
-pygount = ">=1.6"
-coverage = ">=7.3.0"
-importlib-metadata = ">=7.0.0"
-ipdb = ">=0.13.13"
-aiohttp = ">=3.9.1"
-ruff = ">=0.5.7"
-pyright = ">=1.1.375"
-furo = "^2024.8.6"
-typing-extensions = "^4.12.2"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+docs = [
+    "doc8>=1.1.2",
+    "furo>=2024.8.6",
+    "readme-renderer[md]>=43.0",
+    "sphinx>=7.1.2",
+    "sphinx-autobuild>=2021.3.14",
+]
 
 
 [tool.mypy]
@@ -76,6 +83,8 @@ warn_unused_configs = true
 warn_unreachable = true
 warn_no_return = true
 exclude = "tests"
+mypy_path = "src"
+modules = "enum_properties"
 
 
 [tool.doc8]
@@ -110,5 +119,5 @@ exclude = [
 [tool.pyright]
 exclude = ["tests/**/*"]
 include = [
-    "enum_properties"
+    "src/enum_properties"
 ]
