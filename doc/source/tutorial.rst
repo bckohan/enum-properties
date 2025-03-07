@@ -64,7 +64,7 @@ The last property we've added is the ``uri`` property. We've added it as concret
 class because it can be created from the slug and version. We could have specified it in the value
 tuple but that would be very verbose and less
 `DRY <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_. To make this property symmetric we
-added it to the ``_symmetric_builtins_`` list.
+decorate it with :py:func:`~enum_properties.symmetric`.
 
 We can use our enumeration like so:
 
