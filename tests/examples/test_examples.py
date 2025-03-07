@@ -83,6 +83,7 @@ def test_howto_flag_no_iterable():
         from tests.examples import howto_flags_no_iterable
 
 
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="requires Python 3.11 or higher")
 def test_howto_flag_boundaries():
     with pytest.raises(ValueError):
         from tests.examples import howto_flag_boundaries
