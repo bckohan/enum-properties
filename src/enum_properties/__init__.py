@@ -19,7 +19,7 @@ from collections.abc import Generator, Hashable, Iterable
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 2, 0)
+VERSION = (2, 2, 1)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
