@@ -36,7 +36,7 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://enum-properties.readthedocs.io"
+"Homepage" = "https://github.com/bckohan/enum-properties"
 "Documentation" = "https://enum-properties.readthedocs.io"
 "Repository" = "https://github.com/bckohan/enum-properties"
 "Issues" = "https://github.com/bckohan/enum-properties/issues"
