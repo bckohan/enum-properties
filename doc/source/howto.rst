@@ -57,6 +57,16 @@ symmetric, annotate your type hint with :py:class:`~enum_properties.Symmetric`:
     insensitive, use the ``case_fold=True`` parameter on the :py:class:`~enum_properties.Symmetric`
     dataclass.
 
+``case_fold`` will more than just make matching case insensitive. It will store the string using
+the `unicode standard Normalization Form Compatibility Decomposition (NFKD) algorithm
+<https://unicode.org/reports/tr15>`_. This breaks down characters into their canonical components.
+For example, accented characters like "é" are decomposed to "e". This is particularly useful when
+you want to compare strings or search text in a way that ignores differences in case and
+accent/diacritic representations.
+
+For futher reading, here's `more than you ever wanted to know about unicode
+<https://tonsky.me/blog/unicode>`_.
+
 .. tip::
 
     By default, none values for symmetric properties will not be symmetric. To change this behavior

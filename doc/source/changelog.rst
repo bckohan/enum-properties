@@ -10,6 +10,7 @@ v2.1.1 (2025-03-07)
 * Fixed `Symmetric dataclass is missing from __all__ <https://github.com/bckohan/enum-properties/issues/81>`_
 * Implemented `Move to intersphinx references for stdlib types <https://github.com/bckohan/enum-properties/issues/78>`_
 * Implemented `Update docs to diataxis organization <https://github.com/bckohan/enum-properties/issues/66>`_
+* Implemented `More precise case_fold documentation. <https://github.com/bckohan/enum-properties/issues/55>`_
 
 
 v2.1.0 (2025-03-06)
