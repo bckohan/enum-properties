@@ -18,7 +18,7 @@ v2.2.0 (2025-03-07)
 ===================
 
 * Fixed `StrEnumProperties is missing from __all__ <https://github.com/bckohan/enum-properties/issues/83>`_
-* Implemented `Test all example code in docs. <https://github.com/bckohan/enum-properties/issues/82>_`
+* Implemented `Test all example code in docs. <https://github.com/bckohan/enum-properties/issues/82>`_
 * Fixed `Symmetric dataclass is missing from __all__ <https://github.com/bckohan/enum-properties/issues/81>`_
 * Implemented `Decorator to make properties symmetric <https://github.com/bckohan/enum-properties/issues/80>`_
 * Implemented `Move to intersphinx references for stdlib types <https://github.com/bckohan/enum-properties/issues/78>`_
