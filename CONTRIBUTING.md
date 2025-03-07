@@ -71,3 +71,12 @@ test_int_flag example test you would do:
     just test tests/annotations/test_flags.py::TestFlags
     just test tests/annotations/test_flags.py::TestFlags::test_int_flag
 ```
+
+
+## Issuing Releases
+
+Update the versions in pyproject.toml and src/enum_properties/__init__.py then run:
+
+```bash
+    just release x.x.x
+```
