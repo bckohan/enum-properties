@@ -91,7 +91,15 @@ def test_howto_flag_boundaries():
         from tests.examples import howto_flag_boundaries
 
 
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="requires Python 3.11 or higher")
 def test_howto_nested_classes():
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        from tests.examples import howto_nested_classes_313
+
+
+@pytest.mark.skipif(sys.version_info >= (3, 13), reason="requires Python < 3.13")
+def test_howto_nested_classes_313():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", DeprecationWarning)
         from tests.examples import howto_nested_classes

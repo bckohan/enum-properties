@@ -1,22 +1,26 @@
 from enum_properties import EnumProperties
+from enum import nonmember, member
 
 
 class MyEnum(EnumProperties):
 
-    label: str
-
+    @nonmember
     class Type1:
         pass
 
+    @nonmember
     class Type2:
         pass
 
+    @nonmember
     class Type3:
         pass
 
-    VALUE1 = Type1, 'label1'
-    VALUE2 = Type2, 'label2'
-    VALUE3 = Type3, 'label3'
+    label: str
+
+    VALUE1 = member(Type1), 'label1'
+    VALUE2 = member(Type2), 'label2'
+    VALUE3 = member(Type3), 'label3'
 
 
 # only the expected values become enumeration values

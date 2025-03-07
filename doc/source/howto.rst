@@ -207,12 +207,8 @@ are supported on flags. Boundary specifiers must be supplied as named arguments:
 Use Nested Classes as Enums
 ---------------------------
 
-.. note::
-
-    In python <3.13, nested classes behave normally on enums that inherit from
-    :py:class:`~enum_properties.EnumProperties` and that specify at least one
-    property. In python 3.13 this behavior will remain unchanged in
-    enum-properties and normal :class:`enum.Enum` classes will adopt it.
+You can use nested classes as enumeration values. The tricky part is keeping them from becoming
+values themselves.
 
 On enums that inherit from :class:`enum.Enum` in python < 3.13 nested classes become
 enumeration values because types may be values and a quirk of Python makes it
@@ -220,9 +216,19 @@ difficult to determine if a type on a class is declared as a nested class
 during __new__. For enums with properties we can distinguish declared classes
 because values must be tuples.
 
-Using :py:class:`~enum_properties.EnumProperties` this is possible:
+Note that on 3.13 and above you must use the nonmember/member decorators. Also note that
+the position of ``label`` is important.
 
-.. literalinclude:: ../../tests/examples/howto_nested_classes.py
+.. tabs::
+
+    .. tab:: <3.13
+
+        .. literalinclude:: ../../tests/examples/howto_nested_classes.py
+
+    .. tab:: >=3.11 (required >=3.13)
+
+        .. literalinclude:: ../../tests/examples/howto_nested_classes_313.py
+
 
 What about dataclass Enums?
 ---------------------------
