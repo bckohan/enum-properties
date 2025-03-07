@@ -14,6 +14,11 @@ on:
         required: true
         default: false
         type: boolean
+      clear_cache:
+        description: 'Clear GitHub Actions cache.'
+        required: true
+        default: false
+        type: boolean
 jobs:
   linux:
     runs-on: ubuntu-latest
@@ -27,6 +32,10 @@ jobs:
       COVERAGE_FILE: linux-py${{ matrix.python-version }}.coverage
       
     steps:
+    - name: Clear GitHub Actions cache
+      if: ${{ github.event.inputs.clear_cache == 'true' }}
+      run: sudo rm -rf /opt/hostedtoolcache
+  
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
@@ -79,6 +88,7 @@ jobs:
       
     steps:
     - name: Clear GitHub Actions cache
+      if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: sudo rm -rf /Users/runner/hostedtoolcache
 
     - uses: actions/checkout@v4
@@ -132,6 +142,9 @@ jobs:
       COVERAGE_FILE: windows-py${{ matrix.python-version }}.coverage
       
     steps:
+    - name: Clear GitHub Actions cache
+      if: ${{ github.event.inputs.clear_cache == 'true' }}
+      run: Remove-Item -Recurse -Force C:\hostedtoolcache
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       id: sp

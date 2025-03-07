@@ -41,10 +41,12 @@ def test_howto_symmetry():
     from tests.examples import howto_symmetry
 
 
+@pytest.mark.skipif(sys.version_info < (3, 10), reason="requires Python 3.10 or higher")
 def test_howto_symmetric_overload():
     from tests.examples import howto_symmetric_overload
 
 
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="requires Python 3.11 or higher")
 def test_howto_verify_unique():
     with pytest.raises(ValueError):
         from tests.examples import howto_verify_unique
