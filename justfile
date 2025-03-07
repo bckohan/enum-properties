@@ -102,7 +102,7 @@ open-docs:
     webbrowser.open(f'file://{os.getcwd()}/doc/build/html/index.html')
 
 # build and open the documentation
-docs: build-docs-html open-docs
+docs: install-docs build-docs-html open-docs
 
 # serve the documentation, with auto-reload
 docs-live: install-docs

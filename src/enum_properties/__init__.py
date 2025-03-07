@@ -1,19 +1,14 @@
 r"""
-*******************************************************************************
-   ____                  ___                        __  _
-  / __/__  __ ____ _    / _ \_______  ___  ___ ____/ /_(_)__ ___
- / _// _ \/ // /  ' \  / ___/ __/ _ \/ _ \/ -_) __/ __/ / -_|_-<
-/___/_//_/\_,_/_/_/_/ /_/  /_/  \___/ .__/\__/_/  \__/_/\__/___/
-                                   /_/
-*******************************************************************************
+::
+
+    _____                  _____                     _   _
+    |   __|___ _ _ _____   |  _  |___ ___ ___ ___ ___| |_|_|___ ___
+    |   __|   | | |     |  |   __|  _| . | . | -_|  _|  _| | -_|_ -|
+    |_____|_|_|___|_|_|_|  |__|  |_| |___|  _|___|_| |_| |_|___|___|
+                                        |_|
 
 Metaprogramming and mixin tools that implement property tuple and method
 specialization support for python enumeration classes.
-
-.. todo::
-    Given how dynamic the typing is in this module, static type checking is
-    awkward - revisit in the future if advances warrant it.
-
 """
 
 import enum
@@ -24,7 +19,7 @@ from collections.abc import Generator, Hashable, Iterable
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 1, 0)
+VERSION = (2, 1, 1)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -36,9 +31,11 @@ __all__ = [
     "VERSION",
     "EnumProperties",
     "IntEnumProperties",
+    "StrEnumProperties",
     "FlagProperties",
     "IntFlagProperties",
     "EnumPropertiesMeta",
+    "Symmetric",
     "SymmetricMixin",
     "DecomposeMixin",
     "specialize",
@@ -66,6 +63,10 @@ def _do_casenorm(text: str) -> str:
 
 @dataclass
 class Symmetric:
+    """
+    A dataclass to hold symmetric property options.
+    """
+
     case_fold: bool = False
     """
     If False, symmetric lookup will be case sensitive (default)
@@ -172,7 +173,7 @@ def specialize(*values):
 
 class SymmetricMixin(with_typehint("EnumProperties")):  # type: ignore
     """
-    This mixin enables symmetric Enum_ creation from properties marked
+    This mixin enables symmetric :class:`enum.Enum` creation from properties marked
     symmetric. It is included by default in the
     :py:class:`~enum_properties.EnumProperties` base class, but can be
     disabled by overriding ``_missing_`` and explicitly skipping it.
@@ -261,7 +262,7 @@ class SymmetricMixin(with_typehint("EnumProperties")):  # type: ignore
 class EnumPropertiesMeta(enum.EnumMeta):
     """
     A metaclass for creating enum choices with additional named properties for
-    each value. An Enum_ can be given property support simply by:
+    each value. An :class:`enum.Enum` can be given property support simply by:
 
     .. code-block::
 
@@ -284,7 +285,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
         class MyEnum(SymmetricMixin, enum.Enum, metaclass=EnumPropertiesMeta):
             ...
 
-    All Enum_ functionality is compatible with the EnumPropertiesMeta
+    All :class:`enum.Enum` functionality is compatible with the EnumPropertiesMeta
     metaclass. This class works by stripping out the
     :py:meth:`~enum_properties.p` and :py:meth:`~enum_properties.s`
     values during ``__prepare__`` and using their class name's as expected
@@ -590,7 +591,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
 
 class EnumProperties(SymmetricMixin, enum.Enum, metaclass=EnumPropertiesMeta):
     """
-    Use this base class instead of Enum_ to enable enumeration properties.
+    Use this base class instead of :class:`enum.Enum` to enable enumeration properties.
     For example:
 
     .. code-block::

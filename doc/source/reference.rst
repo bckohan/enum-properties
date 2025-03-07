@@ -1,5 +1,3 @@
-.. include:: refs.rst
-
 .. _reference:
 
 =========

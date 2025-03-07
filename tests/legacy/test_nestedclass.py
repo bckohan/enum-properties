@@ -3,7 +3,6 @@ import sys
 from enum import auto
 from unittest import TestCase
 import warnings
-
 from enum_properties import (
     EnumProperties,
     p,
