@@ -1,5 +1,5 @@
 import typing as t
-from enum_properties import EnumProperties as Enum, s, Symmetric
+from enum_properties import EnumProperties as Enum, s, Symmetric, symmetric
 
 
 class MapBoxStyle(Enum):
@@ -7,9 +7,8 @@ class MapBoxStyle(Enum):
     https://docs.mapbox.com/api/maps/styles/
     """
 
-    # we may also mark builtins and normal properties as symmetric using
-    # the _symmetric_builtins_ attribute
-    _symmetric_builtins_ = [s('name', case_fold=True), 'uri']
+    # we may also mark name symmetric by including a type hint for it
+    name: t.Annotated[str, Symmetric(case_fold=True)]
 
     # type hints specify our additional enum instance properties
     label: t.Annotated[str, Symmetric(case_fold=True)]
@@ -26,7 +25,8 @@ class MapBoxStyle(Enum):
     NAVIGATION_NIGHT  = 'navigation-night',  'Navigation Night',   1
 
     # we can define a normal property to produce property values based
-    # off other properties!
+    # off other properties! We can even use the symmetric decorator to make it symmetric
+    @symmetric()
     @property
     def uri(self) -> str:
         return f'mapbox://styles/mapbox/{self.value}-v{self.version}'

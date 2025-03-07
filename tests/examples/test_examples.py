@@ -54,6 +54,10 @@ def test_howto_symmetric_builtins():
     from tests.examples import howto_symmetric_builtins
 
 
+def test_howto_symmetric_decorator():
+    from tests.examples import howto_symmetric_decorator
+
+
 def test_howto_specialized():
     from tests.examples import howto_specialized
 

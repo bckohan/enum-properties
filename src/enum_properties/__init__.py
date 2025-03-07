@@ -19,7 +19,7 @@ from collections.abc import Generator, Hashable, Iterable
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 1, 1)
+VERSION = (2, 2, 0)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -35,6 +35,7 @@ __all__ = [
     "FlagProperties",
     "IntFlagProperties",
     "EnumPropertiesMeta",
+    "symmetric",
     "Symmetric",
     "SymmetricMixin",
     "DecomposeMixin",
@@ -45,6 +46,7 @@ __all__ = [
 
 
 T = t.TypeVar("T")
+S = t.TypeVar("S")
 
 
 def with_typehint(baseclass: t.Type[T]) -> t.Type[T]:
@@ -78,6 +80,47 @@ class Symmetric:
     none values for symmetric properties will not map back to
     the enumeration value.
     """
+
+
+class _MarkedSymmetric:
+    """
+    This temporarily wraps members and marks them as symmetric until they are set onto
+    the class during enumeration construction.
+    """
+
+    member: t.Any
+    symmetric: Symmetric
+
+    def __init__(self, member: t.Any, symmetric: Symmetric):
+        self.member = member
+        self.symmetric = symmetric
+
+
+def symmetric(case_fold: bool = False, match_none: bool = False) -> t.Callable[[S], S]:
+    """
+    A decorator that marks non-enum value members as symmetric. For example, properties:
+
+    .. code-block:: python
+
+        class MyEnum(EnumProperties):
+
+            ...
+
+            @symmetric(case_fold=True)
+            @property
+            def name(self):
+                return "value"
+
+    :param values: The enumeration value(s) to specialize
+    :return: A decorated specialized member method
+    """
+
+    def symmetric_decorator(member: S) -> S:
+        return _MarkedSymmetric(  # type: ignore
+            member, Symmetric(case_fold, match_none)
+        )
+
+    return symmetric_decorator
 
 
 class _Prop(str):
@@ -407,6 +450,11 @@ class EnumPropertiesMeta(enum.EnumMeta):
                         self._specialized_.setdefault(self._ids_[en_val], {})[key] = (
                             value
                         )
+                elif isinstance(value, _MarkedSymmetric):
+                    self.setdefault("_symmetric_builtins_", []).append(
+                        s(key, value.symmetric.case_fold, value.symmetric.match_none)
+                    )
+                    dict.__setitem__(self, key, value.member)
                 elif key in EnumPropertiesMeta.EXPECTED:
                     dict.__setitem__(self, key, value)
                 elif key in EnumPropertiesMeta.RESERVED:
