@@ -11,12 +11,12 @@ default:
 # install the uv package manager
 [linux]
 [macos]
-install_uv:
+install-uv:
     curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # install the uv package manager
 [windows]
-install_uv:
+install-uv:
     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 # setup the venv and pre-commit hooks

@@ -14,7 +14,7 @@ We provide a platform independent justfile with recipes for all the development 
 `enum-properties` uses [uv](https://docs.astral.sh/uv) for environment, package and dependency management:
 
 ```bash
-    just install_uv
+    just install-uv
 ```
 
 Next, initialize and install the development environment:
