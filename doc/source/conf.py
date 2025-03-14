@@ -25,11 +25,9 @@ import enum_properties
 
 # -- Project information -----------------------------------------------------
 
-project = 'enum-properties'
-copyright = f'2022-{datetime.now().year}, Brian Kohan'
-author = 'Brian Kohan'
-
-# The full version, including alpha/beta/rc tags
+project = enum_properties.__title__
+copyright = enum_properties.__copyright__
+author = enum_properties.__author__
 release = enum_properties.__version__
 
 

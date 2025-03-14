@@ -19,7 +19,7 @@ from collections.abc import Generator, Hashable, Iterable
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 2, 2)
+VERSION = (2, 2, 3)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -111,7 +111,9 @@ def symmetric(case_fold: bool = False, match_none: bool = False) -> t.Callable[[
             def name(self):
                 return "value"
 
-    :param values: The enumeration value(s) to specialize
+
+    :param case_fold: Pass True to make the property case insensitive
+    :param match_none: Pass True to make None values symmetric
     :return: A decorated specialized member method
     """
 
