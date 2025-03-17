@@ -8,6 +8,8 @@ Enumerations in Python can provide rich class based interfaces, well suited to m
 real world examples are presented here that leverage enum properties to encapsulate more
 information and get our enums to do more work.
 
+.. _tutorial_address_route:
+
 Address Route Type
 __________________
 
@@ -34,6 +36,8 @@ We use an integer literal as our enumeration values to save space if these enume
 persisted in a datastore by value. By specifying them directly instead of using ``auto()`` we
 reserve the ability to add additional route types in alphabetical order without accidentally
 invalidating any persisted data.
+
+.. _tutorial_mapbox_style:
 
 MapBox Style
 ____________

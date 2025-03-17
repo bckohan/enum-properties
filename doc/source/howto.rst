@@ -4,6 +4,8 @@
 How To
 ======
 
+.. _howto_add_properties:
+
 Add Properties to an Enum
 -------------------------
 
@@ -41,6 +43,7 @@ equivalent to:
 .. literalinclude:: ../../tests/examples/howto_metaclass.py
     :lines: 2-7
 
+.. _howto_symmetric_properties:
 
 Get Enums from their properties
 -------------------------------
@@ -107,6 +110,9 @@ the metaclass you must also inherit from :py:class:`~enum_properties.SymmetricMi
 .. literalinclude:: ../../tests/examples/howto_symmetric_metaclass.py
     :lines: 2-7
 
+
+.. _howto_symmetric_precedence:
+
 Handle Symmetric Overloads
 --------------------------
 
@@ -137,6 +143,8 @@ example to make name case insensitive we might:
 .. literalinclude:: ../../tests/examples/howto_symmetric_builtins.py
 
 
+.. _howto_symmetric_decorator:
+
 Mark @properties as Symmetric
 -----------------------------
 
@@ -145,6 +153,8 @@ in the Enum value tuple as symmetric. For example:
 
 .. literalinclude:: ../../tests/examples/howto_symmetric_decorator.py
 
+
+.. _howto_specialize_members:
 
 Specializing Member Functions
 -----------------------------
@@ -171,6 +181,8 @@ can share the same specialization.
 
 .. literalinclude:: ../../tests/examples/howto_specialized_list.py
 
+
+.. _howto_flags:
 
 Flags
 -----
@@ -204,6 +216,8 @@ are supported on flags. Boundary specifiers must be supplied as named arguments:
 .. literalinclude:: ../../tests/examples/howto_flag_boundaries.py
 
 
+.. _howto_nested_class_values:
+
 Use Nested Classes as Enums
 ---------------------------
 
@@ -229,6 +243,8 @@ the position of ``label`` is important.
 
         .. literalinclude:: ../../tests/examples/howto_nested_classes_313.py
 
+
+.. _howto_dataclass_enums:
 
 What about dataclass Enums?
 ---------------------------
@@ -266,6 +282,8 @@ enumeration for the following reasons:**
 .. literalinclude:: ../../tests/examples/howto_dataclass_integration.py
 
 
+.. _howto_hash_equivalency:
+
 Define hash equivalent enums
 ----------------------------
 
@@ -282,6 +300,8 @@ you will have to implement this yourself. For example, if you wanted your color 
 be an rgb tuple:
 
 .. literalinclude:: ../../tests/examples/howto_hash_equiv_def.py
+
+.. _howto_legacy_api:
 
 Use the legacy (1.x) API
 ------------------------

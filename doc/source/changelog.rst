@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v2.2.4 (2025-03-17)
+===================
+
+* Add intersphinx reference points to howto and tutorial doc sections.
+
+
 v2.2.3 (2025-03-14)
 ===================
 
