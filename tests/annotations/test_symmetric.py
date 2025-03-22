@@ -1,5 +1,4 @@
 from unittest import TestCase
-from enum import property
 from enum_properties import EnumProperties, symmetric
 import sys
 
