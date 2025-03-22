@@ -1,7 +1,12 @@
 from unittest import TestCase
-from typing_extensions import Annotated
-
+from enum import property
 from enum_properties import EnumProperties, symmetric
+import sys
+
+if sys.version_info[0:2] >= (3, 11):
+    from enum import property as enum_property
+else:
+    from types import DynamicClassAttribute as enum_property
 
 
 class TestSymmetricDecorator(TestCase):
@@ -82,3 +87,22 @@ class TestSymmetricDecorator(TestCase):
         self.assertTrue(SymEnum(SymEnum.ONE.label) is SymEnum.ONE)
         self.assertTrue(SymEnum(SymEnum.TWO.label) is SymEnum.TWO)
         self.assertTrue(SymEnum(SymEnum.THREE.label) is SymEnum.THREE)
+
+    def test_make_enum_properties_symmetric(self):
+        class SymEnum(EnumProperties):
+            ONE = 1
+            TWO = 2
+            THREE = 3
+
+            @symmetric(case_fold=True)
+            @enum_property
+            def label(self):
+                return self.name
+
+        self.assertEqual(SymEnum.ONE.label, "ONE")
+        self.assertEqual(SymEnum.TWO.label, "TWO")
+        self.assertEqual(SymEnum.THREE.label, "THREE")
+
+        self.assertTrue(SymEnum("one") is SymEnum.ONE)
+        self.assertTrue(SymEnum("tWo") is SymEnum.TWO)
+        self.assertTrue(SymEnum("THRee") is SymEnum.THREE)
