@@ -1,13 +1,11 @@
 import sys
-from enum import auto
+import enum
 from unittest import TestCase
 from typing_extensions import Annotated
 
 from enum_properties import (
     EnumProperties,
     FlagProperties,
-    IntEnumProperties,
-    IntFlagProperties,
     Symmetric,
     specialize,
     symmetric,
@@ -55,8 +53,15 @@ class TestAliases(TestCase):
             def method(self) -> str:
                 return self.label * 8
 
-            class Nested:
-                pass
+            if sys.version_info[:2] >= (3, 11):
+
+                @enum.nonmember
+                class Nested:
+                    pass
+            else:
+
+                class Nested:
+                    pass
 
         self.assertEqual(
             EnumWithAliasesComplex.__first_class_members__,
@@ -146,8 +151,15 @@ class TestAliases(TestCase):
             def method(self) -> str:
                 return self.label * 8
 
-            class Nested:
-                pass
+            if sys.version_info[:2] >= (3, 11):
+
+                @enum.nonmember
+                class Nested:
+                    pass
+            else:
+
+                class Nested:
+                    pass
 
         self.assertEqual(
             FlagWithAliasesComplex.__first_class_members__,
