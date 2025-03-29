@@ -282,6 +282,18 @@ enumeration for the following reasons:**
 .. literalinclude:: ../../tests/examples/howto_dataclass_integration.py
 
 
+.. _howto_members_and_aliases:
+Get members and aliases
+-----------------------
+
+Symmetric properties are added to the :attr:`~enum.EnumType.__members__` attribute,
+and alias members do not appear in :attr:`~enum.Enum._member_names_`. To get a list
+of first class members and aliases use
+:attr:`~enum_properties.EnumProperties.__first_class_members__`. This class member may
+also be overridden if you wish to customize this behavior for users.
+
+.. literalinclude:: ../../tests/examples/howto_members_and_aliases.py
+
 .. _howto_hash_equivalency:
 
 Define hash equivalent enums

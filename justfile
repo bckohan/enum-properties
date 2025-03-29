@@ -130,6 +130,28 @@ check-docs-links: _link_check
 check-docs:
     @just run doc8 --ignore-path ./doc/build --max-line-length 100 -q ./doc
 
+# fetch the intersphinx references for the given package
+[script]
+fetch-refs LIB: install-docs
+    import os
+    from pathlib import Path
+    import logging as _logging
+    import sys
+    import runpy
+    from sphinx.ext.intersphinx import inspect_main
+    _logging.basicConfig()
+
+    libs = runpy.run_path(Path(os.getcwd()) / "doc/source/conf.py").get("intersphinx_mapping")
+    url = libs.get("{{ LIB }}", None)
+    if not url:
+        sys.exit(f"Unrecognized {{ LIB }}, must be one of: {', '.join(libs.keys())}")
+    if url[1] is None:
+        url = f"{url[0].rstrip('/')}/objects.inv"
+    else:
+        url = url[1]
+
+    raise SystemExit(inspect_main([url]))
+
 # lint the code
 check-lint:
     @just run ruff check --select I

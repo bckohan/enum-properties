@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.3.0 (2025-03-29)
+===================
+
+* Implemented `Need a way to distinguish symmetric properties from first class aliases. <https://github.com/bckohan/enum-properties/issues/86>`_
+
 v2.2.5 (2025-03-22)
 ===================
 

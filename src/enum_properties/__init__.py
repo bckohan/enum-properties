@@ -19,7 +19,7 @@ from collections.abc import Generator, Hashable, Iterable
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 2, 5)
+VERSION = (2, 3, 0)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -230,6 +230,38 @@ class SymmetricMixin(with_typehint("EnumProperties")):  # type: ignore
     property will be a case sensitive symmetric property.
     """
 
+    _ep_symmetric_map_: t.Dict[t.Any, enum.Enum]
+    """
+    The case sensitive mapping of symmetric values to enumeration values.
+    """
+
+    _ep_isymmetric_map_: t.Dict[str, enum.Enum]
+    """
+    The case insensitive mapping of symmetric values to enumeration values.
+    """
+
+    _ep_coerce_types_: t.List[t.Type[t.Any]]
+    """
+    On instantiation, if _missing_ is invoked a coercion attempt will be made to each
+    of these types before failure.
+    """
+
+    _num_sym_props_: int
+    """
+    The number of symmetric properties on this enumeration.
+    """
+
+    _properties_: t.List[_Prop]
+    """
+    List of properties defined on the enumeration class.
+    """
+
+    __first_class_members__: t.List[str]
+    """
+    The list of first class members - this includes all members and aliases. May be
+    overridden.
+    """
+
     def __eq__(self, value: t.Any) -> bool:
         """Symmetric equality - try to coerce value before failure"""
         if isinstance(value, self.__class__):
@@ -346,6 +378,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
     # members reserved for use by EnumProperties
     RESERVED = [
         "_properties_",
+        "_num_sym_props_",
         "_ep_coerce_types_",
         "_ep_symmetric_map_",
         "_ep_isymmetric_map_",
@@ -354,7 +387,9 @@ class EnumPropertiesMeta(enum.EnumMeta):
     _ep_symmetric_map_: t.Dict[t.Any, enum.Enum]
     _ep_isymmetric_map_: t.Dict[str, enum.Enum]
     _ep_coerce_types_: t.List[t.Type[t.Any]]
+    _num_sym_props_: int
     _properties_: t.List[_Prop]
+    __first_class_members__: t.List[str]
 
     @classmethod
     def __prepare__(mcs, cls, bases, **kwargs):
@@ -396,6 +431,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             _ids_: t.Dict[int, str] = {}
             _member_names: t.Union[t.List[str], t.Dict[str, t.Any]]
             _create_properties_: bool = False
+            __first_class_members__: t.List[str] = []
 
             class AnnotationPropertyRecorder(dict):
                 class_dict: "_PropertyEnumDict"
@@ -479,6 +515,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                         # todo remove below when minimum python >= 3.13
                         not isinstance(value, type)
                     ):
+                        self.__first_class_members__.append(key)
                         try:
                             num_vals = len(value) - len(self._ep_properties_)
                             if num_vals < 1 or len(self._ep_properties_) != len(
@@ -553,9 +590,15 @@ class EnumPropertiesMeta(enum.EnumMeta):
             **kwargs,
         )
         cls._ep_coerce_types_ = []
+        cls._num_sym_props_ = 0
         cls._ep_symmetric_map_ = cls._member_map_
         cls._ep_isymmetric_map_ = {}
         cls._properties_ = list(classdict._ep_properties_.keys())
+
+        # we allow users to override this
+        cls.__first_class_members__ = classdict.get(
+            "__first_class_members__", classdict.__first_class_members__
+        )
 
         if classdict._specialized_:
             for val in cls:  # type: ignore[var-annotated]
@@ -598,11 +641,13 @@ class EnumPropertiesMeta(enum.EnumMeta):
                 setattr(member, prop, values[idx])
 
         # we reverse to maintain precedence order for symmetric lookups
+        cls._num_sym_props_ = 0
         member_values = t.cast(
             t.List[enum.Enum],
             list(cls._value2member_map_.values() or cls.__members__.values()),
         )
         for prop in reversed([prop for prop in cls._properties_ if prop.symmetric]):
+            cls._num_sym_props_ += 1
             prop = t.cast(_SProp, prop)
             for idx, val2 in enumerate(reversed(classdict._ep_properties_[prop])):
                 enum_cls = member_values[len(member_values) - 1 - idx]
@@ -615,6 +660,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     add_coerce_type(type(val2))
 
         # add builtin symmetries
+        cls._num_sym_props_ += len(getattr(cls, "_symmetric_builtins_", []))
         for sym_builtin in reversed(getattr(cls, "_symmetric_builtins_", [])):
             # allow simple strings for the default case
             if isinstance(sym_builtin, str):

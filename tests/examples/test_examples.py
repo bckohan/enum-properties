@@ -123,3 +123,7 @@ def test_howto_hash_equiv_def():
 
 def test_howto_legacy():
     from tests.examples import howto_legacy
+
+
+def test_howto_members_and_aliases():
+    from tests.examples import howto_members_and_aliases

@@ -14,3 +14,4 @@ Module
    :undoc-members:
    :show-inheritance:
    :private-members:
+   :special-members: __first_class_members__
