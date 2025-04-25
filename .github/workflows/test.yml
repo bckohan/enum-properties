@@ -45,7 +45,7 @@ jobs:
     - name: Install Just
       uses: extractions/setup-just@v3
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v6
       with:
         enable-cache: true
     - name: Install Dependencies
@@ -100,7 +100,7 @@ jobs:
     - name: Install Just
       uses: extractions/setup-just@v3
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v6
       with:
         enable-cache: true
     - name: Install Dependencies
@@ -154,7 +154,7 @@ jobs:
     - name: Install Just
       uses: extractions/setup-just@v3
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v6
       with:
         enable-cache: true
     - name: Install Dependencies
@@ -195,7 +195,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
       - name: Setup Just
