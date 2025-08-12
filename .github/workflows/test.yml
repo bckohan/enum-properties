@@ -36,7 +36,7 @@ jobs:
       if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: sudo rm -rf /opt/hostedtoolcache
   
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
       uses: actions/setup-python@v5
@@ -91,7 +91,7 @@ jobs:
       if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: sudo rm -rf /Users/runner/hostedtoolcache
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
       uses: actions/setup-python@v5
@@ -145,7 +145,7 @@ jobs:
     - name: Clear GitHub Actions cache
       if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: Remove-Item -Recurse -Force C:\hostedtoolcache
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
       uses: actions/setup-python@v5
@@ -188,7 +188,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         id: sp
         with:
