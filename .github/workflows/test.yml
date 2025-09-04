@@ -39,7 +39,7 @@ jobs:
     - uses: actions/checkout@v5
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Just
@@ -94,7 +94,7 @@ jobs:
     - uses: actions/checkout@v5
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Just
@@ -148,7 +148,7 @@ jobs:
     - uses: actions/checkout@v5
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Just
@@ -189,7 +189,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         id: sp
         with:
           python-version: '3.12'
