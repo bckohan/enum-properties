@@ -573,6 +573,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     if len(self._member_names) > before:
                         self._create_properties_ = False
 
+        if sys.version_info[:2] >= (3, 14):
+            return {"_ep_enum_dict_": _PropertyEnumDict()}
         return _PropertyEnumDict()  # type: ignore[no-untyped-call]
 
     def __new__(mcs, classname, bases, classdict, **kwargs):
@@ -590,6 +592,25 @@ class EnumPropertiesMeta(enum.EnumMeta):
             incorrectly, or if non-hashable values are provided for a
             symmetric property.
         """
+        if sys.version_info[:2] >= (3, 14):
+            from annotationlib import (
+                Format,
+                call_annotate_function,
+                get_annotate_from_class_namespace,
+            )
+
+            lazy_dict = classdict.pop("_ep_enum_dict_")
+            annotate = get_annotate_from_class_namespace(classdict)
+            if annotate:
+                lazy_dict["__annotations__"] = {}
+                for attr, typ in call_annotate_function(
+                    annotate, format=Format.VALUE
+                ).items():
+                    lazy_dict["__annotations__"][attr] = typ  # or other formats
+            for key, value in classdict.items():
+                lazy_dict[key] = value
+            classdict = lazy_dict
+
         cls = super().__new__(
             mcs,
             classname,
