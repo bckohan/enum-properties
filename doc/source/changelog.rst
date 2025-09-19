@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.4.0 (2025-09-18)
+===================
+
+* Implemented `Support Python 3.14, drop 3.8 support <https://github.com/bckohan/enum-properties/issues/97>`_
+
 v2.3.0 (2025-03-29)
 ===================
 
