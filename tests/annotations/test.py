@@ -899,8 +899,14 @@ class TestEnums(TestCase):
             # should not be interpreted as a property
             label: str
 
-        with self.assertRaises(AttributeError):
-            MyEnum2.VALUE1.label
+        if sys.version_info[:2] < (3, 14):
+            with self.assertRaises(AttributeError):
+                MyEnum2.VALUE1.label
+        else:
+            # Python 3.14+ supports this use case
+            self.assertEqual(MyEnum2.VALUE1.label, "label1")
+            self.assertEqual(MyEnum2.VALUE2.label, "label2")
+            self.assertEqual(MyEnum2.VALUE3.label, "label3")
 
         class MyEnum3(EnumProperties):
             VALUE1 = 0, "label1"
