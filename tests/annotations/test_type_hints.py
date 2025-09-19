@@ -1,6 +1,6 @@
 import sys
 from unittest import TestCase
-from typing_extensions import Annotated
+from typing import Annotated
 
 from enum_properties import (
     IntEnumProperties,

@@ -1,11 +1,10 @@
 from enum import auto
 import typing as t
-from typing_extensions import Annotated
 from enum_properties import EnumProperties, FlagProperties, IntFlagProperties, Symmetric
 
 
 class IntPerm(IntFlagProperties):
-    label: Annotated[str, Symmetric(case_fold=True)]
+    label: t.Annotated[str, Symmetric(case_fold=True)]
 
     R = 1, "read"
     W = 2, "write"
@@ -14,7 +13,7 @@ class IntPerm(IntFlagProperties):
 
 
 class Perm(FlagProperties):
-    label: Annotated[str, Symmetric(case_fold=True)]
+    label: t.Annotated[str, Symmetric(case_fold=True)]
 
     R = auto(), "read"
     W = auto(), "write"
@@ -23,8 +22,8 @@ class Perm(FlagProperties):
 
 
 class PriorityEx(EnumProperties):
-    prop1: Annotated[str, Symmetric()]
-    prop2: Annotated[str, Symmetric(case_fold=True)]
+    prop1: t.Annotated[str, Symmetric()]
+    prop2: t.Annotated[str, Symmetric(case_fold=True)]
 
     ONE = 0, "1", [3, 4]
     TWO = 1, "2", [3, "4"]

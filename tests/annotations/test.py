@@ -2,7 +2,7 @@ import typing as t
 from collections.abc import Hashable
 from enum import Enum, auto
 from unittest import TestCase
-from typing_extensions import Annotated
+import sys
 
 from enum_properties import (
     EnumProperties,
@@ -22,14 +22,14 @@ class TestEnums(TestCase):
         with self.assertRaises(ValueError):
 
             class BadEnum(EnumProperties):
-                bad_prop: Annotated[str, Symmetric()]
+                bad_prop: t.Annotated[str, Symmetric()]
 
                 VAL1 = "E1", "E1 Label", "Good prop"
                 VAL2 = "E2", "E2 Label", {"hashable": False}
 
     def test_unicode_casefold(self):
         class CaseAgnostic(EnumProperties):
-            label: Annotated[str, Symmetric(case_fold=True)]
+            label: t.Annotated[str, Symmetric(case_fold=True)]
 
             ONE = 1, "ß"
             TWO = 2, "Σίσυφος"
@@ -39,7 +39,7 @@ class TestEnums(TestCase):
 
         # test that closest case matches first
         class CaseFirstMatch(EnumProperties):
-            label: Annotated[str, Symmetric(case_fold=True)]
+            label: t.Annotated[str, Symmetric(case_fold=True)]
 
             ONE = 1, "ß"
             TWO = 2, "Σίσυφος"
@@ -53,8 +53,8 @@ class TestEnums(TestCase):
         class Color(IntEnumProperties):
             value: int
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True)]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
@@ -143,8 +143,8 @@ class TestEnums(TestCase):
     def test_property_lists(self):
         class Color(EnumProperties):
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True)]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
@@ -161,10 +161,10 @@ class TestEnums(TestCase):
 
     def test_symmetric_builtin_override(self):
         class Color(EnumProperties):
-            name: Annotated[str, Symmetric(case_fold=True)]
+            name: t.Annotated[str, Symmetric(case_fold=True)]
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True)]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
@@ -179,8 +179,8 @@ class TestEnums(TestCase):
             _symmetric_builtins_ = [s("name", case_fold=True)]
 
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True)]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
@@ -197,8 +197,8 @@ class TestEnums(TestCase):
                 _symmetric_builtins_ = [s("does_not_exist")]
 
                 spanish: str
-                rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-                hex: Annotated[str, Symmetric()]
+                rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+                hex: t.Annotated[str, Symmetric()]
 
                 RED = 1, "Roja", (1, 0, 0), "ff0000"
                 GREEN = 2, "Verde", (0, 1, 0), "00ff00"
@@ -208,8 +208,8 @@ class TestEnums(TestCase):
         # test default behavior
         class ColorDefault(EnumProperties):
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric()]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric()]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), None
@@ -227,8 +227,8 @@ class TestEnums(TestCase):
 
         class ColorNoMatchNone(EnumProperties):
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True, match_none=False)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True, match_none=False)]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), None
@@ -245,8 +245,8 @@ class TestEnums(TestCase):
 
         class ColorMatchNone(EnumProperties):
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(match_none=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(match_none=True)]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), None
@@ -276,8 +276,8 @@ class TestEnums(TestCase):
 
         class Color(DisableSymmetryMixin, EnumProperties):
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True)]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
@@ -321,8 +321,8 @@ class TestEnums(TestCase):
 
     def test_symmetry_priorities(self):
         class Priority(EnumProperties):
-            prop1: Annotated[str, Symmetric()]
-            prop2: Annotated[int, Symmetric()]
+            prop1: t.Annotated[str, Symmetric()]
+            prop2: t.Annotated[int, Symmetric()]
 
             FIRST = 1, "3", 3
             SECOND = 2, "2", 2
@@ -337,8 +337,8 @@ class TestEnums(TestCase):
 
     def test_symmetry_tuples(self):
         class Priority(EnumProperties):
-            prop1: Annotated[str, Symmetric()]
-            prop2: Annotated[t.List[t.Union[float, str]], Symmetric()]
+            prop1: t.Annotated[str, Symmetric()]
+            prop2: t.Annotated[t.List[t.Union[float, str]], Symmetric()]
 
             FIRST = 1, "3", [2.1, "2.3"]
             SECOND = 2, "2", [2.2, "2.2"]
@@ -361,8 +361,8 @@ class TestEnums(TestCase):
     def test_auto(self):
         class ColorAutoSym(EnumProperties):
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True)]
 
             def _generate_next_value_(name, start, count, last_values):
                 return name.title()
@@ -410,8 +410,8 @@ class TestEnums(TestCase):
 
         class ColorAutoIntSym(EnumProperties):
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True)]
 
             RED = auto(), "Roja", (1, 0, 0), "ff0000"
             GREEN = auto(), "Verde", (0, 1, 0), "00ff00"
@@ -460,8 +460,8 @@ class TestEnums(TestCase):
     def test_ignore(self):
         class Color(EnumProperties):
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True)]
 
             _ignore_ = ["BLACK", "NOT_ENOUGH_PROPS"]
 
@@ -499,8 +499,8 @@ class TestEnums(TestCase):
     def test_null_props(self):
         class Color(EnumProperties):
             spanish: str
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True, match_none=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True, match_none=True)]
 
             RED = 1, "Roja", (1, 0, 0), "ff0000"
             GREEN = 2, None, (0, 1, 0), "00ff00"
@@ -558,8 +558,8 @@ class TestEnums(TestCase):
         self.assertEqual(Color.BLUE.hex, "0000ff")
 
         class Color(EnumProperties):
-            rgb: Annotated[t.Tuple[int, int, int], Symmetric()]
-            hex: Annotated[str, Symmetric(case_fold=True)]
+            rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
+            hex: t.Annotated[str, Symmetric(case_fold=True)]
 
             RED = auto(), (1, 0, 0), "0xff0000"
             GREEN = auto(), (0, 1, 0), "0x00ff00"
@@ -596,10 +596,10 @@ class TestEnums(TestCase):
             # this special attribute
             _symmetric_builtins_ = ["uri"]
 
-            name: Annotated[str, Symmetric(case_fold=True)]
+            name: t.Annotated[str, Symmetric(case_fold=True)]
 
             # type hints are optional for better dev experience
-            label: Annotated[str, Symmetric(case_fold=True)]
+            label: t.Annotated[str, Symmetric(case_fold=True)]
             version: int
 
             # name               value                 label           version
@@ -701,10 +701,10 @@ class TestEnums(TestCase):
 
         class AddressRoute(EnumProperties):
             # name is a builtin property of Enum, we can override its case insensitivity
-            name: Annotated[str, Symmetric(case_fold=True)]
+            name: t.Annotated[str, Symmetric(case_fold=True)]
 
-            abbr: Annotated[str, Symmetric(case_fold=True)]
-            alt: Annotated[t.List[str], Symmetric(case_fold=True)]
+            abbr: t.Annotated[str, Symmetric(case_fold=True)]
+            alt: t.Annotated[t.List[str], Symmetric(case_fold=True)]
 
             # name  value    abbr         alt
             ALLEY = 1, "ALY", ["ALLEE", "ALLY"]
@@ -755,8 +755,8 @@ class TestEnums(TestCase):
 
     def test_precedence(self):
         class PriorityEx(EnumProperties):
-            prop1: Annotated[str, Symmetric()]
-            prop2: Annotated[t.List[t.Union[int, str]], Symmetric()]
+            prop1: t.Annotated[str, Symmetric()]
+            prop2: t.Annotated[t.List[t.Union[int, str]], Symmetric()]
 
             ONE = 0, "1", [3, 4]
             TWO = 1, "2", [3, "4"]
@@ -792,8 +792,8 @@ class TestEnums(TestCase):
             pass
 
         class PriorityEx(EnumProperties):
-            prop1: Annotated[Type1, Symmetric()]
-            prop2: Annotated[Type2, Symmetric()]
+            prop1: t.Annotated[Type1, Symmetric()]
+            prop2: t.Annotated[Type2, Symmetric()]
 
             ONE = 2, Type1(0), Type2(1)
             TWO = 3, Type2(0), Type1(1)
@@ -823,7 +823,7 @@ class TestEnums(TestCase):
 
         class TransitiveEnum(EnumProperties):
             label: str
-            pos: Annotated[t.Union[HashableEnum1, HashableEnum2], Symmetric()]
+            pos: t.Annotated[t.Union[HashableEnum1, HashableEnum2], Symmetric()]
 
             VAL0 = 0, "Value 0", HashableEnum1.VAL0_1
             VAL1 = 1, "Value 1", HashableEnum1.VAL1_1
@@ -911,12 +911,17 @@ class TestEnums(TestCase):
             VALUE2 = 1, "label2"
             VALUE3 = 2, "label3"
 
-        with self.assertRaises(AttributeError):
-            MyEnum3.VALUE1.label
+        if sys.version_info[:2] < (3, 14):
+            with self.assertRaises(AttributeError):
+                MyEnum3.VALUE1.label
+        else:
+            # Python 3.14+ supports this use case
+            self.assertEqual(MyEnum3.VALUE1.label, "label1")
+            self.assertEqual(MyEnum3.VALUE2.label, "label2")
+            self.assertEqual(MyEnum3.VALUE3.label, "label3")
 
     def test_reference_enums(self):
         from enum import Enum
-        from typing_extensions import Annotated
         from enum_properties import EnumProperties, Symmetric
 
         class IndependentEnum(Enum):
@@ -925,7 +930,7 @@ class TestEnums(TestCase):
             VALUE2 = 22
 
         class DependentEnum(EnumProperties):
-            indep: Annotated[IndependentEnum, Symmetric()]
+            indep: t.Annotated[IndependentEnum, Symmetric()]
 
             VALUE0 = 0, IndependentEnum.VALUE2
             VALUE1 = 1, IndependentEnum.VALUE1

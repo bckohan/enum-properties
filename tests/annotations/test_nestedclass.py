@@ -2,7 +2,7 @@ import enum
 import sys
 from enum import auto
 from unittest import TestCase
-from typing_extensions import Annotated
+from typing import Annotated
 import warnings
 
 from enum_properties import (

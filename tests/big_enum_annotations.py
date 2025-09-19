@@ -1,6 +1,6 @@
 """The standard enum type for ISO 3166-1 common countrys"""
 
-from typing_extensions import Annotated
+from typing import Annotated
 from enum_properties import EnumProperties, Symmetric
 
 
