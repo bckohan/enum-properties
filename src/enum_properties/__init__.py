@@ -406,7 +406,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
     __first_class_members__: t.List[str]
 
     @classmethod
-    def __prepare__(mcs, cls, bases, **kwargs):
+    def __prepare__(metacls, cls, bases, **kwds):  # type: ignore[override]
         """
         Strip properties out of inheritance and record them on our class
         dictionary for per-value based assignment in ``__new__``.
@@ -429,7 +429,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             else:
                 real_bases.append(base)
 
-        class_dict = super().__prepare__(cls, tuple(real_bases), **kwargs)
+        class_dict = super().__prepare__(cls, tuple(real_bases), **kwds)
 
         class _PropertyEnumDict(class_dict.__class__):  # type: ignore[name-defined]
             """
@@ -630,7 +630,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             In python 3.14+ annotations are loaded after enum members are
             defined, so we have to reconcile our properties here.
             """
-            from annotationlib import (
+            from annotationlib import (  # pyright: ignore[reportMissingImports]
                 Format,
                 call_annotate_function,
                 get_annotate_from_class_namespace,
@@ -901,7 +901,7 @@ class FlagProperties(
         return enum.Flag.__hash__(self)
 
 
-class IntFlagProperties(  # type: ignore[misc]
+class IntFlagProperties(
     DecomposeMixin, SymmetricMixin, enum.IntFlag, metaclass=EnumPropertiesMeta
 ):
     """

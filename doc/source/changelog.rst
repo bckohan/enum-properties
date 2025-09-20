@@ -7,15 +7,6 @@ v2.4.0 (2025-09-18)
 
 * Implemented `Support Python 3.14, drop 3.8 support <https://github.com/bckohan/enum-properties/issues/97>`_
 
-  .. warning::
-
-    If you are using a dataclass enum with additional properties, you will now need to encapsulate
-    the dataclass attributes in a tuple as the first element of the enum member tuple. This syntax
-    worked before but it was also lenient and took the first N elements of the member tuple that
-    were not properties. This change makes the syntax more explicit and less error prone and was
-    necessitated to support Python 3.14 because properties are determined after the enum member
-    values are set on the class due to lazy evaluation of annotations.
-
 
 v2.3.0 (2025-03-29)
 ===================

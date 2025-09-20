@@ -449,8 +449,8 @@ class TestFlags(TestCase):
             class CreatureHybridSpecialized(
                 CreatureDataMixin, EnumProperties, s("kingdom")
             ):
-                BEETLE = ("small", 6), "insect"
-                DOG = ("medium", 4, False), "mammal"
+                BEETLE = "small", 6, "insect"
+                DOG = "medium", 4, False, "mammal"
 
                 @specialize(BEETLE)
                 def function(self):
@@ -485,7 +485,7 @@ class TestFlags(TestCase):
             class CreatureHybridSpecialized(
                 CreatureDataHashableMixin, EnumProperties, s("kingdom")
             ):
-                BEETLE = ("small", 6), "insect"
+                BEETLE = "small", 6, "insect"
                 DOG = (
                     (
                         "medium",

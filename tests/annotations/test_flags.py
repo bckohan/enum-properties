@@ -432,7 +432,7 @@ class TestFlags(TestCase):
             class CreatureHybrid(CreatureDataMixin, EnumProperties):
                 kingdom: Annotated[str, Symmetric()]
 
-                BEETLE = ("small", 6, False), "insect"
+                BEETLE = "small", 6, False, "insect"
                 DOG = (
                     (
                         "medium",
@@ -457,8 +457,8 @@ class TestFlags(TestCase):
             class CreatureHybridSpecialized(CreatureDataMixin, EnumProperties):
                 kingdom: Annotated[str, Symmetric()]
 
-                BEETLE = ("small", 6), "insect"
-                DOG = ("medium", 4, False), "mammal"
+                BEETLE = "small", 6, "insect"
+                DOG = "medium", 4, False, "mammal"
 
                 @specialize(BEETLE)
                 def function(self):
@@ -493,7 +493,7 @@ class TestFlags(TestCase):
             class CreatureHybridSpecialized(CreatureDataHashableMixin, EnumProperties):
                 kingdom: Annotated[str, Symmetric()]
 
-                BEETLE = ("small", 6), "insect"
+                BEETLE = "small", 6, "insect"
                 DOG = (
                     (
                         "medium",
