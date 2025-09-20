@@ -57,6 +57,12 @@ T = t.TypeVar("T")
 S = t.TypeVar("S")
 
 
+_lazy_annotations_: bool = sys.version_info[:2] >= (3, 14)
+"""
+Annotations are loaded after enum member definitions in python 3.14+
+"""
+
+
 def with_typehint(baseclass: t.Type[T]) -> t.Type[T]:
     """
     This is icky but it works - revisit in future.
@@ -435,6 +441,12 @@ class EnumPropertiesMeta(enum.EnumMeta):
             """
 
             _ep_properties_ = properties
+
+            # lazy properties in annotation declaration order
+            _lazy_properties_: t.List[_Prop] = []
+
+            # member -> value tuple
+            _lazy_property_values_: t.Dict[str, t.Any] = {}
             _specialized_: t.Dict[str, t.Dict[str, _Specialized]] = {}
             _ids_: t.Dict[int, str] = {}
             _member_names: t.Union[t.List[str], t.Dict[str, t.Any]]
@@ -479,7 +491,10 @@ class EnumPropertiesMeta(enum.EnumMeta):
                                     else:
                                         self.class_dict["_symmetric_builtins_"] = [prop]
                             else:
-                                self.class_dict._ep_properties_[prop()] = []
+                                if _lazy_annotations_:
+                                    self.class_dict._lazy_properties_.append(prop())
+                                else:
+                                    self.class_dict._ep_properties_[prop()] = []
                     super().__setitem__(key, value)
 
             def __init__(self):
@@ -489,6 +504,32 @@ class EnumPropertiesMeta(enum.EnumMeta):
                 for item, value in class_dict.items():
                     self[item] = value
                 self._create_properties_ = not self._ep_properties_
+
+            def add_member_and_properties(self, key: str, value: t.Any) -> t.Any:
+                try:
+                    num_vals = len(value) - len(self._ep_properties_)
+                    if num_vals < 1 or len(self._ep_properties_) != len(
+                        value[num_vals:]
+                    ):
+                        raise ValueError(
+                            f"{key} must have "
+                            f"{len(self._ep_properties_)} property "
+                            f"values."
+                        )
+                    idx = num_vals
+                    for values in self._ep_properties_.values():
+                        values.append(value[idx])
+                        idx += 1
+
+                    if num_vals == 1:
+                        return value[0]
+                    else:
+                        return value[0:num_vals]
+
+                except TypeError as type_err:
+                    raise ValueError(
+                        f"{key} must have {len(self._ep_properties_)} property values."
+                    ) from type_err
 
             def __setitem__(self, key, value):
                 if isinstance(value, _Specialized):
@@ -505,7 +546,9 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     dict.__setitem__(self, key, value)
                 elif key in EnumPropertiesMeta.RESERVED:
                     raise ValueError(f"{key} is reserved.")
-                elif self._ep_properties_:
+                elif self._ep_properties_ or (
+                    _lazy_annotations_ and isinstance(value, tuple)
+                ):
                     member_names = getattr(class_dict, "_member_names")
                     # are we an enum value? - just kick this up to parent class
                     # logic, this code runs once on load - its fine that it's
@@ -513,7 +556,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     # ensures robust fidelity to Enum behavior.
                     before = len(member_names)
                     class_dict[key] = value
-                    self._create_properties_ = False  # we're done with annotations
+                    # are we done with annotations?
+                    self._create_properties_ = _lazy_annotations_
                     remove = False
                     if (
                         len(member_names) > before
@@ -524,28 +568,17 @@ class EnumPropertiesMeta(enum.EnumMeta):
                         not isinstance(value, type)
                     ):
                         self.__first_class_members__.append(key)
-                        try:
-                            num_vals = len(value) - len(self._ep_properties_)
-                            if num_vals < 1 or len(self._ep_properties_) != len(
-                                value[num_vals:]
-                            ):
-                                raise ValueError(
-                                    f"{key} must have "
-                                    f"{len(self._ep_properties_)} property "
-                                    f"values."
-                                )
-                            idx = num_vals
-                            for values in self._ep_properties_.values():
-                                values.append(value[idx])
-                                idx += 1
-
+                        if _lazy_annotations_ and not self._ep_properties_:
+                            self._lazy_property_values_[key] = value
+                            # we set the value of the member to the first value in the
+                            # tuple - this is important to do here because it allows
+                            # members to be used as their value element later on in the
+                            # declaration - think named composite flag values - we may
+                            # have to change this later because we do not know what our
+                            # properties are yet
                             value = value[0]
-
-                        except TypeError as type_err:
-                            raise ValueError(
-                                f"{key} must have {len(self._ep_properties_)} "
-                                f"property values."
-                            ) from type_err
+                        else:
+                            value = self.add_member_and_properties(key, value)
 
                     elif key in member_names:
                         remove = True  # pragma: no cover
@@ -569,10 +602,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     before = len(self._member_names)
                     super().__setitem__(key, value)
                     if len(self._member_names) > before:
-                        self._create_properties_ = False
+                        self._create_properties_ = _lazy_annotations_
 
-        if sys.version_info[:2] >= (3, 14):
-            return {"_ep_enum_dict_": _PropertyEnumDict()}
         return _PropertyEnumDict()  # type: ignore[no-untyped-call]
 
     def __new__(mcs, classname, bases, classdict, **kwargs):
@@ -590,24 +621,39 @@ class EnumPropertiesMeta(enum.EnumMeta):
             incorrectly, or if non-hashable values are provided for a
             symmetric property.
         """
-        if sys.version_info[:2] >= (3, 14):
+        if _lazy_annotations_ and not classdict._ep_properties_:
+            """
+            In python 3.14+ annotations are loaded after enum members are
+            defined, so we have to reconcile our properties here.
+            """
             from annotationlib import (
                 Format,
                 call_annotate_function,
                 get_annotate_from_class_namespace,
             )
 
-            lazy_dict = classdict.pop("_ep_enum_dict_")
             annotate = get_annotate_from_class_namespace(classdict)
             if annotate:
-                lazy_dict["__annotations__"] = {}
+                classdict["__annotations__"] = {}
                 for attr, typ in call_annotate_function(
                     annotate, format=Format.VALUE
                 ).items():
-                    lazy_dict["__annotations__"][attr] = typ  # or other formats
-            for key, value in classdict.items():
-                lazy_dict[key] = value
-            classdict = lazy_dict
+                    classdict["__annotations__"][attr] = typ  # or other formats
+
+            if classdict._lazy_property_values_:
+                classdict._ep_properties_ = {
+                    prop: [] for prop in classdict._lazy_properties_
+                }
+                for en, value in classdict._lazy_property_values_.items():
+                    real_value = classdict.add_member_and_properties(en, value)
+                    if real_value != classdict[en] and isinstance(real_value, tuple):
+                        # if we're here - our assumption that the value was the first
+                        # element of the member tuple was wrong - reset it to the real
+                        # value bypassing EnumDict checks
+                        dict.__setitem__(classdict, en, real_value)
+
+            classdict._lazy_properties_.clear()
+            classdict._lazy_property_values_.clear()
 
         cls = super().__new__(
             mcs,
