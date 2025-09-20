@@ -400,8 +400,8 @@ class TestFlags(TestCase):
                 tail: bool = field(repr=False, default=True)
 
             class Creature(CreatureDataMixin, EnumProperties):
-                BEETLE = "small", 6
-                DOG = "medium", 4
+                BEETLE = ("small", 6)
+                DOG = ("medium", 4)
 
             self.assertEqual(Creature.BEETLE.size, "small")
             self.assertEqual(Creature.BEETLE.legs, 6)
@@ -412,8 +412,8 @@ class TestFlags(TestCase):
             self.assertEqual(Creature.DOG.tail, True)
 
             class CreatureEP(CreatureDataMixin, EnumProperties):
-                BEETLE = "small", 6
-                DOG = "medium", 4, False
+                BEETLE = ("small", 6)
+                DOG = ("medium", 4, False)
 
             self.assertEqual(CreatureEP.BEETLE.size, "small")
             self.assertEqual(CreatureEP.BEETLE.legs, 6)
@@ -424,7 +424,7 @@ class TestFlags(TestCase):
             self.assertEqual(CreatureEP.DOG.tail, False)
 
             class CreatureHybrid(CreatureDataMixin, EnumProperties, s("kingdom")):
-                BEETLE = "small", 6, False, "insect"
+                BEETLE = ("small", 6, False), "insect"
                 DOG = (
                     (
                         "medium",
@@ -449,7 +449,7 @@ class TestFlags(TestCase):
             class CreatureHybridSpecialized(
                 CreatureDataMixin, EnumProperties, s("kingdom")
             ):
-                BEETLE = "small", 6, "insect"
+                BEETLE = ("small", 6), "insect"
                 DOG = ("medium", 4, False), "mammal"
 
                 @specialize(BEETLE)
@@ -485,7 +485,7 @@ class TestFlags(TestCase):
             class CreatureHybridSpecialized(
                 CreatureDataHashableMixin, EnumProperties, s("kingdom")
             ):
-                BEETLE = "small", 6, "insect"
+                BEETLE = ("small", 6), "insect"
                 DOG = (
                     (
                         "medium",

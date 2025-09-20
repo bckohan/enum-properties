@@ -409,8 +409,9 @@ class TestFlags(TestCase):
 
         def test_enum_dataclass_support(self):
             """
-            In 3.12, Enum added support for dataclass inheritance which offers similar functionality
-            to enum-properties. This tests evaluates how these step on each other's toes.
+            In 3.12, Enum added support for dataclass inheritance which offers similar
+            functionality to enum-properties. This tests evaluates how these step on
+            each other's toes.
 
             From the std lib docs example:
             """
@@ -431,7 +432,7 @@ class TestFlags(TestCase):
             class CreatureHybrid(CreatureDataMixin, EnumProperties):
                 kingdom: Annotated[str, Symmetric()]
 
-                BEETLE = "small", 6, False, "insect"
+                BEETLE = ("small", 6, False), "insect"
                 DOG = (
                     (
                         "medium",
@@ -456,7 +457,7 @@ class TestFlags(TestCase):
             class CreatureHybridSpecialized(CreatureDataMixin, EnumProperties):
                 kingdom: Annotated[str, Symmetric()]
 
-                BEETLE = "small", 6, "insect"
+                BEETLE = ("small", 6), "insect"
                 DOG = ("medium", 4, False), "mammal"
 
                 @specialize(BEETLE)
@@ -492,7 +493,7 @@ class TestFlags(TestCase):
             class CreatureHybridSpecialized(CreatureDataHashableMixin, EnumProperties):
                 kingdom: Annotated[str, Symmetric()]
 
-                BEETLE = "small", 6, "insect"
+                BEETLE = ("small", 6), "insect"
                 DOG = (
                     (
                         "medium",

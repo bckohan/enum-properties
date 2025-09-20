@@ -14,8 +14,8 @@ class Creature(CreatureDataMixin, EnumProperties):
 
     kingdom: t.Annotated[str, Symmetric()]
 
-    BEETLE = 'small', 6, False, 'insect'
-    DOG = 'medium', 4, 'animal'
+    BEETLE = ('small', 6, False), 'insect'
+    DOG = ('medium', 4), 'animal'
 
 
 # you can now access the dataclass fields on the enumeration values

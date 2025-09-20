@@ -538,10 +538,8 @@ class EnumPropertiesMeta(enum.EnumMeta):
                             for values in self._ep_properties_.values():
                                 values.append(value[idx])
                                 idx += 1
-                            if num_vals == 1:
-                                value = value[0]
-                            else:
-                                value = value[0:num_vals]
+
+                            value = value[0]
 
                         except TypeError as type_err:
                             raise ValueError(

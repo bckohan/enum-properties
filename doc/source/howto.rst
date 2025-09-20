@@ -277,12 +277,13 @@ enumeration for the following reasons:**
 
     EnumProperties also integrates with Enum's dataclass support!
     For example we can add a symmetric property to the Creature
-    enumeration like so:
+    enumeration like so (**note the tuple encapsulating the dataclass fields**):
 
 .. literalinclude:: ../../tests/examples/howto_dataclass_integration.py
 
 
 .. _howto_members_and_aliases:
+
 Get members and aliases
 -----------------------
 
