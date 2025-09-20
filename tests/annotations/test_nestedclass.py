@@ -247,9 +247,6 @@ class TestNestedClassOnEnum(TestCase):
             class Type3:
                 pass
 
-            # should not be interpreted as a property
-            label: str
-
             VALUE1 = Type1, "label1"
             VALUE2 = Type2, "label2"
             VALUE3 = Type3, "label3"

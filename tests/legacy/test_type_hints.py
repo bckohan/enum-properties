@@ -1,3 +1,4 @@
+from __future__ import annotations
 from unittest import TestCase
 
 from enum_properties import IntEnumProperties, p, s

@@ -601,6 +601,10 @@ class EnumPropertiesMeta(enum.EnumMeta):
                         value = self.AnnotationPropertyRecorder(self)
                     before = len(self._member_names)
                     super().__setitem__(key, value)
+                    if key in {"_generate_next_value_", "_ignore_"}:
+                        # this EnumDict renders auto() - so we need to make sure that
+                        # any custom _generate_next_value_ is set on it
+                        class_dict[key] = value
                     if len(self._member_names) > before:
                         self._create_properties_ = _lazy_annotations_
 
@@ -711,7 +715,13 @@ class EnumPropertiesMeta(enum.EnumMeta):
         for idx, member in enumerate(cls.__members__.values()):  # type: ignore[var-annotated]
             member = t.cast(enum.Enum, member)
             for prop, values in classdict._ep_properties_.items():
-                setattr(member, prop, values[idx])
+                try:
+                    setattr(member, prop, values[idx])
+                except IndexError as ierr:
+                    raise ValueError(
+                        f"{member} must have {len(classdict._ep_properties_)} property "
+                        "values."
+                    ) from ierr
 
         # we reverse to maintain precedence order for symmetric lookups
         cls._num_sym_props_ = 0
