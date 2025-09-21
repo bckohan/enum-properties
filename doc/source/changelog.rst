@@ -2,10 +2,17 @@
 Change Log
 ==========
 
-v2.4.0 (2025-09-18)
+v2.4.0 (2025-09-21)
 ===================
 
 * Implemented `Support Python 3.14, drop 3.8 support <https://github.com/bckohan/enum-properties/issues/97>`_
+
+.. warning::
+
+    Python 3.14 lazily loads type annotations when they are accessed. Since annotations are used to
+    define the properties a significant re-ordering of class creation is required on Python 3.14+.
+    All tests are passing and this version should be interface compatible with all previous
+    versions. However, if you encounter any issues please report them.
 
 
 v2.3.0 (2025-03-29)
