@@ -833,16 +833,14 @@ class StrEnumProperties(
     def __hash__(self):
         return getattr(enum, "StrEnum", str).__hash__(self)
 
-    def __str__(self):
-        if sys.version_info < (3, 11):
-            return str(self.value)
-        return super().__str__()
+    if sys.version_info < (3, 11):
 
-    @staticmethod
-    def _generate_next_value_(name, start, count, last_values):
-        if sys.version_info < (3, 11):
+        def __str__(self):
+            return str(self.value)
+
+        @staticmethod
+        def _generate_next_value_(name, start, count, last_values):
             return name.lower()
-        return enum.StrEnum._generate_next_value_(name, start, count, last_values)
 
 
 class DecomposeMixin(with_typehint(enum.Flag)):  # type: ignore
