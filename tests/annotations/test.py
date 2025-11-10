@@ -7,6 +7,7 @@ import sys
 from enum_properties import (
     EnumProperties,
     IntEnumProperties,
+    StrEnumProperties,
     SymmetricMixin,
     Symmetric,
     s,
@@ -948,3 +949,37 @@ class TestEnums(TestCase):
         )
 
         self.assertTrue(DependentEnum(IndependentEnum.VALUE1) is DependentEnum.VALUE1)
+
+    def test_auto_override(self):
+        class NumbersAuto(StrEnumProperties):
+            spanish: str
+
+            ONE = auto(), "Uno"
+            TWO = auto(), "Dos"
+            THREE = auto(), "Tres"
+
+        self.assertEqual(str(NumbersAuto.ONE), "one")
+        self.assertEqual(NumbersAuto.ONE.value, "one")
+        self.assertEqual(NumbersAuto.TWO.value, "two")
+        self.assertEqual(NumbersAuto.THREE.value, "three")
+        self.assertEqual(NumbersAuto.ONE.spanish, "Uno")
+        self.assertEqual(NumbersAuto.TWO.spanish, "Dos")
+        self.assertEqual(NumbersAuto.THREE.spanish, "Tres")
+
+        class ColorAutoOverride(StrEnumProperties):
+            def _generate_next_value_(name, start, count, last_values):
+                return name.title() * 2
+
+            spanish: str
+
+            ONE = auto(), "Uno"
+            TWO = auto(), "Dos"
+            THREE = auto(), "Tres"
+
+        self.assertEqual(str(ColorAutoOverride.ONE), "OneOne")
+        self.assertEqual(ColorAutoOverride.ONE.value, "OneOne")
+        self.assertEqual(ColorAutoOverride.TWO.value, "TwoTwo")
+        self.assertEqual(ColorAutoOverride.THREE.value, "ThreeThree")
+        self.assertEqual(ColorAutoOverride.ONE.spanish, "Uno")
+        self.assertEqual(ColorAutoOverride.TWO.spanish, "Dos")
+        self.assertEqual(ColorAutoOverride.THREE.spanish, "Tres")

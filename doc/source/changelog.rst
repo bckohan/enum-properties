@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.4.1 (2025-11-09)
+===================
+
+* Fixed `StrEnumProperties auto() resolves differently across py 3.11 boundary <https://github.com/bckohan/enum-properties/issues/106>`_
+
 v2.4.0 (2025-09-21)
 ===================
 

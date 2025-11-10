@@ -27,7 +27,7 @@ from collections.abc import Generator, Hashable, Iterable
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 4, 0)
+VERSION = (2, 4, 1)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -832,6 +832,17 @@ class StrEnumProperties(
 
     def __hash__(self):
         return getattr(enum, "StrEnum", str).__hash__(self)
+
+    def __str__(self):
+        if sys.version_info < (3, 11):
+            return str(self.value)
+        return super().__str__()
+
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        if sys.version_info < (3, 11):
+            return name.lower()
+        return enum.StrEnum._generate_next_value_(name, start, count, last_values)
 
 
 class DecomposeMixin(with_typehint(enum.Flag)):  # type: ignore
