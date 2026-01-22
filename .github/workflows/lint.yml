@@ -44,7 +44,7 @@ jobs:
         env:
           PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
         run: |
-          just setup ${{ env.PYTHON_PATH }}
+          just setup "$PYTHON_PATH"
           just install-docs
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
