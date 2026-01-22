@@ -25,18 +25,18 @@ jobs:
         python-version: [ '3.9', '3.14' ]
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b
         with:
           enable-cache: true
       - name: Install Just
-        uses: extractions/setup-just@v3
+        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
       - name: Install Dependencies
         run: |
           just setup ${{ steps.sp.outputs.python-path }}
@@ -47,7 +47,7 @@ jobs:
           sudo apt install emacs
       - name: Setup tmate session
         if: ${{ github.event.inputs.debug == 'true' }}
-        uses: mxschmitt/action-tmate@v3.23
+        uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
         with:
           detached: true
         timeout-minutes: 60

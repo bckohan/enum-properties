@@ -45,11 +45,11 @@ jobs:
       with:
         python-version: ">=3.11"  # for tomlib
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b
       with:
         enable-cache: true
     - name: Setup Just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Verify Tag
       run: |
         TAG_NAME=${GITHUB_REF#refs/tags/}
@@ -70,7 +70,7 @@ jobs:
     - name: Build the binary wheel and a source tarball
       run: just build
     - name: Store the distribution packages
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: python-package-distributions
         path: dist/
@@ -94,12 +94,12 @@ jobs:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
     steps:
     - name: Download all the dists
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
       with:
         name: python-package-distributions
         path: dist/
     - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1.13
+      uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e
 
   github-release:
     name: Publish GitHub Release
@@ -114,12 +114,12 @@ jobs:
 
     steps:
     - name: Download all the dists
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
       with:
         name: python-package-distributions
         path: dist/
     - name: Sign the dists with Sigstore
-      uses: sigstore/gh-action-sigstore-python@v3.2.0
+      uses: sigstore/gh-action-sigstore-python@a5caf349bc536fbef3668a10ed7f5cd309a4b53d
       with:
         inputs: >-
           ./dist/*.tar.gz

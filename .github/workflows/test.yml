@@ -36,17 +36,17 @@ jobs:
       if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: sudo rm -rf /opt/hostedtoolcache
   
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
     - name: Install Just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b
       with:
         enable-cache: true
     - name: Install Dependencies
@@ -59,7 +59,7 @@ jobs:
         sudo apt install emacs
     - name: Setup tmate session
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Install Dependencies
@@ -71,7 +71,7 @@ jobs:
         just test-all
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -92,17 +92,17 @@ jobs:
       if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: sudo rm -rf /Users/runner/hostedtoolcache
 
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
     - name: Install Just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b
       with:
         enable-cache: true
     - name: Install Dependencies
@@ -115,7 +115,7 @@ jobs:
         brew install emacs
     - name: Setup tmate session
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Install Dependencies
@@ -127,7 +127,7 @@ jobs:
         just test-all
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -147,17 +147,17 @@ jobs:
     - name: Clear GitHub Actions cache
       if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: Remove-Item -Recurse -Force C:\hostedtoolcache
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
     - name: Install Just
-      uses: extractions/setup-just@v3
+      uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b
       with:
         enable-cache: true
     - name: Install Dependencies
@@ -166,10 +166,10 @@ jobs:
         just install-docs
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: rhysd/action-setup-vim@v1
+      uses: rhysd/action-setup-vim@19e3dd31a84dbc2c5445d65e9b363f616cab96c1
     - name: Setup tmate session
       if: ${{ github.event.inputs.debug == 'true' }}
-      uses: mxschmitt/action-tmate@v3.23
+      uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101
       with:
         detached: true
     - name: Install Dependencies
@@ -181,7 +181,7 @@ jobs:
         just test-all
 
     - name: Store coverage files
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
       with:
         name: ${{ env.COVERAGE_FILE }}
         path: ${{ env.COVERAGE_FILE }}
@@ -191,25 +191,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         id: sp
         with:
           python-version: '3.12'
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b
         with:
           enable-cache: true
       - name: Setup Just
-        uses: extractions/setup-just@v3
+        uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
       - name: Install Release Dependencies
         run: |
           just setup ${{ steps.sp.outputs.python-path }}
           just install
 
       - name: Get coverage files
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
         with:
           pattern: "*.coverage"
           merge-multiple: true
@@ -217,7 +217,7 @@ jobs:
       - run: just coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
