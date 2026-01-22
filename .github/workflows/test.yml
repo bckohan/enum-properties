@@ -54,12 +54,6 @@ jobs:
       uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b
       with:
         enable-cache: true
-    - name: Install Dependencies
-      env:
-        PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
-      run: |
-        just setup "$PYTHON_PATH"
-        just install-docs
     - name: Install Emacs
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -116,12 +110,6 @@ jobs:
       uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b
       with:
         enable-cache: true
-    - name: Install Dependencies
-      env:
-        PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
-      run: |
-        just setup "$PYTHON_PATH"
-        just install-docs
     - name: install-emacs-macos
       if: ${{ github.event.inputs.debug == 'true' }}
       run: |
@@ -177,12 +165,6 @@ jobs:
       uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b
       with:
         enable-cache: true
-    - name: Install Dependencies
-      env:
-        PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
-      run: |
-        just setup "$PYTHON_PATH"
-        just install-docs
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
       uses: rhysd/action-setup-vim@19e3dd31a84dbc2c5445d65e9b363f616cab96c1
@@ -195,7 +177,7 @@ jobs:
       env:
         PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup "$PYTHON_PATH"
+        just setup "$env:PYTHON_PATH"
         just install
     - name: Run Unit Tests
       run: |
