@@ -61,7 +61,7 @@ jobs:
         git fetch --force origin refs/tags/$TAG_NAME:refs/tags/$TAG_NAME
 
         # verify signature
-        curl -sL https://github.com/${{ env.ACTOR }}.gpg | gpg --import 
+        curl -sL "https://github.com/${GITHUB_ACTOR}.gpg" | gpg --import 
         git tag -v "$TAG_NAME"
 
         # verify version
