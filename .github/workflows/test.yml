@@ -55,8 +55,10 @@ jobs:
       with:
         enable-cache: true
     - name: Install Dependencies
+      env:
+        PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ steps.sp.outputs.python-path }}
+        just setup ${{ env.PYTHON_PATH }}
         just install-docs
     - name: Install Emacs
       if: ${{ github.event.inputs.debug == 'true' }}
@@ -68,8 +70,10 @@ jobs:
       with:
         detached: true
     - name: Install Dependencies
+      env:
+        PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ steps.sp.outputs.python-path }}
+        just setup ${{ env.PYTHON_PATH }}
         just install
     - name: Run Unit Tests
       run: |
@@ -113,8 +117,10 @@ jobs:
       with:
         enable-cache: true
     - name: Install Dependencies
+      env:
+        PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ steps.sp.outputs.python-path }}
+        just setup ${{ env.PYTHON_PATH }}
         just install-docs
     - name: install-emacs-macos
       if: ${{ github.event.inputs.debug == 'true' }}
@@ -126,8 +132,10 @@ jobs:
       with:
         detached: true
     - name: Install Dependencies
+      env:
+        PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ steps.sp.outputs.python-path }}
+        just setup ${{ env.PYTHON_PATH }}
         just install
     - name: Run Unit Tests
       run: |
@@ -170,8 +178,10 @@ jobs:
       with:
         enable-cache: true
     - name: Install Dependencies
+      env:
+        PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ steps.sp.outputs.python-path }}
+        just setup ${{ env.PYTHON_PATH }}
         just install-docs
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
@@ -182,8 +192,10 @@ jobs:
       with:
         detached: true
     - name: Install Dependencies
+      env:
+        PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ steps.sp.outputs.python-path }}
+        just setup ${{ env.PYTHON_PATH }}
         just install
     - name: Run Unit Tests
       run: |
@@ -215,8 +227,10 @@ jobs:
       - name: Setup Just
         uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
       - name: Install Release Dependencies
+        env:
+          PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
         run: |
-          just setup ${{ steps.sp.outputs.python-path }}
+          just setup ${{ env.PYTHON_PATH }}
           just install
 
       - name: Get coverage files
