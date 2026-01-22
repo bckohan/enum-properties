@@ -58,7 +58,7 @@ jobs:
       env:
         PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ env.PYTHON_PATH }}
+        just setup "$PYTHON_PATH"
         just install-docs
     - name: Install Emacs
       if: ${{ github.event.inputs.debug == 'true' }}
@@ -73,7 +73,7 @@ jobs:
       env:
         PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ env.PYTHON_PATH }}
+        just setup "$PYTHON_PATH"
         just install
     - name: Run Unit Tests
       run: |
@@ -120,7 +120,7 @@ jobs:
       env:
         PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ env.PYTHON_PATH }}
+        just setup "$PYTHON_PATH"
         just install-docs
     - name: install-emacs-macos
       if: ${{ github.event.inputs.debug == 'true' }}
@@ -135,7 +135,7 @@ jobs:
       env:
         PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ env.PYTHON_PATH }}
+        just setup "$PYTHON_PATH"
         just install
     - name: Run Unit Tests
       run: |
@@ -181,7 +181,7 @@ jobs:
       env:
         PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ env.PYTHON_PATH }}
+        just setup "$PYTHON_PATH"
         just install-docs
     - name: install-vim-windows
       if: ${{ github.event.inputs.debug == 'true' }}
@@ -195,7 +195,7 @@ jobs:
       env:
         PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
-        just setup ${{ env.PYTHON_PATH }}
+        just setup "$PYTHON_PATH"
         just install
     - name: Run Unit Tests
       run: |
@@ -230,7 +230,7 @@ jobs:
         env:
           PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
         run: |
-          just setup ${{ env.PYTHON_PATH }}
+          just setup "$PYTHON_PATH"
           just install
 
       - name: Get coverage files
