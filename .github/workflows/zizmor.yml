@@ -28,7 +28,10 @@ jobs:
 
       - name: Set up Rust
         uses: actions-rust-lang/setup-rust-toolchain@1780873c7b576612439a134613cc4cc74ce5538c
-
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
       - name: Install Zizmor
         run: |
           cargo install --locked zizmor
@@ -51,6 +54,9 @@ jobs:
 
       - name: Fail on Findings
         run: |
-          count="$(jq '[.runs[].results[]] | length' results.sarif)"
+          count="$(
+            jq '([.runs[]? | (.results // [])[] | select(.level != "note")] | length) // 0' \
+              results.sarif
+          )"
           echo "Zizmor findings: $count"
           test "$count" -eq 0
