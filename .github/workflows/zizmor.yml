@@ -48,3 +48,9 @@ jobs:
         uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89
         with:
           sarif_file: results.sarif
+
+      - name: Fail on Findings
+        run: |
+          count="$(jq '[.runs[].results[]] | length' results.sarif)"
+          echo "Zizmor findings: $count"
+          test "$count" -eq 0
