@@ -1,7 +1,7 @@
 # Security Policy
 
 [![CodeQL](https://github.com/bckohan/enum-properties/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/bckohan/enum-properties/actions/workflows/github-code-scanning/codeql?query=branch:main)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/bckohan/enum-properties/badge)](https://securityscorecards.dev/viewer/?uri=github.com/bckohan/enum-properties)
+[![Zizmor](https://github.com/bckohan/enum-properties/actions/workflows/zizmor.yml/badge.svg?branch=main)](https://docs.zizmor.sh/)[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/bckohan/enum-properties/badge)](https://securityscorecards.dev/viewer/?uri=github.com/bckohan/enum-properties)
 
 ## Supported Versions
 
