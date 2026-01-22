@@ -40,6 +40,8 @@ jobs:
       run: sudo rm -rf /opt/hostedtoolcache
   
     - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+      with:
+        persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
@@ -96,6 +98,8 @@ jobs:
       run: sudo rm -rf /Users/runner/hostedtoolcache
 
     - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+      with:
+        persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
@@ -151,6 +155,8 @@ jobs:
       if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: Remove-Item -Recurse -Force C:\hostedtoolcache
     - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+      with:
+        persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
       id: sp
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
@@ -195,6 +201,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         id: sp
         with:
