@@ -20,14 +20,14 @@ jobs:
       contents: read
       actions: write
     uses: ./.github/workflows/lint.yml
-    secrets: inherit
 
   test:
     permissions:
       contents: read
       actions: write
     uses: ./.github/workflows/test.yml
-    secrets: inherit
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   build:
     name: Build Package
@@ -61,7 +61,7 @@ jobs:
         git fetch --force origin refs/tags/$TAG_NAME:refs/tags/$TAG_NAME
 
         # verify signature
-        curl -sL https://github.com/${{ env.ACTOR }}.gpg | gpg --import 
+        curl -sL "https://github.com/${GITHUB_ACTOR}.gpg" | gpg --import 
         git tag -v "$TAG_NAME"
 
         # verify version
@@ -129,19 +129,23 @@ jobs:
     - name: Create GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_REF_NAME: ${{ github.ref_name }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
       run: >-
         gh release create
-        '${{ github.ref_name }}'
-        --repo '${{ github.repository }}'
+        '$GITHUB_REF_NAME'
+        --repo '$GITHUB_REPOSITORY'
         --generate-notes
         --prerelease
     - name: Upload artifact signatures to GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_REF_NAME: ${{ github.ref_name }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
       # Upload to GitHub Release using the `gh` CLI.
       # `dist/` contains the built packages, and the
       # sigstore-produced signatures and certificates.
       run: >-
         gh release upload
-        '${{ github.ref_name }}' dist/**
-        --repo '${{ github.repository }}'
+        '$GITHUB_REF_NAME' dist/**
+        --repo '$GITHUB_REPOSITORY'

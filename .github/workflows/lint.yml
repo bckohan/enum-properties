@@ -30,6 +30,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
+        id: sp
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: ${{ matrix.python-version }}
@@ -44,7 +45,7 @@ jobs:
         env:
           PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
         run: |
-          just setup ${{ env.PYTHON_PATH }}
+          just setup "$PYTHON_PATH"
           just install-docs
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
