@@ -10,7 +10,7 @@
 [![Test Status](https://github.com/bckohan/enum-properties/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/bckohan/enum-properties/actions/workflows/test.yml?query=branch:main)
 [![Lint Status](https://github.com/bckohan/enum-properties/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/bckohan/enum-properties/actions/workflows/lint.yml?query=branch:main)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/bckohan/enum-properties/badge)](https://securityscorecards.dev/viewer/?uri=github.com/bckohan/enum-properties)
-
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11821/badge)](https://www.bestpractices.dev/projects/11821)
 
 Add properties to Python enumeration values with a simple declarative syntax. [Enum Properties](https://enum-properties.readthedocs.io/en/latest) is a lightweight extension to [Python's Enum class](https://docs.python.org/3/library/enum.html). Example:
 
