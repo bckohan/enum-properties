@@ -28,7 +28,10 @@ jobs:
 
       - name: Set up Rust
         uses: actions-rust-lang/setup-rust-toolchain@1780873c7b576612439a134613cc4cc74ce5538c
-
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
       - name: Install Zizmor
         run: |
           cargo install --locked zizmor
@@ -48,3 +51,12 @@ jobs:
         uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89
         with:
           sarif_file: results.sarif
+
+      - name: Fail on Findings
+        run: |
+          count="$(
+            jq '([.runs[]? | (.results // [])[] | select(.level != "note")] | length) // 0' \
+              results.sarif
+          )"
+          echo "Zizmor findings: $count"
+          test "$count" -eq 0
