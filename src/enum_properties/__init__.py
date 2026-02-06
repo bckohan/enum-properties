@@ -27,13 +27,13 @@ from collections.abc import Generator, Hashable, Iterable
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 4, 1)
+VERSION = (2, 5, 0)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
 __author__ = "Brian Kohan"
 __license__ = "MIT"
-__copyright__ = "Copyright 2022-2025 Brian Kohan"
+__copyright__ = "Copyright 2022-2026 Brian Kohan"
 
 __all__ = [
     "VERSION",
@@ -63,7 +63,7 @@ Annotations are loaded after enum member definitions in python 3.14+
 """
 
 
-def with_typehint(baseclass: t.Type[T]) -> t.Type[T]:
+def with_typehint(baseclass: type[T]) -> type[T]:
     """
     This is icky but it works - revisit in future.
     """
@@ -163,7 +163,7 @@ class _SProp(_Prop):
 
 def s(
     prop_name: str, case_fold: bool = False, match_none: bool = False
-) -> t.Type[_SProp]:
+) -> type[_SProp]:
     """
     Add a symmetric property. Enumeration values will be coercible from this
     property's values.
@@ -183,7 +183,7 @@ def s(
     )
 
 
-def p(prop_name: str) -> t.Type[_Prop]:
+def p(prop_name: str) -> type[_Prop]:
     """
     Add a property of the given name to the enumeration class by inheritance.
     Properties must be specified in the order in which they appear in the
@@ -244,17 +244,17 @@ class SymmetricMixin(with_typehint("EnumProperties")):  # type: ignore
     property will be a case sensitive symmetric property.
     """
 
-    _ep_symmetric_map_: t.Dict[t.Any, enum.Enum]
+    _ep_symmetric_map_: dict[t.Any, enum.Enum]
     """
     The case sensitive mapping of symmetric values to enumeration values.
     """
 
-    _ep_isymmetric_map_: t.Dict[str, enum.Enum]
+    _ep_isymmetric_map_: dict[str, enum.Enum]
     """
     The case insensitive mapping of symmetric values to enumeration values.
     """
 
-    _ep_coerce_types_: t.List[t.Type[t.Any]]
+    _ep_coerce_types_: list[type[t.Any]]
     """
     On instantiation, if _missing_ is invoked a coercion attempt will be made to each
     of these types before failure.
@@ -265,12 +265,12 @@ class SymmetricMixin(with_typehint("EnumProperties")):  # type: ignore
     The number of symmetric properties on this enumeration.
     """
 
-    _properties_: t.List[_Prop]
+    _properties_: list[_Prop]
     """
     List of properties defined on the enumeration class.
     """
 
-    __first_class_members__: t.List[str]
+    __first_class_members__: list[str]
     """
     The list of first class members - this includes all members and aliases. May be
     overridden.
@@ -398,12 +398,12 @@ class EnumPropertiesMeta(enum.EnumMeta):
         "_ep_isymmetric_map_",
     ]
 
-    _ep_symmetric_map_: t.Dict[t.Any, enum.Enum]
-    _ep_isymmetric_map_: t.Dict[str, enum.Enum]
-    _ep_coerce_types_: t.List[t.Type[t.Any]]
+    _ep_symmetric_map_: dict[t.Any, enum.Enum]
+    _ep_isymmetric_map_: dict[str, enum.Enum]
+    _ep_coerce_types_: list[type[t.Any]]
     _num_sym_props_: int
-    _properties_: t.List[_Prop]
-    __first_class_members__: t.List[str]
+    _properties_: list[_Prop]
+    __first_class_members__: list[str]
 
     @classmethod
     def __prepare__(metacls, cls, bases, **kwds):  # type: ignore[override]
@@ -416,7 +416,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             match the number of listed property values in the value tuples.
         """
         bases = list(bases)
-        properties: t.Dict[_Prop, t.List[t.Any]] = {}
+        properties: dict[_Prop, list[t.Any]] = {}
         real_bases = []
         for base in bases:
             if issubclass(base, _Prop):
@@ -443,15 +443,15 @@ class EnumPropertiesMeta(enum.EnumMeta):
             _ep_properties_ = properties
 
             # lazy properties in annotation declaration order
-            _lazy_properties_: t.List[_Prop] = []
+            _lazy_properties_: list[_Prop] = []
 
             # member -> value tuple
-            _lazy_property_values_: t.Dict[str, t.Any] = {}
-            _specialized_: t.Dict[str, t.Dict[str, _Specialized]] = {}
-            _ids_: t.Dict[int, str] = {}
-            _member_names: t.Union[t.List[str], t.Dict[str, t.Any]]
+            _lazy_property_values_: dict[str, t.Any] = {}
+            _specialized_: dict[str, dict[str, _Specialized]] = {}
+            _ids_: dict[int, str] = {}
+            _member_names: t.Union[list[str], dict[str, t.Any]]
             _create_properties_: bool = False
-            __first_class_members__: t.List[str] = []
+            __first_class_members__: list[str] = []
 
             class AnnotationPropertyRecorder(dict):
                 class_dict: "_PropertyEnumDict"
@@ -469,7 +469,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                             key not in EnumPropertiesMeta.RESERVED
                             and key not in EnumPropertiesMeta.EXPECTED
                         ):
-                            prop: t.Type[_Prop]
+                            prop: type[_Prop]
                             if getattr(value, "__metadata__", None) and isinstance(
                                 value.__metadata__[0], Symmetric
                             ):
@@ -699,7 +699,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             if prop.case_fold and isinstance(p_val, str):
                 cls._ep_isymmetric_map_[_do_casenorm(p_val)] = enum_inst
 
-        def add_coerce_type(typ: t.Type[t.Any]):
+        def add_coerce_type(typ: type[t.Any]):
             if (
                 typ not in cls._ep_coerce_types_
                 and issubclass(typ, Hashable)
@@ -726,7 +726,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
         # we reverse to maintain precedence order for symmetric lookups
         cls._num_sym_props_ = 0
         member_values = t.cast(
-            t.List[enum.Enum],
+            list[enum.Enum],
             list(cls._value2member_map_.values() or cls.__members__.values()),
         )
         for prop in reversed([prop for prop in cls._properties_ if prop.symmetric]):
