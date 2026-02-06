@@ -39,7 +39,7 @@ jobs:
       if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: sudo rm -rf /opt/hostedtoolcache
   
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -95,7 +95,7 @@ jobs:
       if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: sudo rm -rf /Users/runner/hostedtoolcache
 
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -150,7 +150,7 @@ jobs:
     - name: Clear GitHub Actions cache
       if: ${{ github.event.inputs.clear_cache == 'true' }}
       run: Remove-Item -Recurse -Force C:\hostedtoolcache
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -194,7 +194,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
