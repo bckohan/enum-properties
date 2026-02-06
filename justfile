@@ -19,23 +19,22 @@ install-uv:
 install-uv:
     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 
-# setup the venv and pre-commit hooks
+# setup the venv, pre-commit hooks
 setup python="python":
     uv venv -p {{ python }}
-    @just run pre-commit install
+    @just install-precommit
 
 # install git pre-commit hooks
 install-precommit:
-    @just run pre-commit install
+    @just run --no-default-groups --group precommit --exact --isolated pre-commit install
 
 # update and install development dependencies
 install *OPTS:
+    @just install-precommit
     uv sync {{ OPTS }}
-    @just run pre-commit install
 
-# install documentation dependencies
-install-docs:
-    uv sync --group docs --all-extras
+_install-docs:
+    uv sync --no-default-groups --group docs --all-extras
 
 [script]
 _lock-python:
@@ -48,16 +47,28 @@ _lock-python:
 
 # lock to specific python and versions of given dependencies
 test-lock +PACKAGES: _lock-python
-    uv add {{ PACKAGES }}
+    uv add --no-sync {{ PACKAGES }}
+    uv sync --reinstall --no-default-groups --no-install-project
 
-# run static type checking
-check-types:
-    @just run mypy
-    @just run pyright
+# run static type checking with mypy
+check-types-mypy *RUN_ARGS:
+    @just run --no-default-groups --all-extras --group typing {{ RUN_ARGS }} mypy
+
+# run static type checking with pyright
+check-types-pyright *RUN_ARGS:
+    @just run --no-default-groups --all-extras --group typing {{ RUN_ARGS }} pyright
+
+# run all static type checking
+check-types: check-types-mypy check-types-pyright
+
+# run all static type checking in an isolated environment
+check-types-isolated:
+    @just check-types-mypy --exact --isolated
+    @just check-types-pyright --exact --isolated
 
 # run package checks
 check-package:
-    @just run pip check
+    uv pip check
 
 # remove doc build artifacts
 [script]
@@ -80,11 +91,11 @@ clean-git-ignored:
 clean: clean-docs clean-env clean-git-ignored
 
 # build html documentation
-build-docs-html: install-docs
+build-docs-html: _install-docs
     @just run sphinx-build --fresh-env --builder html --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/html
 
 # build pdf documentation
-build-docs-pdf: install-docs
+build-docs-pdf: _install-docs
     @just run sphinx-build --fresh-env --builder latexpdf --doctree-dir ./doc/build/doctrees ./doc/source ./doc/build/pdf
 
 # build the docs
@@ -102,14 +113,14 @@ open-docs:
     webbrowser.open(f'file://{os.getcwd()}/doc/build/html/index.html')
 
 # build and open the documentation
-docs: install-docs build-docs-html open-docs
+docs: _install-docs build-docs-html open-docs
 
 # serve the documentation, with auto-reload
-docs-live: install-docs
-    @just run sphinx-autobuild doc/source doc/build --open-browser --watch src --port 8000 --delay 1
+docs-live:
+    @just run --no-default-groups --group docs sphinx-autobuild doc doc/_build --open-browser --watch src --port 8000 --delay 1
 
 _link_check:
-    -uv run sphinx-build -b linkcheck -Q -D linkcheck_timeout=10 ./doc/source ./doc/build
+    -uv run --no-default-groups --group docs sphinx-build -b linkcheck -Q -D linkcheck_timeout=10 ./doc/source ./doc/build
 
 # check the documentation links for broken links
 [script]
@@ -128,11 +139,11 @@ check-docs-links: _link_check
 
 # lint the documentation
 check-docs:
-    @just run doc8 --ignore-path ./doc/build --max-line-length 100 -q ./doc
+    @just run --no-default-groups --group lint doc8 --ignore-path ./doc/build --max-line-length 100 -q ./doc
 
 # fetch the intersphinx references for the given package
 [script]
-fetch-refs LIB: install-docs
+fetch-refs LIB: _install-docs
     import os
     from pathlib import Path
     import logging as _logging
@@ -154,29 +165,32 @@ fetch-refs LIB: install-docs
 
 # lint the code
 check-lint:
-    @just run ruff check --select I
-    @just run ruff check
+    @just run --no-default-groups --group lint ruff check --select I
+    @just run --no-default-groups --group lint ruff check
 
 # check if the code needs formatting
 check-format:
-    @just run ruff format --check
+    @just run --no-default-groups --group lint ruff format --check
 
 # check that the readme renders
 check-readme:
-    @just run -m readme_renderer ./README.md -o /tmp/README.html
+    @just run --no-default-groups --group lint -m readme_renderer ./README.md -o /tmp/README.html
+
+_check-readme-quiet:
+    @just --quiet check-readme
 
 # sort the python imports
 sort-imports:
-    @just run ruff check --fix --select I
+    @just run --no-default-groups --group lint ruff check --fix --select I
 
 # format the code and sort imports
 format: sort-imports
     just --fmt --unstable
-    @just run ruff format
+    @just run --no-default-groups --group lint ruff format
 
 # sort the imports and fix linting issues
 lint: sort-imports
-    @just run ruff check --fix
+    @just run --no-default-groups --group lint ruff check --fix
 
 # fix formatting, linting issues and import sorting
 fix: lint format
@@ -184,13 +198,19 @@ fix: lint format
 # run all static checks
 check: check-lint check-format check-types check-package check-docs check-docs-links check-readme
 
-# run all tests
-test-all:
-    @just run pytest --cov-append
+# run all checks including documentation link checking (slow)
+check-all: check check-docs-links
 
 # run tests
 test *TESTS:
-    @just run pytest --cov-append {{ TESTS }}
+    @just run --no-default-groups --exact --group test --isolated pytest {{ TESTS }} --cov 
+
+# debug an test
+debug-test *TESTS:
+    @just run pytest \
+      -o addopts='-ra -q' \
+      -s --trace --pdbcls=IPython.terminal.debugger:Pdb \
+      --headed {{ TESTS }}
 
 # run the pre-commit checks
 precommit:
@@ -198,9 +218,9 @@ precommit:
 
 # generate the test coverage report
 coverage:
-    @just run coverage combine --keep *.coverage
-    @just run coverage report
-    @just run coverage xml
+    @just run --no-default-groups --group coverage coverage combine --keep *.coverage
+    @just run --no-default-groups --group coverage coverage report
+    @just run --no-default-groups --group coverage coverage xml
 
 # run the command in the virtual environment
 run +ARGS:
@@ -223,7 +243,7 @@ validate_version VERSION:
     print(raw_version)
 
 # issue a relase for the given semver string (e.g. 2.1.0)
-release VERSION:
+release VERSION: install check-all
     @just validate_version v{{ VERSION }}
     git tag -s v{{ VERSION }} -m "{{ VERSION }} Release"
     git push origin v{{ VERSION }}

@@ -71,7 +71,7 @@ jobs:
         just install
     - name: Run Unit Tests
       run: |
-        just test-all
+        just test
 
     - name: Store coverage files
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -127,7 +127,7 @@ jobs:
         just install
     - name: Run Unit Tests
       run: |
-        just test-all
+        just test
 
     - name: Store coverage files
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -181,7 +181,7 @@ jobs:
         just install
     - name: Run Unit Tests
       run: |
-        just test-all
+        just test
 
     - name: Store coverage files
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
