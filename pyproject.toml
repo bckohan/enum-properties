@@ -48,18 +48,6 @@ packages = ["src/enum_properties"]
 
 
 [dependency-groups]
-dev = [
-    "coverage>=7.6.1",
-    "importlib-metadata>=8.5.0",
-    "ipdb>=0.13.13",
-    "mypy>=1.14.1",
-    "packaging>=24.2",
-    "pre-commit>=3.5.0",
-    "pyright>=1.1.396",
-    "pytest>=8.3.5",
-    "pytest-cov>=5.0.0",
-    "ruff>=0.9.9",
-]
 docs = [
     "doc8>=1.1.2",
     "furo>=2024.8.6",
@@ -67,6 +55,35 @@ docs = [
     "sphinx>=7.1.2",
     "sphinx-autobuild>=2021.3.14",
     "sphinx-tabs>=3.4.7",
+]
+typing = [
+    "pyright>=1.1.390",
+    "mypy>=1.19.1",
+]
+lint = [
+    "ruff>=0.15.0", 
+    "readme-renderer[md]>=43.0",
+    "doc8>=1.1.2"
+]
+precommit = [
+    "pre-commit>=3.5.0",
+]
+coverage = ["coverage>=7.6.1"]
+test = [
+    { include-group = "coverage" },
+    "pytest>=8.3.4",
+    "pytest-cov>=5.0.0",
+]
+dev = [
+    { include-group = "typing" },
+    { include-group = "test" },
+    { include-group = "docs" },
+    { include-group = "lint" },
+    { include-group = "precommit" },
+    "packaging>=24.2",
+    "tomlkit>=0.13.3",
+    "ipdb>=0.13.13",
+    "ipython>=8.18.1",
 ]
 
 

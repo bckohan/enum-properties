@@ -68,10 +68,9 @@ jobs:
         PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
         just setup "$PYTHON_PATH"
-        just install
     - name: Run Unit Tests
       run: |
-        just test-all
+        just test
 
     - name: Store coverage files
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -124,10 +123,9 @@ jobs:
         PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
         just setup "$PYTHON_PATH"
-        just install
     - name: Run Unit Tests
       run: |
-        just test-all
+        just test
 
     - name: Store coverage files
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -178,10 +176,9 @@ jobs:
         PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
       run: |
         just setup "$env:PYTHON_PATH"
-        just install
     - name: Run Unit Tests
       run: |
-        just test-all
+        just test
 
     - name: Store coverage files
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -213,7 +210,6 @@ jobs:
           PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
         run: |
           just setup "$PYTHON_PATH"
-          just install
 
       - name: Get coverage files
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
