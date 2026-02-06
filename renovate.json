@@ -1,6 +1,33 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
+  "extends": ["config:base"],
+
+  // (1) Update GitHub Actions refs + their pinned commit SHAs ("digests")
+  "enabledManagers": ["github-actions"],
+  "pinDigests": true,
+
+  // (3) Cool-off period ~ 1 month before proposing updates
+  "stabilityDays": 30,
+
+  // (4) Batch updates and open at most 1 PR per week
+  // Run only on Mondays, and keep only 1 PR open at a time.
+  "schedule": ["on monday"],
+  "prConcurrentLimit": 1,
+
+  // Make that one PR a batch
+  "separateMajorMinor": false,
+  "separateMinorPatch": false,
+
+  "packageRules": [
+    {
+      // (2) Only follow release-like tags (no branches like main/master)
+      // Renovate will still pin the ref to the commit SHA because pinDigests=true.
+      "matchManagers": ["github-actions"],
+      "allowedVersions": "/^v?\\d+(?:\\.\\d+){0,2}$/",
+
+      // (4) Batch all GHA updates into the single weekly PR
+      "groupName": "weekly-github-actions",
+      "groupSlug": "weekly-github-actions"
+    }
   ]
 }
