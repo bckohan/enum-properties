@@ -46,7 +46,6 @@ jobs:
           PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
         run: |
           just setup "$PYTHON_PATH"
-          just install-docs
       - name: Install Emacs
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
@@ -61,6 +60,7 @@ jobs:
         run: |
           just check-lint
           just check-format
-          just check-types
-          just check-package
+          just check-types-isolated
+          just check-docs
           just check-readme
+          just check-package
