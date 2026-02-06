@@ -449,7 +449,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             _lazy_property_values_: dict[str, t.Any] = {}
             _specialized_: dict[str, dict[str, _Specialized]] = {}
             _ids_: dict[int, str] = {}
-            _member_names: t.Union[list[str], dict[str, t.Any]]
+            _member_names: list[str] | dict[str, t.Any]
             _create_properties_: bool = False
             __first_class_members__: list[str] = []
 
