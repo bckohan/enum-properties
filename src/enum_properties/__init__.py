@@ -53,7 +53,6 @@ __all__ = [
 ]
 
 
-T = t.TypeVar("T")
 S = t.TypeVar("S")
 
 
@@ -63,13 +62,14 @@ Annotations are loaded after enum member definitions in python 3.14+
 """
 
 
-def with_typehint(baseclass: type[T]) -> type[T]:
-    """
-    This is icky but it works - revisit in future.
-    """
-    if t.TYPE_CHECKING:
-        return baseclass  # pragma: no cover
-    return object  # type: ignore
+if t.TYPE_CHECKING:
+    # For type checking, mixins inherit from enum types to provide proper attributes
+    _SymmetricMixinBase: type[enum.Enum] = enum.Enum
+    _DecomposeMixinBase: type[enum.Flag] = enum.Flag
+else:
+    # At runtime, mixins are just object-based
+    _SymmetricMixinBase = object
+    _DecomposeMixinBase = object
 
 
 def _do_casenorm(text: str) -> str:
@@ -230,7 +230,7 @@ def specialize(*values):
     return specialize_decorator
 
 
-class SymmetricMixin(with_typehint("EnumProperties")):  # type: ignore
+class SymmetricMixin(_SymmetricMixinBase):
     """
     This mixin enables symmetric :class:`enum.Enum` creation from properties marked
     symmetric. It is included by default in the
@@ -311,7 +311,7 @@ class SymmetricMixin(with_typehint("EnumProperties")):  # type: ignore
                 if composite is None:
                     composite = cls(val)
                 else:
-                    composite |= cls(val)
+                    composite |= cls(val)  # type: ignore[operator]
             if composite is None:
                 return cls(0)
             return composite
@@ -843,7 +843,7 @@ class StrEnumProperties(
             return name.lower()
 
 
-class DecomposeMixin(with_typehint(enum.Flag)):  # type: ignore
+class DecomposeMixin(_DecomposeMixinBase):
     """
     A mixin for Flag enumerations that decomposes composite enumeration values
     and allows us to treat composite enumeration values as iterables of
@@ -885,7 +885,7 @@ class DecomposeMixin(with_typehint(enum.Flag)):  # type: ignore
         return len(self.flagged)
 
 
-class FlagProperties(
+class FlagProperties(  # pyright: ignore[reportIncompatibleMethodOverride,reportIncompatibleVariableOverride]
     DecomposeMixin, SymmetricMixin, enum.Flag, metaclass=EnumPropertiesMeta
 ):
     """
@@ -910,7 +910,7 @@ class FlagProperties(
         return enum.Flag.__hash__(self)
 
 
-class IntFlagProperties(
+class IntFlagProperties(  # pyright: ignore[reportIncompatibleMethodOverride,reportIncompatibleVariableOverride]
     DecomposeMixin, SymmetricMixin, enum.IntFlag, metaclass=EnumPropertiesMeta
 ):
     """

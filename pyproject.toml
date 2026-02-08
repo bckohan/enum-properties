@@ -51,7 +51,7 @@ docs = [
     "doc8>=1.1.2",
     "furo>=2024.8.6",
     "readme-renderer[md]>=43.0",
-    "sphinx>=7.1.2",
+    "sphinx>=8.0.0",
     "sphinx-autobuild>=2021.3.14",
     "sphinx-tabs>=3.4.7",
 ]
@@ -109,7 +109,7 @@ warn_no_return = true
 mypy_path = ["src"]
 explicit_package_bases = true
 namespace_packages = true
-# Only analyze files under src/ by default
+# Analyze both source and test files
 files = [
   "src/enum_properties",
   "tests/type_hints",
@@ -145,6 +145,7 @@ exclude = [
 ]
 
 [tool.pyright]
+# Analyze both source and test files
 include = [
     "src/enum_properties",
     "tests/type_hints"

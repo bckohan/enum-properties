@@ -562,7 +562,7 @@ dev = [
     { name = "pytest-cov", specifier = ">=5.0.0" },
     { name = "readme-renderer", extras = ["md"], specifier = ">=43.0" },
     { name = "ruff", specifier = ">=0.15.0" },
-    { name = "sphinx", specifier = ">=7.1.2" },
+    { name = "sphinx", specifier = ">=8.0.0" },
     { name = "sphinx-autobuild", specifier = ">=2021.3.14" },
     { name = "sphinx-tabs", specifier = ">=3.4.7" },
     { name = "tomlkit", specifier = ">=0.13.3" },
@@ -571,7 +571,7 @@ docs = [
     { name = "doc8", specifier = ">=1.1.2" },
     { name = "furo", specifier = ">=2024.8.6" },
     { name = "readme-renderer", extras = ["md"], specifier = ">=43.0" },
-    { name = "sphinx", specifier = ">=7.1.2" },
+    { name = "sphinx", specifier = ">=8.0.0" },
     { name = "sphinx-autobuild", specifier = ">=2021.3.14" },
     { name = "sphinx-tabs", specifier = ">=3.4.7" },
 ]

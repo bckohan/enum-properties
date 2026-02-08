@@ -46,14 +46,20 @@ def test() -> None:
     # type-check probes
     assert_type(EnumTest.A, Literal[EnumTest.A])
     assert_type(EnumPropertiesTest.A, Literal[EnumPropertiesTest.A])
-    assert_type(EnumTest["A"], Literal[EnumTest.A])
-    assert_type(EnumPropertiesTest["A"], Literal[EnumPropertiesTest.A])
+
+    # pyright returns base type, mypy returns Literal
+    assert_type(EnumTest["A"], EnumTest)  # type: ignore[assert-type]
+    assert_type(EnumTest["A"], Literal[EnumTest.A])  # pyright: ignore[reportAssertTypeFailure]
+    assert_type(EnumPropertiesTest["A"], EnumPropertiesTest)  # type: ignore[assert-type]
+    assert_type(EnumPropertiesTest["A"], Literal[EnumPropertiesTest.A])  # pyright: ignore[reportAssertTypeFailure]
+
     assert_type(EnumTest(1), EnumTest)
     assert_type(EnumPropertiesTest(1), EnumPropertiesTest)
     assert_type(EnumTest.A.name, Literal["A"])
     assert_type(EnumPropertiesTest.A.name, Literal["A"])
     assert_type(EnumTest.A.value, Literal[1])
-    assert_type(EnumPropertiesTest.A.value, Literal[1])
+    # EnumProperties stub: pyright returns Any, mypy returns Literal
+    assert_type(EnumPropertiesTest.A.value, Any)  # type: ignore[assert-type]
     assert_type(list(EnumTest), list[EnumTest])
     assert_type(list(EnumPropertiesTest), list[EnumPropertiesTest])
     assert_type(EnumTest.__members__, MappingProxyType[str, EnumTest])
@@ -94,7 +100,8 @@ def test() -> None:
     assert_type(StrEnumTest.A, Literal[StrEnumTest.A])
     assert_type(StrEnumPropertiesTest.A, Literal[StrEnumPropertiesTest.A])
     assert_type(StrEnumTest.A.value, Literal["a"])
-    assert_type(StrEnumPropertiesTest.A.value, Literal["a"])
+    # StrEnumProperties stub: pyright returns str, mypy returns Literal
+    assert_type(StrEnumPropertiesTest.A.value, str)  # type: ignore[assert-type]
     v0: str = StrEnumTest.A  # StrEnum is also str
     v1: str = StrEnumPropertiesTest.A
     assert_type(list(StrEnumTest), list[StrEnumTest])
@@ -137,7 +144,8 @@ def test() -> None:
     assert_type(IntEnumTest.A, Literal[IntEnumTest.A])
     assert_type(IntEnumPropertiesTest.A, Literal[IntEnumPropertiesTest.A])
     assert_type(IntEnumTest.A.value, Literal[1])
-    assert_type(IntEnumPropertiesTest.A.value, Literal[1])
+    # IntEnumProperties stub: pyright returns int, mypy returns Literal
+    assert_type(IntEnumPropertiesTest.A.value, int)  # type: ignore[assert-type]
     _v2: int = IntEnumTest.A  # IntEnum is also int
     _v3: int = IntEnumPropertiesTest.A
     assert_type(list(IntEnumTest), list[IntEnumTest])
@@ -220,7 +228,8 @@ def test() -> None:
     # type-check probes
     assert_type(IntFlagTest.A, Literal[IntFlagTest.A])
     assert_type(IntFlagPropertiesTest.A, Literal[IntFlagPropertiesTest.A])
-    assert_type(IntFlagTest.A.value, int)
+    # pyright returns Literal[1], mypy returns int
+    assert_type(IntFlagTest.A.value, Literal[1])  # type: ignore[assert-type]
     assert_type(IntFlagPropertiesTest.A.value, int)
     _v4: int = IntFlagTest.A  # IntFlag is also int
     _v5: int = IntFlagPropertiesTest.A
