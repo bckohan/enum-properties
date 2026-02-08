@@ -106,10 +106,14 @@ warn_redundant_casts = true
 warn_unused_configs = true
 warn_unreachable = true
 warn_no_return = true
-exclude = "tests"
-mypy_path = "src"
-modules = "enum_properties"
-
+mypy_path = ["src"]
+explicit_package_bases = true
+namespace_packages = true
+# Only analyze files under src/ by default
+files = [
+  "src/enum_properties",
+  "tests/type_hints",
+]
 
 [tool.doc8]
 ignore-path = "doc/_build"
@@ -141,9 +145,9 @@ exclude = [
 ]
 
 [tool.pyright]
-exclude = ["tests/**/*"]
 include = [
-    "src/enum_properties"
+    "src/enum_properties",
+    "tests/type_hints"
 ]
 
 [tool.coverage.run]

@@ -13,12 +13,6 @@ repos:
         language: system
         pass_filenames: false
 
-      - id: typing
-        name: Typing
-        entry: just check-types
-        language: system
-        pass_filenames: false
-
       - id: docs
         name: Docs
         entry: just check-docs
