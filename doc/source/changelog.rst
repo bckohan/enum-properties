@@ -2,7 +2,12 @@
 Change Log
 ==========
 
-v2.5.0 (2026-02-08)
+v2.5.1 (2026-02-09)
+===================
+
+* Fixed `In some inheritance scenarios auto() values are not resolved correctly. <https://github.com/bckohan/enum-properties/issues/149>`_
+
+v2.5.0 (2026-02-09)
 ===================
 
 * Fixed `Enum properties derived enums do not inherit type hint interface of Enum. <https://github.com/bckohan/enum-properties/issues/144>`_
