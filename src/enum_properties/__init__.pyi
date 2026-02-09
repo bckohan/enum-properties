@@ -5,7 +5,12 @@ import sys
 from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Any, Callable, Literal, Never, TypeVar, overload
+from typing import Any, Callable, Literal, TypeAlias, TypeVar, overload
+
+if sys.version_info >= (3, 11):
+    pass
+else:
+    pass
 
 VERSION: tuple[int, int, int]
 __title__: str
@@ -16,6 +21,10 @@ __copyright__: str
 
 S = TypeVar("S")
 _EnumMemberT = TypeVar("_EnumMemberT")
+_EnumNames: TypeAlias = (
+    str | Iterable[str] | Iterable[Iterable[str | Any]] | Mapping[str, Any]
+)
+_Signature: TypeAlias = Any
 
 @dataclass
 class Symmetric:
@@ -65,20 +74,41 @@ class EnumPropertiesMeta(enum.EnumMeta):
     def __call__(
         cls: type[_EnumMemberT], value: Any, names: None = None
     ) -> _EnumMemberT: ...
-    @overload
-    def __call__(
-        cls,
-        value: str,
-        names: str | Iterable[str] | Iterable[Iterable[str | Any]] | Mapping[str, Any],
-        *,
-        module: str | None = None,
-        qualname: str | None = None,
-        type: type | None = None,
-        start: int = 1,
-        boundary: enum.FlagBoundary | None = None,
-    ) -> type[enum.Enum]: ...
-    @overload
-    def __call__(cls, value: Any, *values: Any) -> Never: ...
+
+    if sys.version_info >= (3, 11):
+        @overload
+        def __call__(
+            cls,
+            value: str,
+            names: _EnumNames,
+            *,
+            module: str | None = None,
+            qualname: str | None = None,
+            type: type | None = None,
+            start: int = 1,
+            boundary: enum.FlagBoundary | None = None,
+        ) -> type[enum.Enum]: ...
+    else:
+        @overload
+        def __call__(
+            cls,
+            value: str,
+            names: _EnumNames,
+            *,
+            module: str | None = None,
+            qualname: str | None = None,
+            type: type | None = None,
+            start: int = 1,
+        ) -> type[enum.Enum]: ...
+
+    if sys.version_info >= (3, 12):
+        @overload
+        def __call__(
+            cls: type[_EnumMemberT], value: Any, *values: Any
+        ) -> _EnumMemberT: ...
+    if sys.version_info >= (3, 14):
+        @property
+        def __signature__(cls) -> _Signature: ...
 
 # SymmetricMixin is a mixin class, not an enum itself.
 # It provides symmetric lookup functionality to enum classes.

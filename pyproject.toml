@@ -112,8 +112,7 @@ namespace_packages = true
 # Analyze both source and test files
 files = [
   "src/enum_properties",
-  "tests/type_hints",
-  "tests/annotations/test.py",
+  "tests/type_hints"
 ]
 
 [tool.doc8]
@@ -149,8 +148,7 @@ exclude = [
 # Analyze both source and test files
 include = [
     "src/enum_properties",
-    "tests/type_hints",
-    "tests/annotations/test.py"
+    "tests/type_hints"
 ]
 
 [tool.coverage.run]

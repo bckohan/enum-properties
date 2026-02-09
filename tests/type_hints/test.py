@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from enum import Enum, Flag, IntEnum, IntFlag, StrEnum
+import sys
+import enum
 from typing import TYPE_CHECKING, Any, Literal
 from types import MappingProxyType
 
-try:
-    # Py 3.11+
-    from typing import assert_type
-except ImportError:  # pragma: no cover
-    # Py 3.10
+
+if sys.version_info < (3, 11):
     from typing_extensions import assert_type
+else:
+    from typing import assert_type
 
 from enum_properties import (
     EnumProperties,
@@ -22,7 +22,7 @@ from enum_properties import (
 
 def test() -> None:
     # ------------------------------------------------------------------ Enum
-    class EnumTest(Enum):
+    class EnumTest(enum.Enum):
         A = 1
         B = 2
         C = 3
@@ -33,11 +33,14 @@ def test() -> None:
         C = 3
 
     # runtime
-    _0: list[Enum] = [m for m in EnumTest]
-    _1: list[Enum] = [m for m in EnumPropertiesTest]
+    _0: list[enum.Enum] = [m for m in EnumTest]
+    _1: list[enum.Enum] = [m for m in EnumPropertiesTest]
     assert _0 and _1
-    assert 1 in EnumTest
-    assert 1 in EnumPropertiesTest
+    try:
+        assert 1 in EnumTest
+        assert 1 in EnumPropertiesTest
+    except TypeError:
+        assert sys.version_info < (3, 12)
     assert EnumTest["A"] is EnumTest.A
     assert EnumPropertiesTest["A"] is EnumPropertiesTest.A
     assert EnumTest(1) is EnumTest.A
@@ -68,10 +71,18 @@ def test() -> None:
     )
 
     # --------------------------------------------------------------- StrEnum
-    class StrEnumTest(StrEnum):
-        A = "a"
-        B = "b"
-        C = "c"
+    if sys.version_info >= (3, 11):
+
+        class StrEnumTest(enum.StrEnum):
+            A = "a"
+            B = "b"
+            C = "c"
+    else:
+
+        class StrEnumTest(str, enum.Enum):
+            A = "a"
+            B = "b"
+            C = "c"
 
     class StrEnumPropertiesTest(StrEnumProperties):
         A = "a"
@@ -84,8 +95,11 @@ def test() -> None:
     _2r: list[Any] = [m for m in reversed(StrEnumTest)]
     _3r: list[Any] = [m for m in reversed(StrEnumPropertiesTest)]
     assert _2 and _3
-    assert "a" in StrEnumTest
-    assert "a" in StrEnumPropertiesTest
+    try:
+        assert "a" in StrEnumTest
+        assert "a" in StrEnumPropertiesTest
+    except TypeError:
+        assert sys.version_info < (3, 12)
     _2a: StrEnumTest = StrEnumTest["A"]
     _3a: StrEnumPropertiesTest = StrEnumPropertiesTest["A"]
     assert StrEnumTest["A"] is StrEnumTest.A
@@ -112,7 +126,7 @@ def test() -> None:
     )
 
     # --------------------------------------------------------------- IntEnum
-    class IntEnumTest(IntEnum):
+    class IntEnumTest(enum.IntEnum):
         A = 1
         B = 2
         C = 3
@@ -128,8 +142,11 @@ def test() -> None:
     _4r: list[Any] = [m for m in reversed(IntEnumTest)]
     _5r: list[Any] = [m for m in reversed(IntEnumPropertiesTest)]
     assert _4 and _5
-    assert 1 in IntEnumTest
-    assert 1 in IntEnumPropertiesTest
+    try:
+        assert 1 in IntEnumTest
+        assert 1 in IntEnumPropertiesTest
+    except TypeError:
+        assert sys.version_info < (3, 12)
     assert IntEnumTest["A"] is IntEnumTest.A
     assert IntEnumPropertiesTest["A"] is IntEnumPropertiesTest.A
     assert IntEnumTest(1) is IntEnumTest.A
@@ -156,7 +173,7 @@ def test() -> None:
     )
 
     # ------------------------------------------------------------------ Flag
-    class FlagTest(Flag):
+    class FlagTest(enum.Flag):
         A = 1 << 0
         B = 1 << 1
         C = 1 << 2
@@ -167,11 +184,14 @@ def test() -> None:
         C = 1 << 2
 
     # runtime
-    _6: list[Flag] = [m for m in FlagTest]
-    _7: list[Flag] = [m for m in FlagPropertiesTest]
+    _6: list[enum.Flag] = [m for m in FlagTest]
+    _7: list[enum.Flag] = [m for m in FlagPropertiesTest]
     assert _6 and _7
-    assert 1 in FlagTest
-    assert 1 in FlagPropertiesTest
+    try:
+        assert 1 in FlagTest
+        assert 1 in FlagPropertiesTest
+    except TypeError:
+        assert sys.version_info < (3, 12)
 
     ab0 = FlagTest.A | FlagTest.B
     ab1 = FlagPropertiesTest.A | FlagPropertiesTest.B
@@ -201,7 +221,7 @@ def test() -> None:
     assert_type(FlagPropertiesTest.A & FlagPropertiesTest.B, FlagPropertiesTest)
 
     # --------------------------------------------------------------- IntFlag
-    class IntFlagTest(IntFlag):
+    class IntFlagTest(enum.IntFlag):
         A = 1 << 0
         B = 1 << 1
         C = 1 << 2
@@ -215,8 +235,11 @@ def test() -> None:
     _8: list[int] = [m for m in IntFlagTest]
     _9: list[int] = [m for m in IntFlagPropertiesTest]
     assert _8 and _9
-    assert 1 in IntFlagTest
-    assert 1 in IntFlagPropertiesTest
+    try:
+        assert 1 in IntFlagTest
+        assert 1 in IntFlagPropertiesTest
+    except TypeError:
+        assert sys.version_info < (3, 12)
 
     ab2 = IntFlagTest.A | IntFlagTest.B
     ab3 = IntFlagPropertiesTest.A | IntFlagPropertiesTest.B

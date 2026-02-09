@@ -60,22 +60,6 @@ class TestEnums(TestCase):
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
             BLUE = 3, "Azul", (0, 0, 1), "0000ff"
 
-            @t.overload
-            def __init__(self, value: int, *_): ...
-
-            @t.overload
-            def __init__(self, value: str, *_): ...
-
-            @t.overload
-            def __init__(self, value: tuple[int, int, int], *_): ...
-
-            def __init__(
-                self,
-                value: int | str | tuple[int, int, int],
-                *args,
-            ):
-                super().__init__(value, *args)  # type: ignore
-
         self.assertEqual(list(Color), [Color.RED, Color.GREEN, Color.BLUE])
 
         self.assertEqual(Color.RED, Color((1, 0, 0)))
