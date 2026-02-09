@@ -248,3 +248,17 @@ def test() -> None:
     assert_type(
         IntFlagPropertiesTest.A & IntFlagPropertiesTest.B, IntFlagPropertiesTest
     )
+
+    class Color(IntEnumProperties):
+        spanish: str
+
+        RED = 1, "Roja"
+        GREEN = 2, "Verde"
+        BLUE = 3, "Azul"
+
+    class ColorFlag(IntFlagProperties):
+        spanish: str
+
+        RED = 1, "Roja"
+        GREEN = 2, "Verde"
+        BLUE = 4, "Azul"

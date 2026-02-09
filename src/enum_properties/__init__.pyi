@@ -107,23 +107,27 @@ class DecomposeMixin:
 class EnumProperties(  # type: ignore[misc]
     SymmetricMixin, enum.Enum, metaclass=EnumPropertiesMeta
 ):
+    def __init__(self, value: object = ..., *args: object) -> None: ...
     def __hash__(self) -> int: ...
 
 class IntEnumProperties(  # type: ignore[misc]
     SymmetricMixin, enum.IntEnum, metaclass=EnumPropertiesMeta
 ):
+    def __init__(self, value: int, *args: object) -> None: ...
     def __hash__(self) -> int: ...
 
 if sys.version_info >= (3, 11):
     class StrEnumProperties(  # type: ignore[misc]
         SymmetricMixin, enum.StrEnum, metaclass=EnumPropertiesMeta
     ):
+        def __init__(self, value: str, *args: object) -> None: ...
         def __hash__(self) -> int: ...
 
 else:
     class StrEnumProperties(  # type: ignore[misc]
         SymmetricMixin, str, enum.Enum, metaclass=EnumPropertiesMeta
     ):
+        def __init__(self, value: str, *args: object) -> None: ...
         def __hash__(self) -> int: ...
         def __str__(self) -> str: ...
         @staticmethod
@@ -134,6 +138,7 @@ else:
 class FlagProperties(  # type: ignore[misc]
     DecomposeMixin, SymmetricMixin, enum.Flag, metaclass=EnumPropertiesMeta
 ):
+    def __init__(self, value: object = ..., *args: object) -> None: ...
     @staticmethod
     def _generate_next_value_(
         name: str, start: int, count: int, last_values: list[Any]
@@ -143,6 +148,7 @@ class FlagProperties(  # type: ignore[misc]
 class IntFlagProperties(  # type: ignore[misc]
     DecomposeMixin, SymmetricMixin, enum.IntFlag, metaclass=EnumPropertiesMeta
 ):
+    def __init__(self, value: int, *args: object) -> None: ...
     @staticmethod
     def _generate_next_value_(
         name: str, start: int, count: int, last_values: list[Any]

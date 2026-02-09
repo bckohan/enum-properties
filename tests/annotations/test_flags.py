@@ -305,7 +305,7 @@ class TestFlags(TestCase):
                     CRIMSON = 1, "crimson"
 
             @verify(UNIQUE)
-            class Color(EnumProperties):
+            class Color2(EnumProperties):
                 label: str
 
                 RED = 1, "red"
@@ -313,13 +313,13 @@ class TestFlags(TestCase):
                 BLUE = 3, "blue"
                 CRIMSON = 4, "crimson"
 
-            self.assertEqual(Color.GREEN.label, "green")
-            self.assertEqual(Color.CRIMSON.label, "crimson")
+            self.assertEqual(Color2.GREEN.label, "green")
+            self.assertEqual(Color2.CRIMSON.label, "crimson")
 
             with self.assertRaises(ValueError):
                 # this throws an error if label is symmetric!
                 @verify(UNIQUE)
-                class Color(EnumProperties):
+                class Color3(EnumProperties):
                     label: Annotated[str, Symmetric()]
 
                     RED = 1, "red"
@@ -330,7 +330,7 @@ class TestFlags(TestCase):
             with self.assertRaises(ValueError):
 
                 @verify(CONTINUOUS)
-                class Color(IntEnumProperties):
+                class Color4(IntEnumProperties):
                     label: Annotated[str, Symmetric()]
 
                     RED = 1, "red"
@@ -338,20 +338,20 @@ class TestFlags(TestCase):
                     BLUE = 5, "blue"
 
             @verify(CONTINUOUS)
-            class Color(IntEnumProperties):
+            class Color5(IntEnumProperties):
                 label: Annotated[str, Symmetric()]
 
                 RED = 1, "red"
                 GREEN = 2, "green"
                 BLUE = 3, "blue"
 
-            self.assertEqual(Color.BLUE.label, "blue")
-            self.assertEqual(Color.RED, Color("red"))
+            self.assertEqual(Color5.BLUE.label, "blue")
+            self.assertEqual(Color5.RED, Color5("red"))
 
             with self.assertRaises(ValueError):
 
                 @verify(NAMED_FLAGS)
-                class Color(IntFlagProperties):
+                class Color6(IntFlagProperties):
                     label: Annotated[str, Symmetric()]
 
                     RED = 1, "red"
@@ -361,7 +361,7 @@ class TestFlags(TestCase):
                     NEON = 31, "neon"
 
             @verify(NAMED_FLAGS)
-            class Color(IntFlagProperties):
+            class Color7(IntFlagProperties):
                 label: Annotated[str, Symmetric()]
 
                 RED = 1, "red"
@@ -370,14 +370,14 @@ class TestFlags(TestCase):
                 WHITE = 16, "white"
                 NEON = 32, "neon"
 
-            self.assertEqual(Color.BLUE | Color.NEON, Color(["blue", "neon"]))
+            self.assertEqual(Color7.BLUE | Color7.NEON, Color7(["blue", "neon"]))
 
     if sys.version_info >= (3, 11):  # pragma: no cover
 
         def test_enum_property(self):
             from enum import property as enum_property
 
-            class Color(EnumProperties):
+            class Color2(EnumProperties):
                 label: Annotated[str, Symmetric()]
 
                 RED = 1, "red"
@@ -388,13 +388,13 @@ class TestFlags(TestCase):
                 def blue(self):
                     return "whatever"
 
-            self.assertEqual(Color.BLUE.blue, "whatever")
+            self.assertEqual(Color2.BLUE.blue, "whatever")
 
             # attempting to assign an enum_property to a class as an existing
             # property name should raise an AttributeError
             with self.assertRaises(AttributeError):
 
-                class Color(EnumProperties):
+                class Color4(EnumProperties):
                     label: Annotated[str, Symmetric()]
 
                     RED = 1, "red"

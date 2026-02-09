@@ -52,7 +52,6 @@ class TestEnums(TestCase):
 
     def test_properties_and_symmetry(self):
         class Color(IntEnumProperties):
-            value: int
             spanish: str
             rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
             hex: t.Annotated[str, Symmetric(case_fold=True)]
