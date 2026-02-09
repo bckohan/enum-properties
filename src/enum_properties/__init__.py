@@ -556,6 +556,12 @@ class EnumPropertiesMeta(enum.EnumMeta):
                     # ensures robust fidelity to Enum behavior.
                     before = len(member_names)
                     class_dict[key] = value
+                    if value and isinstance(
+                        ((value,) if not isinstance(value, tuple) else value)[0],
+                        enum.auto,
+                    ):
+                        # capture resolved auto() values
+                        value = class_dict[key]
                     # are we done with annotations?
                     self._create_properties_ = _lazy_annotations_
                     remove = False
