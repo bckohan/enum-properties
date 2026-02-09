@@ -60,6 +60,22 @@ class TestEnums(TestCase):
             GREEN = 2, "Verde", (0, 1, 0), "00ff00"
             BLUE = 3, "Azul", (0, 0, 1), "0000ff"
 
+            @t.overload
+            def __init__(self, value: int, *_): ...
+
+            @t.overload
+            def __init__(self, value: str, *_): ...
+
+            @t.overload
+            def __init__(self, value: tuple[int, int, int], *_): ...
+
+            def __init__(
+                self,
+                value: int | str | tuple[int, int, int],
+                *args,
+            ):
+                super().__init__(value, *args)  # type: ignore
+
         self.assertEqual(list(Color), [Color.RED, Color.GREEN, Color.BLUE])
 
         self.assertEqual(Color.RED, Color((1, 0, 0)))
@@ -161,7 +177,7 @@ class TestEnums(TestCase):
 
     def test_symmetric_builtin_override(self):
         class Color(EnumProperties):
-            name: t.Annotated[str, Symmetric(case_fold=True)]
+            name: t.Annotated[str, Symmetric(case_fold=True)]  # pyright: ignore[reportIncompatibleMethodOverride]
             spanish: str
             rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
             hex: t.Annotated[str, Symmetric(case_fold=True)]
@@ -364,6 +380,7 @@ class TestEnums(TestCase):
             rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
             hex: t.Annotated[str, Symmetric(case_fold=True)]
 
+            @staticmethod
             def _generate_next_value_(name, start, count, last_values):
                 return name.title()
 
@@ -557,7 +574,7 @@ class TestEnums(TestCase):
         self.assertEqual(Color.GREEN.hex, "00ff00")
         self.assertEqual(Color.BLUE.hex, "0000ff")
 
-        class Color(EnumProperties):
+        class Color2(EnumProperties):
             rgb: t.Annotated[t.Tuple[int, int, int], Symmetric()]
             hex: t.Annotated[str, Symmetric(case_fold=True)]
 
@@ -565,27 +582,27 @@ class TestEnums(TestCase):
             GREEN = auto(), (0, 1, 0), "0x00ff00"
             BLUE = auto(), (0, 0, 1), "0x0000ff"
 
-        self.assertEqual(Color.RED, Color((1, 0, 0)))
-        self.assertEqual(Color.GREEN, Color((0, 1, 0)))
-        self.assertEqual(Color.BLUE, Color((0, 0, 1)))
+        self.assertEqual(Color2.RED, Color2((1, 0, 0)))
+        self.assertEqual(Color2.GREEN, Color2((0, 1, 0)))
+        self.assertEqual(Color2.BLUE, Color2((0, 0, 1)))
 
-        self.assertEqual(Color.RED, Color("0xff0000"))
-        self.assertEqual(Color.GREEN, Color("0x00ff00"))
-        self.assertEqual(Color.BLUE, Color("0x0000ff"))
+        self.assertEqual(Color2.RED, Color2("0xff0000"))
+        self.assertEqual(Color2.GREEN, Color2("0x00ff00"))
+        self.assertEqual(Color2.BLUE, Color2("0x0000ff"))
 
         self.assertTrue(
-            Color.RED
-            == Color(hex(16711680))
+            Color2.RED
+            == Color2(hex(16711680))
             == hex(16711680)
             == "0xff0000"
-            == Color.RED
+            == Color2.RED
         )
-        self.assertTrue(Color.RED == (1, 0, 0))
-        self.assertTrue((1, 0, 0) == Color.RED)
-        self.assertTrue(Color.RED != (0, 1, 0))
-        self.assertTrue((0, 1, 0) != Color.RED)
-        self.assertTrue(Color.RED == "0xFF0000")
-        self.assertTrue("0xFF0000" == Color.RED)
+        self.assertTrue(Color2.RED == (1, 0, 0))
+        self.assertTrue((1, 0, 0) == Color2.RED)
+        self.assertTrue(Color2.RED != (0, 1, 0))
+        self.assertTrue((0, 1, 0) != Color2.RED)
+        self.assertTrue(Color2.RED == "0xFF0000")
+        self.assertTrue("0xFF0000" == Color2.RED)
 
         class MapBoxStyle(EnumProperties):
             """
@@ -596,7 +613,7 @@ class TestEnums(TestCase):
             # this special attribute
             _symmetric_builtins_ = ["uri"]
 
-            name: t.Annotated[str, Symmetric(case_fold=True)]
+            name: t.Annotated[str, Symmetric(case_fold=True)]  # pyright: ignore[reportIncompatibleMethodOverride]
 
             # type hints are optional for better dev experience
             label: t.Annotated[str, Symmetric(case_fold=True)]
@@ -701,7 +718,7 @@ class TestEnums(TestCase):
 
         class AddressRoute(EnumProperties):
             # name is a builtin property of Enum, we can override its case insensitivity
-            name: t.Annotated[str, Symmetric(case_fold=True)]
+            name: t.Annotated[str, Symmetric(case_fold=True)]  # pyright: ignore[reportIncompatibleMethodOverride]
 
             abbr: t.Annotated[str, Symmetric(case_fold=True)]
             alt: t.Annotated[t.List[str], Symmetric(case_fold=True)]
@@ -745,7 +762,7 @@ class TestEnums(TestCase):
         """enum_properties is reserved - test that we get an exception"""
 
         class PropConflict(EnumProperties):
-            _properties_: t.Tuple[int, int, int]
+            _properties_: t.Tuple[int, int, int]  # type: ignore[assignment]
 
             ONE = auto(), (1, 2, 3)  # pragma: no cover
             TWO = auto(), (3, 4, 5)  # pragma: no cover
@@ -776,7 +793,7 @@ class TestEnums(TestCase):
         """
 
         class HashableType:
-            def __init__(self, value):
+            def __init__(self, value: int):
                 self.value = value
 
             def __eq__(self, other):
@@ -867,7 +884,7 @@ class TestEnums(TestCase):
         from enum_properties import EnumProperties, p
         from enum import auto
 
-        class Color(EnumProperties, p("rgb"), p("hex")):
+        class Color(EnumProperties, p("rgb"), p("hex")):  # type: ignore
             extra: int  # this does not become a property
 
             # name   value      rgb       hex
@@ -875,7 +892,7 @@ class TestEnums(TestCase):
             GREEN = auto(), (0, 1, 0), "00ff00"
             BLUE = auto(), (0, 0, 1), "0000ff"
 
-        self.assertEqual(Color.RED.rgb, (1, 0, 0))
+        self.assertEqual(Color.RED.rgb, (1, 0, 0))  # pyright: ignore[reportAttributeAccessIssue]
 
         with self.assertRaises(AttributeError):
             Color.RED.extra
@@ -966,7 +983,8 @@ class TestEnums(TestCase):
         self.assertEqual(NumbersAuto.THREE.spanish, "Tres")
 
         class ColorAutoOverride(StrEnumProperties):
-            def _generate_next_value_(name, start, count, last_values):
+            @staticmethod
+            def _generate_next_value_(name, start, count, last_values) -> str:
                 return name.title() * 2
 
             spanish: str
