@@ -10,6 +10,9 @@ on:
   pull_request:
   merge_group:
   workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: true
   workflow_dispatch:
     inputs:
       debug:
