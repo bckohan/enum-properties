@@ -137,8 +137,8 @@ jobs:
         GITHUB_REPOSITORY: ${{ github.repository }}
       run: >-
         gh release create
-        '$GITHUB_REF_NAME'
-        --repo '$GITHUB_REPOSITORY'
+        "$GITHUB_REF_NAME"
+        --repo "$GITHUB_REPOSITORY"
         --generate-notes
         --prerelease
     - name: Upload artifact signatures to GitHub Release
@@ -151,5 +151,5 @@ jobs:
       # sigstore-produced signatures and certificates.
       run: >-
         gh release upload
-        '$GITHUB_REF_NAME' dist/**
-        --repo '$GITHUB_REPOSITORY'
+        "$GITHUB_REF_NAME" dist/**
+        --repo "$GITHUB_REPOSITORY"
