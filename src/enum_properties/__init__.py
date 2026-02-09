@@ -64,8 +64,8 @@ Annotations are loaded after enum member definitions in python 3.14+
 
 if t.TYPE_CHECKING:
     # For type checking, mixins inherit from enum types to provide proper attributes
-    _SymmetricMixinBase: type[enum.Enum] = enum.Enum
-    _DecomposeMixinBase: type[enum.Flag] = enum.Flag
+    _SymmetricMixinBase: type[enum.Enum] = enum.Enum  # pragma: no cover
+    _DecomposeMixinBase: type[enum.Flag] = enum.Flag  # pragma: no cover
 else:
     # At runtime, mixins are just object-based
     _SymmetricMixinBase = object
