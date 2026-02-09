@@ -2,6 +2,13 @@
 Change Log
 ==========
 
+v2.5.0 (2026-02-08)
+===================
+
+* Fixed `Enum properties derived enums do not inherit type hint interface of Enum. <https://github.com/bckohan/enum-properties/issues/144>`_
+  
+  * A stub file is now shipped for the public interface.
+
 v2.4.1 (2025-11-09)
 ===================
 

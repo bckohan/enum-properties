@@ -133,3 +133,4 @@ dmypy.json
 .DS_Store
 .idea
 .ruff_cache
+CLAUDE.md

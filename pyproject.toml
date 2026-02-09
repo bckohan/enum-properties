@@ -4,9 +4,9 @@ build-backend = "hatchling.build"
 
 [project]
 name = "enum-properties"
-version = "2.4.1"
+version = "2.5.0"
 description = "Add properties and method specializations to Python enumeration values with a simple declarative syntax."
-requires-python = ">=3.9,<4.0"
+requires-python = ">=3.10,<4.0"
 authors = [
   {name = "Brian Kohan", email = "bckohan@gmail.com"}
 ]
@@ -25,7 +25,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -52,7 +51,7 @@ docs = [
     "doc8>=1.1.2",
     "furo>=2024.8.6",
     "readme-renderer[md]>=43.0",
-    "sphinx>=7.1.2",
+    "sphinx>=8.0.0",
     "sphinx-autobuild>=2021.3.14",
     "sphinx-tabs>=3.4.7",
 ]
@@ -107,10 +106,14 @@ warn_redundant_casts = true
 warn_unused_configs = true
 warn_unreachable = true
 warn_no_return = true
-exclude = "tests"
-mypy_path = "src"
-modules = "enum_properties"
-
+mypy_path = ["src"]
+explicit_package_bases = true
+namespace_packages = true
+# Analyze both source and test files
+files = [
+  "src/enum_properties",
+  "tests/type_hints"
+]
 
 [tool.doc8]
 ignore-path = "doc/_build"
@@ -142,9 +145,10 @@ exclude = [
 ]
 
 [tool.pyright]
-exclude = ["tests/**/*"]
+# Analyze both source and test files
 include = [
-    "src/enum_properties"
+    "src/enum_properties",
+    "tests/type_hints"
 ]
 
 [tool.coverage.run]

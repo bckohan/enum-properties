@@ -29,7 +29,6 @@ Next, initialize and install the development environment:
 `enum-properties` documentation is generated using [Sphinx](https://www.sphinx-doc.org). Any new feature PRs must provide updated documentation for the features added. To build the docs run:
 
 ```bash
-    just install-docs
     just docs
 ```
 
@@ -72,6 +71,11 @@ test_int_flag example test you would do:
     just test tests/annotations/test_flags.py::TestFlags::test_int_flag
 ```
 
+To debug a test:
+
+```bash
+    just debug-test tests/annotations/test_flags.py::TestFlags::test_int_flag
+```
 
 ## Issuing Releases
 
