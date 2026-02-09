@@ -12,7 +12,7 @@ on:
   workflow_call:
     secrets:
       CODECOV_TOKEN:
-        required: false
+        required: true
   workflow_dispatch:
     inputs:
       debug:
