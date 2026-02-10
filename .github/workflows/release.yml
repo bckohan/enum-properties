@@ -55,8 +55,6 @@ jobs:
     - name: Setup Just
       uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff
     - name: Verify Tag
-      env:
-        ACTOR: ${{ github.actor }}
       run: |
         TAG_NAME=${GITHUB_REF#refs/tags/}
         echo "Verifying tag $TAG_NAME..."
