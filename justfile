@@ -196,7 +196,7 @@ lint: sort-imports
 fix: lint format
 
 # run all static checks
-check: check-lint check-format check-types check-package check-docs check-docs-links check-readme
+check: check-lint check-format check-types check-package check-docs check-readme
 
 # run all checks including documentation link checking (slow)
 check-all: check check-docs-links
