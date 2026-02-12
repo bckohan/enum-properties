@@ -7,11 +7,6 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any, Callable, Literal, TypeAlias, TypeVar, overload
 
-if sys.version_info >= (3, 11):
-    pass
-else:
-    pass
-
 VERSION: tuple[int, int, int]
 __title__: str
 __version__: str
