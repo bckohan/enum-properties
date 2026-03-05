@@ -27,7 +27,7 @@ from collections.abc import Generator, Hashable, Iterable, Mapping
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 6, 0)
+VERSION = (2, 7, 0)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -54,6 +54,10 @@ __all__ = [
 
 
 S = t.TypeVar("S")
+
+_enum_property = property
+if sys.version_info[0:2] >= (3, 11):
+    from enum import property as _enum_property
 
 
 _lazy_annotations_: bool = sys.version_info[:2] >= (3, 14)
@@ -110,9 +114,10 @@ class _MarkedSymmetric:
         self.symmetric = symmetric
 
 
-def symmetric(case_fold: bool = False, match_none: bool = False) -> t.Callable[[S], S]:
+def symmetric(case_fold: bool = False, match_none: bool = False):
     """
-    A decorator that marks non-enum value members as symmetric. For example, properties:
+    A decorator that marks non-enum value members as symmetric. Plain functions are
+    automatically wrapped with :func:`property`. For example:
 
     .. code-block:: python
 
@@ -121,7 +126,6 @@ def symmetric(case_fold: bool = False, match_none: bool = False) -> t.Callable[[
             ...
 
             @symmetric(case_fold=True)
-            @property
             def name(self):
                 return "value"
 
@@ -132,7 +136,9 @@ def symmetric(case_fold: bool = False, match_none: bool = False) -> t.Callable[[
     """
 
     def symmetric_decorator(member: S) -> S:
-        return _MarkedSymmetric(  # type: ignore
+        if callable(member) and not isinstance(member, (property, _enum_property)):
+            member = _enum_property(member)  # type: ignore[assignment]
+        return _MarkedSymmetric(  # type: ignore[return-value]
             member, Symmetric(case_fold, match_none)
         )
 
