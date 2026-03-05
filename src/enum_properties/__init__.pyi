@@ -14,8 +14,8 @@ __author__: str
 __license__: str
 __copyright__: str
 
-S = TypeVar("S")
 _T = TypeVar("_T")
+_PropertyT = TypeVar("_PropertyT", bound=property)
 _EnumMemberT = TypeVar("_EnumMemberT")
 _EnumNames: TypeAlias = (
     str | Iterable[str] | Iterable[Iterable[str | Any]] | Mapping[str, Any]
@@ -56,10 +56,7 @@ class _SymmetricProperty(Generic[_T]):
 class _SymmetricDecorator:
     """Return type of symmetric() — wraps a callable as a symmetric property."""
     @overload
-    def __call__(self, f: property) -> property: ...
-    if sys.version_info >= (3, 11):
-        @overload
-        def __call__(self, f: enum.property) -> enum.property: ...
+    def __call__(self, f: _PropertyT) -> _PropertyT: ...
     @overload
     def __call__(self, f: Callable[[Any], _T]) -> _SymmetricProperty[_T]: ...
 

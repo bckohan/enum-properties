@@ -21,7 +21,7 @@ class TestSymmetricDecorator(TestCase):
 
             @symmetric(case_fold=True)
             @property
-            def label(self):
+            def label(self) -> str:
                 return self.name
 
         self.assertEqual(SymEnum.ONE.label, "ONE")
@@ -96,7 +96,7 @@ class TestSymmetricDecorator(TestCase):
 
             @symmetric(case_fold=True)
             @enum_property
-            def label(self):
+            def label(self) -> str:
                 return self.name
 
         self.assertEqual(SymEnum.ONE.label, "ONE")
