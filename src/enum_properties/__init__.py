@@ -57,7 +57,9 @@ S = t.TypeVar("S")
 
 _enum_property = property
 if sys.version_info[0:2] >= (3, 11):
-    from enum import property as _enum_property
+    from enum import (
+        property as _enum_property,  # pyright: ignore[reportAttributeAccessIssue]
+    )
 
 
 _lazy_annotations_: bool = sys.version_info[:2] >= (3, 14)
