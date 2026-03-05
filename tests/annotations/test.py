@@ -984,3 +984,17 @@ class TestEnums(TestCase):
         self.assertEqual(ColorAutoOverride.ONE.spanish, "Uno")
         self.assertEqual(ColorAutoOverride.TWO.spanish, "Dos")
         self.assertEqual(ColorAutoOverride.THREE.spanish, "Tres")
+
+    def test_name_annotation_plain_non_symmetric(self):
+        """Annotating 'name' without Symmetric is silently ignored (line 630->644)."""
+
+        class MyEnum(EnumProperties):
+            name: str  # plain (non-symmetric) — hits the issubclass(prop, _SProp) False branch
+            label: str
+
+            A = "a", "alpha"
+            B = "b", "beta"
+
+        # 'name' behavior is unchanged: still case-sensitive symmetric by default
+        self.assertIs(MyEnum("A"), MyEnum.A)
+        self.assertEqual(MyEnum.A.label, "alpha")
