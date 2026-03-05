@@ -385,6 +385,11 @@ class TestFunctionalAPI(TestCase):
         AnEnum = EnumProperties("AnEnum", [], properties=("label",))
         self.assertEqual(list(AnEnum), [])
 
+    def test_names_as_empty_generator(self):
+        """Empty generator produces an enum with no members."""
+        AnEnum = EnumProperties("AnEnum", (x for x in []), properties=("label",))
+        self.assertEqual(list(AnEnum), [])
+
     def test_names_as_plain_list_of_strings(self):
         """List of plain strings auto-assigns sequential start values (line 508)."""
         AnEnum = EnumProperties("AnEnum", ["X", "Y", "Z"], start=10)
