@@ -57,6 +57,9 @@ class _SymmetricDecorator:
     """Return type of symmetric() — wraps a callable as a symmetric property."""
     @overload
     def __call__(self, f: property) -> property: ...
+    if sys.version_info >= (3, 11):
+        @overload
+        def __call__(self, f: enum.property) -> enum.property: ...
     @overload
     def __call__(self, f: Callable[[Any], _T]) -> _SymmetricProperty[_T]: ...
 
