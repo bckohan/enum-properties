@@ -14,12 +14,10 @@ class Color(EnumProperties):
     BLUE   = auto(), (0, 0, 1), '0000ff'
 
     @symmetric()
-    @property
     def integer(self) -> int:
         return int(self.hex, 16)
 
     @symmetric()
-    @property
     def binary(self) -> str:
         return bin(self.integer)[2:]
 

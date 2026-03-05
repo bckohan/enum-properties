@@ -5,7 +5,7 @@ import sys
 from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Any, Callable, Literal, TypeAlias, TypeVar, overload
+from typing import Any, Callable, Generic, Literal, TypeAlias, TypeVar, overload
 
 VERSION: tuple[int, int, int]
 __title__: str
@@ -14,7 +14,8 @@ __author__: str
 __license__: str
 __copyright__: str
 
-S = TypeVar("S")
+_T = TypeVar("_T")
+_PropertyT = TypeVar("_PropertyT", bound=property)
 _EnumMemberT = TypeVar("_EnumMemberT")
 _EnumNames: TypeAlias = (
     str | Iterable[str] | Iterable[Iterable[str | Any]] | Mapping[str, Any]
@@ -42,9 +43,26 @@ def s(
     prop_name: str, case_fold: bool = False, match_none: bool = False
 ) -> type[_SProp]: ...
 def p(prop_name: str) -> type[_Prop]: ...
+
+class _SymmetricProperty(Generic[_T]):
+    """Read-only descriptor returned by @symmetric(); __get__ on an instance returns _T."""
+    @overload
+    def __get__(
+        self, obj: None, objtype: type[Any] = ...
+    ) -> _SymmetricProperty[_T]: ...
+    @overload
+    def __get__(self, obj: Any, objtype: type[Any] | None = ...) -> _T: ...
+
+class _SymmetricDecorator:
+    """Return type of symmetric() — wraps a callable as a symmetric property."""
+    @overload
+    def __call__(self, f: _PropertyT) -> _PropertyT: ...
+    @overload
+    def __call__(self, f: Callable[[Any], _T]) -> _SymmetricProperty[_T]: ...
+
 def symmetric(
     case_fold: bool = False, match_none: bool = False
-) -> Callable[[S], S]: ...
+) -> _SymmetricDecorator: ...
 def specialize(
     *values: Any,
 ) -> Callable[[Callable[..., Any]], Callable[..., Any]]: ...

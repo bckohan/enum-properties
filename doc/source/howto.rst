@@ -148,8 +148,9 @@ example to make name case insensitive we might:
 Mark @properties as Symmetric
 -----------------------------
 
-The :py:func:`~enum_properties.symmetric` decorator may be used to mark @properties as symmetric or other members not specified
-in the Enum value tuple as symmetric. For example:
+The :py:func:`~enum_properties.symmetric` decorator may be used to mark methods as
+symmetric. Plain functions are automatically wrapped as properties, so ``@property``
+is not required. For example:
 
 .. literalinclude:: ../../tests/examples/howto_symmetric_decorator.py
 

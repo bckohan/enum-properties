@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.7.0 (2026-03-04)
+===================
+
+* Implemented `Make @symmetric a property if it wraps a plain function. <https://github.com/bckohan/enum-properties/issues/153>`_
+
 v2.6.0 (2026-03-04)
 ===================
 

@@ -17,6 +17,7 @@ from enum_properties import (
     IntEnumProperties,
     IntFlagProperties,
     StrEnumProperties,
+    symmetric,
 )
 
 
@@ -285,3 +286,20 @@ def test() -> None:
         RED = 1, "Roja"
         GREEN = 2, "Verde"
         BLUE = 4, "Azul"
+
+    # ---------------------------------------------------- @symmetric decorator
+    class SymColor(EnumProperties):
+        @symmetric()
+        def integer(self) -> int:
+            return int(str(self.value), 16)
+
+        @symmetric()
+        def label(self) -> str:
+            return self.name
+
+        RED = "ff0000"
+        GREEN = "00ff00"
+        BLUE = "0000ff"
+
+    assert_type(SymColor.RED.integer, int)
+    assert_type(SymColor.RED.label, str)

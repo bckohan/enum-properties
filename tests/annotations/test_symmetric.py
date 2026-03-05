@@ -21,7 +21,7 @@ class TestSymmetricDecorator(TestCase):
 
             @symmetric(case_fold=True)
             @property
-            def label(self):
+            def label(self) -> str:
                 return self.name
 
         self.assertEqual(SymEnum.ONE.label, "ONE")
@@ -74,14 +74,15 @@ class TestSymmetricDecorator(TestCase):
             TWO = 2
             THREE = 3
 
-            # lol - should work with anything
+            # plain functions are auto-wrapped as properties
             @symmetric()
             def label(self):
                 return self.name
 
-        self.assertEqual(SymEnum.ONE.label(), "ONE")
-        self.assertEqual(SymEnum.TWO.label(), "TWO")
-        self.assertEqual(SymEnum.THREE.label(), "THREE")
+        # label is now a property — access without parens
+        self.assertEqual(SymEnum.ONE.label, "ONE")
+        self.assertEqual(SymEnum.TWO.label, "TWO")
+        self.assertEqual(SymEnum.THREE.label, "THREE")
 
         self.assertTrue(SymEnum(SymEnum.ONE.label) is SymEnum.ONE)
         self.assertTrue(SymEnum(SymEnum.TWO.label) is SymEnum.TWO)
@@ -95,7 +96,7 @@ class TestSymmetricDecorator(TestCase):
 
             @symmetric(case_fold=True)
             @enum_property
-            def label(self):
+            def label(self) -> str:
                 return self.name
 
         self.assertEqual(SymEnum.ONE.label, "ONE")
