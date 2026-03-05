@@ -134,3 +134,4 @@ dmypy.json
 .idea
 .ruff_cache
 CLAUDE.md
+uv.lock
