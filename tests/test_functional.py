@@ -5,7 +5,6 @@ EnumProperties("Name", {"A": ("a", True), ...}, properties=("prop",))
 """
 
 import sys
-import typing as t
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -160,7 +159,6 @@ class TestFunctionalAPI(TestCase):
             {"RED": ("red", "#f00"), "BLUE": ("blue", "#00f")},
             properties=("hex",),
         )
-        Color.hex: t.ClassVar[str]  # type: ignore[no-untyped-def]
         self.assertEqual(Color.RED, "red")
         self.assertEqual(Color.RED.hex, "#f00")
 
@@ -338,7 +336,7 @@ class TestFunctionalAPI(TestCase):
 
     def test_properties_as_string_raises(self):
         """Passing a bare string for properties= raises TypeError with a hint."""
-        with self.assertRaises(TypeError, msg="Did you mean properties=("):
+        with self.assertRaisesRegex(TypeError, r"Did you mean properties=\("):
             EnumProperties(
                 "AnEnum",
                 {"A": ("a", 1)},
@@ -377,8 +375,8 @@ class TestFunctionalAPI(TestCase):
 
     def test_names_as_string_with_properties(self):
         """names as string + properties raises because values can't carry props."""
-        # The string form produces scalar values, not tuples, so add_member_and_properties
-        # will raise.
+        # The string form produces scalar values, not tuples, so property
+        # extraction will raise.
         with self.assertRaises(ValueError):
             EnumProperties("AnEnum", "A B C", properties=("label",))
 
@@ -395,7 +393,7 @@ class TestFunctionalAPI(TestCase):
         self.assertEqual(AnEnum.Z.value, 12)
 
     def test_names_as_generic_iterable(self):
-        """A generator (non-list/tuple/dict) is consumed as (name, value) pairs (line 514)."""
+        """A generator of (name, value) pairs is consumed correctly."""
         pairs = (
             (name, (i, label))
             for i, (name, label) in enumerate([("A", "alpha"), ("B", "beta")], start=1)
@@ -404,6 +402,15 @@ class TestFunctionalAPI(TestCase):
         self.assertEqual(AnEnum.A.value, 1)
         self.assertEqual(AnEnum.A.label, "alpha")
         self.assertEqual(AnEnum.B.label, "beta")
+
+    def test_names_as_string_generator_with_properties_raises(self):
+        """Generator of plain string names + properties= raises (no property data)."""
+        with self.assertRaises(ValueError):
+            EnumProperties(
+                "AnEnum",
+                (n for n in ["A", "B"]),
+                properties=("label",),
+            )
 
     def test_module_not_set_when_getframe_fails(self):
         """When sys._getframe raises, module stays None and __module__ is unchanged

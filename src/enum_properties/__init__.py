@@ -518,7 +518,16 @@ class EnumPropertiesMeta(enum.EnumMeta):
         elif isinstance(names, Mapping):
             items = list(names.items())
         else:
-            items = list(names)
+            # Non-sequence iterables (e.g. generators).  Match Enum functional
+            # API: if this is an iterable of names, generate sequential values;
+            # otherwise, treat elements as (name, value) pairs.
+            raw_items = list(names)
+            if not raw_items:
+                items = []
+            elif all(isinstance(n, str) for n in raw_items):
+                items = [(name, start + i) for i, name in enumerate(raw_items)]
+            else:
+                items = [tuple(item) for item in raw_items]  # type: ignore[assignment]
 
         # Populate the classdict; _PropertyEnumDict.__setitem__ strips property
         # values from each tuple and records them in _ep_properties_.
