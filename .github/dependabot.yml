@@ -15,15 +15,3 @@ updates:
       gha-updates:
         patterns:
           - "*"
-
-  # Python
-  - package-ecosystem: "uv"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    commit-message:
-      prefix: ⬆
-    groups:
-      uv-updates:
-        patterns:
-          - "*"
