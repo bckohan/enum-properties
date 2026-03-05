@@ -314,6 +314,34 @@ be an rgb tuple:
 
 .. literalinclude:: ../../tests/examples/howto_hash_equiv_def.py
 
+.. _howto_functional_api:
+
+Use the Functional (Dynamic) API
+---------------------------------
+
+Python's standard :class:`enum.Enum` supports a `functional API
+<https://docs.python.org/3/howto/enum.html#functional-api>`_ that creates
+enumeration classes dynamically at runtime. :py:class:`~enum_properties.EnumProperties`
+extends this with a ``properties`` keyword argument that names the extra
+fields packed into each member's value tuple.
+
+Each entry in ``properties`` can be:
+
+- A **string** – creates a plain (non-symmetric) property with that name,
+  equivalent to :py:func:`~enum_properties.p`.
+- A :py:func:`~enum_properties.p` or :py:func:`~enum_properties.s` **type** –
+  used directly, which lets you configure symmetry and ``case_fold`` options.
+
+.. literalinclude:: ../../tests/examples/howto_functional.py
+    :lines: 1-26
+
+:py:class:`~enum_properties.FlagProperties` and
+:py:class:`~enum_properties.IntFlagProperties` are also supported:
+
+.. literalinclude:: ../../tests/examples/howto_functional.py
+    :lines: 30-
+
+
 .. _howto_legacy_api:
 
 Use the legacy (1.x) API

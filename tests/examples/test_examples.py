@@ -127,3 +127,7 @@ def test_howto_legacy():
 
 def test_howto_members_and_aliases():
     from tests.examples import howto_members_and_aliases
+
+
+def test_howto_functional():
+    from tests.examples import howto_functional
