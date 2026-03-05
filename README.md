@@ -5,6 +5,7 @@
 [![PyPI version](https://badge.fury.io/py/enum-properties.svg)](https://pypi.python.org/pypi/enum-properties/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/enum-properties.svg)](https://pypi.python.org/pypi/enum-properties/)
 [![PyPI status](https://img.shields.io/pypi/status/enum-properties.svg)](https://pypi.python.org/pypi/enum-properties)
+[![PyPI - Types](https://img.shields.io/pypi/types/enum-properties.svg)](https://pypi.python.org/pypi/enum-properties)
 [![Documentation Status](https://readthedocs.org/projects/enum-properties/badge/?version=latest)](http://enum-properties.readthedocs.io/?badge=latest/)
 [![Code Cov](https://codecov.io/gh/bckohan/enum-properties/branch/main/graph/badge.svg?token=0IZOKN2DYL)](https://codecov.io/gh/bckohan/enum-properties)
 [![Test Status](https://github.com/bckohan/enum-properties/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/bckohan/enum-properties/actions/workflows/test.yml?query=branch:main)

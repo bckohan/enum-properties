@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "enum-properties"
-version = "2.5.1"
+version = "2.6.0"
 description = "Add properties and method specializations to Python enumeration values with a simple declarative syntax."
 requires-python = ">=3.10,<4.0"
 authors = [
@@ -31,7 +31,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
     "Topic :: Software Development :: Libraries",
-    "Topic :: Software Development :: Libraries :: Python Modules"
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
 ]
 
 [project.urls]

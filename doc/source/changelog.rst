@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.6.0 (2026-03-04)
+===================
+
+* Implemented `Support the Enum functional API. <https://github.com/bckohan/enum-properties/issues/156>`_
+
 v2.5.1 (2026-02-09)
 ===================
 

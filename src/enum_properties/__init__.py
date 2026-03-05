@@ -23,11 +23,11 @@ import enum
 import sys
 import typing as t
 import unicodedata
-from collections.abc import Generator, Hashable, Iterable
+from collections.abc import Generator, Hashable, Iterable, Mapping
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 5, 1)
+VERSION = (2, 6, 0)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -404,6 +404,152 @@ class EnumPropertiesMeta(enum.EnumMeta):
     _num_sym_props_: int
     _properties_: list[_Prop]
     __first_class_members__: list[str]
+
+    def __call__(  # type: ignore[override]  # pyright: ignore[reportIncompatibleMethodOverride]
+        cls,
+        value,
+        names=None,
+        *,
+        module=None,
+        qualname=None,
+        type=None,
+        start=1,
+        properties=None,
+        **kwargs,
+    ):
+        """
+        Overrides :meth:`enum.EnumMeta.__call__` to support the functional API
+        with a ``properties`` argument. When ``names`` is provided along with
+        ``properties``, a new enum class is created with the given properties.
+
+        ``properties`` may be an iterable of:
+
+        - :class:`str` – creates a non-symmetric property with that name
+        - :func:`p` or :func:`s` type – used directly (preserves case-fold /
+          match-none options on symmetric properties)
+
+        Example::
+
+            AnEnum = EnumProperties(
+                "AnEnum",
+                {"A": ("a", True), "B": ("b", False)},
+                properties=("prop",),
+            )
+
+        :param value: Class name when using the functional API, otherwise the
+            member value to look up.
+        :param names: Member definitions (dict, list of pairs, or string).
+        :param module: Module name for the new class.
+        :param qualname: Qualified name for the new class.
+        :param type: An optional mixin type for the new class.
+        :param start: Starting value for auto-generated member values.
+        :param properties: Property specifications for the functional API.
+        """
+        if names is None:
+            if properties is not None:
+                raise TypeError("'properties' argument requires 'names' argument")
+            # Normal member-value lookup – delegate entirely to EnumMeta.
+            return super().__call__(value, **kwargs)
+
+        if properties is None:
+            # Standard functional API without properties.
+            return super().__call__(
+                value,
+                names,
+                module=module,
+                qualname=qualname,
+                type=type,
+                start=start,
+                **kwargs,
+            )
+
+        # ------------------------------------------------------------------
+        # Functional API *with* properties
+        # ------------------------------------------------------------------
+        metacls = cls.__class__  # EnumPropertiesMeta
+
+        # Parse each property specification into a p()/s() *type*.
+        if isinstance(properties, str):
+            raise TypeError(
+                f"'properties' must be an iterable of strings or p()/s() types, "
+                f"not str. Did you mean properties=({properties!r},)?"
+            )
+        prop_types = []
+        for prop in properties:
+            if isinstance(prop, str):
+                prop_types.append(p(prop))
+            else:
+                try:
+                    if issubclass(prop, _Prop):
+                        prop_types.append(prop)
+                        continue
+                except TypeError:
+                    pass
+                raise TypeError(
+                    f"Invalid property specification: {prop!r}. "
+                    "Expected a string, p(), or s() property."
+                )
+
+        # Build the base-class tuple.  Property types are prepended so that
+        # __prepare__ picks them up and records them in _ep_properties_.
+        if type is None:
+            bases: tuple[t.Any, ...] = (cls,)
+        else:
+            bases = (type, cls)
+        full_bases = tuple(prop_types) + bases
+
+        # Let __prepare__ build the classdict (it strips prop_types from bases
+        # and populates _ep_properties_).
+        classdict = metacls.__prepare__(value, full_bases, **kwargs)
+
+        # Parse *names* into a list of (member_name, value) pairs.
+        if isinstance(names, str):
+            names = names.replace(",", " ").split()
+
+        items: list[tuple[str, t.Any]]
+        if isinstance(names, (list, tuple)):
+            if not names:
+                items = []
+            elif isinstance(names[0], str):
+                # Plain list of names – generate sequential values.
+                items = [(name, start + i) for i, name in enumerate(names)]
+            else:
+                items = [tuple(item) for item in names]  # type: ignore[assignment]
+        elif isinstance(names, Mapping):
+            items = list(names.items())
+        else:
+            # Non-sequence iterables (e.g. generators).  Match Enum functional
+            # API: if this is an iterable of names, generate sequential values;
+            # otherwise, treat elements as (name, value) pairs.
+            raw_items = list(names)
+            if not raw_items:
+                items = []
+            elif all(isinstance(n, str) for n in raw_items):
+                items = [(name, start + i) for i, name in enumerate(raw_items)]
+            else:
+                items = [tuple(item) for item in raw_items]  # type: ignore[assignment]
+
+        # Populate the classdict; _PropertyEnumDict.__setitem__ strips property
+        # values from each tuple and records them in _ep_properties_.
+        for name, val in items:
+            classdict[name] = val
+
+        # Construct the enum class.  Pass *bases* (without prop_types) because
+        # __new__ also filters _Prop subclasses, and __prepare__ already
+        # recorded the properties.
+        enum_class = metacls.__new__(metacls, value, bases, classdict, **kwargs)
+        enum_class.__qualname__ = qualname or value
+
+        if module is None:
+            try:
+                module = sys._getframe(1).f_globals["__name__"]
+            except (AttributeError, ValueError, KeyError):
+                pass
+
+        if module is not None:
+            enum_class.__module__ = module
+
+        return enum_class
 
     @classmethod
     def __prepare__(metacls, cls, bases, **kwds):  # type: ignore[override]

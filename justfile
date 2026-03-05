@@ -36,20 +36,6 @@ install *OPTS:
 _install-docs:
     uv sync --no-default-groups --group docs --all-extras
 
-[script]
-_lock-python:
-    import tomlkit
-    import sys
-    f='pyproject.toml'
-    d=tomlkit.parse(open(f).read())
-    d['project']['requires-python']='=={}'.format(sys.version.split()[0])
-    open(f,'w').write(tomlkit.dumps(d))
-
-# lock to specific python and versions of given dependencies
-test-lock +PACKAGES: _lock-python
-    uv add --no-sync {{ PACKAGES }}
-    uv sync --reinstall --no-default-groups --no-install-project
-
 # run static type checking with mypy
 check-types-mypy *RUN_ARGS:
     @just run --no-default-groups --all-extras --group typing {{ RUN_ARGS }} mypy

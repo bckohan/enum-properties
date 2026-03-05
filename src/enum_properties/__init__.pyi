@@ -36,6 +36,8 @@ class _SProp(_Prop):
     case_fold: bool
     match_none: bool
 
+_PropertySpec: TypeAlias = str | type[_Prop]
+
 def s(
     prop_name: str, case_fold: bool = False, match_none: bool = False
 ) -> type[_SProp]: ...
@@ -82,6 +84,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             type: type | None = None,
             start: int = 1,
             boundary: enum.FlagBoundary | None = None,
+            properties: Iterable[_PropertySpec] | None = None,
         ) -> type[enum.Enum]: ...
     else:
         @overload
@@ -94,6 +97,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             qualname: str | None = None,
             type: type | None = None,
             start: int = 1,
+            properties: Iterable[_PropertySpec] | None = None,
         ) -> type[enum.Enum]: ...
 
     if sys.version_info >= (3, 12):
