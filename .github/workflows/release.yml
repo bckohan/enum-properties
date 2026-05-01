@@ -25,6 +25,7 @@ jobs:
     permissions:
       contents: read
       actions: write
+      id-token: write
     uses: ./.github/workflows/test.yml
 
   build:
