@@ -27,7 +27,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@a0b538fa0b742a6aa35d6e2c169b4bd06d225a98
+        uses: actions-rust-lang/setup-rust-toolchain@2b1f5e9b395427c92ee4e3331786ca3c37afe2d7
       - name: Install jq
         run: |
           sudo apt-get update
@@ -41,14 +41,14 @@ jobs:
           zizmor --format sarif .github/workflows/ > results.sarif
 
       - name: Upload analysis results
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: zizmor-results
           path: results.sarif
           retention-days: 7
 
       - name: Upload to code-scanning
-        uses: github/codeql-action/upload-sarif@c793b717bc78562f491db7b0e93a3a178b099162
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225
         with:
           sarif_file: results.sarif
 
