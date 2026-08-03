@@ -20,7 +20,7 @@ class TestEnums(TestCase):
         Tests that a value error is thrown when an unhashable type is used as
         a symmetric property
         """
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
 
             class BadEnum(EnumProperties):
                 bad_prop: t.Annotated[str, Symmetric()]

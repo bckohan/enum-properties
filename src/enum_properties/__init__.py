@@ -19,6 +19,8 @@ Metaprogramming and mixin tools that implement property tuple and method
 specialization support for python enumeration classes.
 """
 
+from __future__ import annotations
+
 import enum
 import sys
 import typing as t
@@ -27,7 +29,7 @@ from collections.abc import Generator, Hashable, Iterable, Mapping
 from dataclasses import dataclass
 from functools import cached_property
 
-VERSION = (2, 7, 0)
+VERSION = (2, 8, 0)
 
 __title__ = "Enum Properties"
 __version__ = ".".join(str(i) for i in VERSION)
@@ -37,19 +39,19 @@ __copyright__ = "Copyright 2022-2026 Brian Kohan"
 
 __all__ = [
     "VERSION",
+    "DecomposeMixin",
     "EnumProperties",
-    "IntEnumProperties",
-    "StrEnumProperties",
-    "FlagProperties",
-    "IntFlagProperties",
     "EnumPropertiesMeta",
-    "symmetric",
+    "FlagProperties",
+    "IntEnumProperties",
+    "IntFlagProperties",
+    "StrEnumProperties",
     "Symmetric",
     "SymmetricMixin",
-    "DecomposeMixin",
-    "specialize",
     "p",
     "s",
+    "specialize",
+    "symmetric",
 ]
 
 
@@ -284,7 +286,7 @@ class SymmetricMixin(_SymmetricMixinBase):
     overridden.
     """
 
-    def __eq__(self, value: t.Any) -> bool:
+    def __eq__(self, value: object) -> bool:
         """Symmetric equality - try to coerce value before failure"""
         if isinstance(value, self.__class__):
             return self.value == value.value
@@ -293,7 +295,7 @@ class SymmetricMixin(_SymmetricMixinBase):
         except (ValueError, TypeError):
             return False
 
-    def __ne__(self, value: t.Any) -> bool:
+    def __ne__(self, value: object) -> bool:
         """Symmetric inequality is the inverse of symmetric equality"""
         return not self.__eq__(value)
 
@@ -352,7 +354,7 @@ class SymmetricMixin(_SymmetricMixinBase):
                     if isinstance(val, str):
                         return cls._ep_isymmetric_map_[_do_casenorm(val)]
 
-                except Exception:
+                except Exception:  # noqa: BLE001, S110
                     pass
 
         return super()._missing_(value)
@@ -395,10 +397,10 @@ class EnumPropertiesMeta(enum.EnumMeta):
     """
 
     # members expected to be supplied by inheriting classes
-    EXPECTED = ["_symmetric_builtins_"]
+    EXPECTED: t.ClassVar[list[str]] = ["_symmetric_builtins_"]
 
     # members reserved for use by EnumProperties
-    RESERVED = [
+    RESERVED: t.ClassVar[list[str]] = [
         "_properties_",
         "_num_sym_props_",
         "_ep_coerce_types_",
@@ -583,7 +585,9 @@ class EnumPropertiesMeta(enum.EnumMeta):
             else:
                 real_bases.append(base)
 
-        class_dict = super().__prepare__(cls, tuple(real_bases), **kwds)
+        class_dict: _PropertyEnumDict = super().__prepare__(
+            cls, tuple(real_bases), **kwds
+        )
 
         class _PropertyEnumDict(class_dict.__class__):  # type: ignore[name-defined]
             """
@@ -597,61 +601,61 @@ class EnumPropertiesMeta(enum.EnumMeta):
             _ep_properties_ = properties
 
             # lazy properties in annotation declaration order
-            _lazy_properties_: list[_Prop] = []
+            _lazy_properties_: list[_Prop]
 
             # member -> value tuple
-            _lazy_property_values_: dict[str, t.Any] = {}
-            _specialized_: dict[str, dict[str, _Specialized]] = {}
-            _ids_: dict[int, str] = {}
+            _lazy_property_values_: dict[str, t.Any]
+            _specialized_: dict[str, dict[str, _Specialized]]
+            _ids_: dict[int, str]
             _member_names: list[str] | dict[str, t.Any]
             _create_properties_: bool = False
-            __first_class_members__: list[str] = []
+            __first_class_members__: list[str]
 
             class AnnotationPropertyRecorder(dict):
-                class_dict: "_PropertyEnumDict"
+                class_dict: _PropertyEnumDict
                 create_properties: bool
 
-                def __init__(self, class_dict: "_PropertyEnumDict"):
+                def __init__(self, class_dict: _PropertyEnumDict):
                     self.class_dict = class_dict
                     # we only use annotations to create properties if p/s value
                     # inheritance is not used
                     super().__init__()
 
                 def __setitem__(self, key, value):
-                    if self.class_dict._create_properties_:
-                        if (
-                            key not in EnumPropertiesMeta.RESERVED
-                            and key not in EnumPropertiesMeta.EXPECTED
+                    if self.class_dict._create_properties_ and (
+                        key not in EnumPropertiesMeta.RESERVED
+                        and key not in EnumPropertiesMeta.EXPECTED
+                    ):
+                        prop: type[_Prop]
+                        if getattr(value, "__metadata__", None) and isinstance(
+                            value.__metadata__[0], Symmetric
                         ):
-                            prop: type[_Prop]
-                            if getattr(value, "__metadata__", None) and isinstance(
-                                value.__metadata__[0], Symmetric
-                            ):
-                                prop = s(
-                                    key,
-                                    case_fold=value.__metadata__[0].case_fold,
-                                    match_none=value.__metadata__[0].match_none,
-                                )
-                            else:
-                                prop = p(key)
-                            if key == "name" or key == "value":
-                                if issubclass(prop, _SProp):
-                                    if self.class_dict.__contains__(
-                                        "_symmetric_builtins_"
-                                    ):
-                                        self.class_dict["_symmetric_builtins_"].append(
-                                            prop
-                                        )
-                                    else:
-                                        self.class_dict["_symmetric_builtins_"] = [prop]
-                            else:
-                                if _lazy_annotations_:
-                                    self.class_dict._lazy_properties_.append(prop())
+                            prop = s(
+                                key,
+                                case_fold=value.__metadata__[0].case_fold,
+                                match_none=value.__metadata__[0].match_none,
+                            )
+                        else:
+                            prop = p(key)
+                        if key == "name" or key == "value":
+                            if issubclass(prop, _SProp):
+                                if self.class_dict.__contains__("_symmetric_builtins_"):
+                                    self.class_dict["_symmetric_builtins_"].append(prop)
                                 else:
-                                    self.class_dict._ep_properties_[prop()] = []
+                                    self.class_dict["_symmetric_builtins_"] = [prop]
+                        else:
+                            if _lazy_annotations_:
+                                self.class_dict._lazy_properties_.append(prop())
+                            else:
+                                self.class_dict._ep_properties_[prop()] = []
                     super().__setitem__(key, value)
 
             def __init__(self):
+                self._lazy_properties_ = []
+                self._lazy_property_values_ = {}
+                self._specialized_ = {}
+                self._ids_ = {}
+                self.__first_class_members__ = []
                 super().__init__()
                 for attr in set(dir(class_dict)).difference(set(dir(self))):
                     setattr(self, attr, getattr(class_dict, attr))
@@ -703,7 +707,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
                 elif self._ep_properties_ or (
                     _lazy_annotations_ and isinstance(value, tuple)
                 ):
-                    member_names = getattr(class_dict, "_member_names")
+                    member_names = class_dict._member_names
                     # are we an enum value? - just kick this up to parent class
                     # logic, this code runs once on load - its fine that it's
                     # doing a little redundant work and doing it this way
@@ -781,7 +785,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
         4) Add casefolded symmetric maps for any symmetric properties
         5) Add any symmetric builtin properties to our symmetric maps
 
-        :raises ValueError: if ``_symmetric_builtins_`` is specified
+        :raises TypeError: if ``_symmetric_builtins_`` is specified
             incorrectly, or if non-hashable values are provided for a
             symmetric property.
         """
@@ -850,7 +854,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             if p_val is None and not prop.match_none:
                 return
             if not isinstance(p_val, Hashable):
-                raise ValueError(
+                raise TypeError(
                     f"{cls}.{prop}:{p_val} is not hashable. Symmetrical "
                     f"enumeration properties must be hashable or a list of "
                     f"hashable values."
@@ -911,7 +915,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             elif issubclass(sym_builtin, _SProp):
                 sym_builtin = sym_builtin()
             else:
-                raise ValueError(
+                raise TypeError(
                     f"_symmetric_builtins_ contained {type(sym_builtin)}, "
                     f"expected string or s() property."
                 )
@@ -1017,7 +1021,7 @@ class DecomposeMixin(_DecomposeMixinBase):
         """
         Returns the list of flags that are active.
         """
-        return list(flag for flag in iter(self))
+        return list(iter(self))
 
     def __iter__(self):
         """
