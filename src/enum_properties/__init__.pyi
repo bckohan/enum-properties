@@ -2,10 +2,10 @@
 
 import enum
 import sys
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Callable, Iterable, Iterator, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Any, Callable, Generic, Literal, TypeAlias, TypeVar, overload
+from typing import Any, Generic, Literal, TypeAlias, TypeVar, overload
 
 VERSION: tuple[int, int, int]
 __title__: str
@@ -136,8 +136,8 @@ class SymmetricMixin:
     _num_sym_props_: int
     _properties_: list[_Prop]
     __first_class_members__: list[str]
-    def __eq__(self, value: Any) -> bool: ...
-    def __ne__(self, value: Any) -> bool: ...
+    def __eq__(self, value: object) -> bool: ...
+    def __ne__(self, value: object) -> bool: ...
     @classmethod
     def _missing_(cls, value: Any) -> Any: ...
 
@@ -176,7 +176,6 @@ else:
     ):
         def __init__(self, value: str, *args: object) -> None: ...
         def __hash__(self) -> int: ...
-        def __str__(self) -> str: ...
         @staticmethod
         def _generate_next_value_(
             name: str, start: int, count: int, last_values: list[Any]

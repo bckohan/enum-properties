@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+v2.8.0 (2026-08-03)
+===================
+
+* Throw TypeError instead of ValueError when wrong types are encountered in enum class definitions.
+* Fix linting issues with latest versions of ruff.
+
 v2.7.0 (2026-03-04)
 ===================
 
