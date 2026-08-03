@@ -30,7 +30,7 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
     env:
       COVERAGE_FILE: linux-py${{ matrix.python-version }}.coverage
       
@@ -85,7 +85,7 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
     env:
       COVERAGE_FILE: macos-py${{ matrix.python-version }}.coverage
       
@@ -140,7 +140,7 @@ jobs:
       actions: write
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
     env:
       COVERAGE_FILE: windows-py${{ matrix.python-version }}.coverage
       

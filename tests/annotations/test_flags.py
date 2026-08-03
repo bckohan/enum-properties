@@ -405,6 +405,96 @@ class TestFlags(TestCase):
                     def label(self):
                         return "label"
 
+    if sys.version_info >= (3, 15):  # pragma: no cover
+
+        def test_show_flag_values(self):
+            """
+            In 3.15, show_flag_values was added to enum.__all__ making it
+            public API.
+            """
+            import enum
+
+            self.assertIn("show_flag_values", enum.__all__)
+
+            class Perm(IntFlagProperties):
+                label: Annotated[str, Symmetric(case_fold=True)]
+
+                R = 1, "read"
+                W = 2, "write"
+                X = 4, "execute"
+                RWX = 7, "all"
+
+            self.assertEqual(enum.show_flag_values(Perm.R), [1])
+            self.assertEqual(enum.show_flag_values(Perm.R | Perm.X), [1, 4])
+            self.assertEqual(enum.show_flag_values(Perm.RWX), [1, 2, 4])
+            self.assertEqual(enum.show_flag_values(Perm("all")), [1, 2, 4])
+            self.assertEqual(enum.show_flag_values(Perm(0)), [])
+
+            class FPerm(FlagProperties):
+                label: Annotated[str, Symmetric(case_fold=True)]
+
+                R = auto(), "read"
+                W = auto(), "write"
+                X = auto(), "execute"
+
+            self.assertEqual(enum.show_flag_values(FPerm.W), [2])
+            self.assertEqual(enum.show_flag_values(FPerm(["read", "execute"])), [1, 4])
+
+        def test_enum_bin(self):
+            """
+            In 3.15, bin was added to enum.__all__ making it public API. It
+            renders twos-complement with an explicit leading sign bit.
+            """
+            import enum
+
+            self.assertIn("bin", enum.__all__)
+
+            self.assertEqual(enum.bin(10), "0b0 1010")
+            self.assertEqual(enum.bin(~10), "0b1 0101")
+
+            class Perm(IntFlagProperties):
+                label: Annotated[str, Symmetric(case_fold=True)]
+
+                R = 1, "read"
+                W = 2, "write"
+                X = 4, "execute"
+
+            self.assertEqual(enum.bin(Perm.R), "0b0 1")
+            self.assertEqual(enum.bin(Perm.W | Perm.X), "0b0 110")
+            self.assertEqual(enum.bin(Perm("read") | Perm("write")), "0b0 11")
+
+        def test_flag_negative_value_inversion(self):
+            """
+            In 3.15, negative flag values declared in the class body are
+            inverted against the mask of positive member bits, so members
+            can be declared with ~ and negative lookups resolve to their
+            positive complement.
+            """
+
+            class Perm(IntFlagProperties):
+                label: Annotated[str, Symmetric(case_fold=True)]
+
+                R = 1, "read"
+                W = 2, "write"
+                X = 4, "execute"
+                NOT_R = ~1, "not read"
+
+            # ~1 == -2 is masked against R|W|X to the positive composite W|X
+            self.assertEqual(Perm.NOT_R.value, 6)
+            self.assertEqual(Perm.NOT_R.label, "not read")
+            self.assertIs(~Perm.R, Perm.NOT_R)
+            self.assertEqual((~Perm.R).label, "not read")
+            self.assertIs(Perm.NOT_R, Perm.W | Perm.X)
+
+            # negative lookup values also resolve to the positive complement
+            self.assertIs(Perm(-2), Perm.NOT_R)
+            self.assertIs(Perm(~Perm.R.value), Perm.NOT_R)
+
+            # symmetric property lookup still works for ~-declared members
+            self.assertIs(Perm("not read"), Perm.NOT_R)
+            self.assertIs(Perm("NOT READ"), Perm.NOT_R)
+            self.assertIs(Perm(["write", "execute"]), Perm.NOT_R)
+
     if sys.version_info >= (3, 12):  # pragma: no cover
 
         def test_enum_dataclass_support(self):
