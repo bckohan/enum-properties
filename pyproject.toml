@@ -139,6 +139,7 @@ exclude = [
     "examples",
     "tests/resources/bad_code.py"
 ]
+extend-exclude = ["*.md"]
 
 [tool.ruff.lint]
 exclude = [

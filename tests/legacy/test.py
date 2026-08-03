@@ -59,7 +59,7 @@ class TestEnums(TestCase):
         Tests that a value error is thrown when an unhashable type is used as
         a symmetric property
         """
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
 
             class BadEnum(EnumProperties, s("bad_prop")):
                 VAL1 = "E1", "E1 Label", "Good prop"
@@ -194,7 +194,7 @@ class TestEnums(TestCase):
         self.assertEqual(Color.BLUE, Color("Blue"))
 
     def test_symmetric_builtin_override_wrongtype(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
 
             class Color(
                 EnumProperties, p("spanish"), s("rgb"), s("hex", case_fold=True)
