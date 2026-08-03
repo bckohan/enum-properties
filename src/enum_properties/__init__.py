@@ -612,7 +612,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
             __first_class_members__: list[str]
 
             class AnnotationPropertyRecorder(dict):
-                class_dict_: _PropertyEnumDict
+                class_dict: _PropertyEnumDict
                 create_properties: bool
 
                 def __init__(self, class_dict: _PropertyEnumDict):
@@ -785,7 +785,7 @@ class EnumPropertiesMeta(enum.EnumMeta):
         4) Add casefolded symmetric maps for any symmetric properties
         5) Add any symmetric builtin properties to our symmetric maps
 
-        :raises ValueError: if ``_symmetric_builtins_`` is specified
+        :raises TypeError: if ``_symmetric_builtins_`` is specified
             incorrectly, or if non-hashable values are provided for a
             symmetric property.
         """
