@@ -181,11 +181,16 @@ lint: sort-imports
 # fix formatting, linting issues and import sorting
 fix: lint format
 
+# run zizmor security analysis of CI
+zizmor:
+    cargo install --locked zizmor
+    zizmor --persona auditor --format sarif .github/workflows/ > zizmor.sarif
+
 # run all static checks
 check: check-lint check-format check-types check-package check-docs check-readme
 
 # run all checks including documentation link checking (slow)
-check-all: check check-docs-links
+check-all: check zizmor check-docs-links
 
 # run tests
 test *TESTS:

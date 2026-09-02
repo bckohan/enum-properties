@@ -2,7 +2,11 @@ name: Test
 
 permissions:
   contents: read
-  
+
+concurrency:
+  group: test-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
@@ -25,9 +29,6 @@ on:
 jobs:
   linux:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: write
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
@@ -50,6 +51,8 @@ jobs:
         allow-prereleases: true
     - name: Install Just
       uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+      with:
+        just-version: 1.58.0
     - name: Install uv
       uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
       with:
@@ -80,9 +83,6 @@ jobs:
   
   macos:
     runs-on: macos-latest
-    permissions:
-      contents: read
-      actions: write
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
@@ -105,6 +105,8 @@ jobs:
         allow-prereleases: true
     - name: Install Just
       uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+      with:
+        just-version: 1.58.0
     - name: Install uv
       uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
       with:
@@ -135,9 +137,6 @@ jobs:
   
   windows:
     runs-on: windows-latest
-    permissions:
-      contents: read
-      actions: write
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
@@ -159,6 +158,8 @@ jobs:
         allow-prereleases: true
     - name: Install Just
       uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+      with:
+        just-version: 1.58.0
     - name: Install uv
       uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
       with:
@@ -191,7 +192,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
+      id-token: write # for oidc authentication to codecov
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -208,6 +209,8 @@ jobs:
           enable-cache: true
       - name: Setup Just
         uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
+        with:
+          just-version: 1.58.0
       - name: Install Release Dependencies
         env:
           PYTHON_PATH: ${{ steps.sp.outputs.python-path }}
