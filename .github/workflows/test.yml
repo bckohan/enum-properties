@@ -54,7 +54,7 @@ jobs:
       with:
         just-version: 1.58.0
     - name: Install uv
-      uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+      uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
       with:
         enable-cache: true
     - name: Install Emacs
@@ -108,7 +108,7 @@ jobs:
       with:
         just-version: 1.58.0
     - name: Install uv
-      uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+      uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
       with:
         enable-cache: true
     - name: install-emacs-macos
@@ -161,7 +161,7 @@ jobs:
       with:
         just-version: 1.58.0
     - name: Install uv
-      uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+      uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
       with:
         enable-cache: true
     - name: install-vim-windows
@@ -204,7 +204,7 @@ jobs:
           python-version: '3.14'
 
       - name: Install uv
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           enable-cache: true
       - name: Setup Just
