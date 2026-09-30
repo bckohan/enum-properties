@@ -361,37 +361,61 @@ not be interpreted as properties. For example:
 Document Your Enums with Sphinx
 -------------------------------
 
-HTML tables are the most natural rendering of an enum with properties in Sphinx documentation. The
-:pypi:`sphinxcontrib-enum` extension provides a directive to do this. There are also
-:ref:`many options <sphinxcontrib-enum:directive>` for things like adding legends and download
-buttons.
+The examples below use the mapbox style enum from the tutorials:
 
 .. literalinclude:: ../../tests/examples/mapbox.py
    :start-after: from enum_properties
    :end-before: assert MapBoxStyle
 
-.. code-block:: rst
+.. tabs::
 
-    .. enum-table:: tests.examples.mapbox.MapBoxStyle
-        :columns: name, value, label, version, uri
-        :download:
-        :legend:
+    .. tab:: Table Format
+
+        HTML tables are the most natural rendering of an enum with properties in Sphinx documentation. The
+        :pypi:`sphinxcontrib-enum` extension provides a directive to do this. There are also
+        :ref:`many options <sphinxcontrib-enum:directive>` for things like adding legends and download
+        buttons.
+
+        .. code-block:: rst
+
+            .. enum-table:: tests.examples.mapbox.MapBoxStyle
+                :columns: name, value, label, version, uri
+                :download:
+                :legend:
 
 
-.. enum-table:: tests.examples.mapbox.MapBoxStyle
-    :columns: name, value, label, version, uri
-    :download:
-    :legend:
+        .. enum-table:: tests.examples.mapbox.MapBoxStyle
+            :columns: name, value, label, version, uri
+            :download:
+            :legend:
 
-Autodoc works for enumerations with properties as well, but the properties
-beyond ``value`` are stripped from the members:
+    .. tab:: Enum Tools
 
-.. code-block:: rst
+        The :pypi:`enum-tools` Sphinx extension also provides a directive to document enumerations.
 
-    .. autoclass:: tests.examples.mapbox.MapBoxStyle
-       :members:
-       :undoc-members:
+        .. code-block:: rst
 
-.. autoclass:: tests.examples.mapbox.MapBoxStyle
-   :members:
-   :undoc-members:
+            .. autoenum:: tests.examples.mapbox.MapBoxStyle
+                :members:
+                :undoc-members:
+
+        .. autoenum:: tests.examples.mapbox.MapBoxStyle
+            :members:
+            :undoc-members:
+            :no-index:
+
+    .. tab:: Auto Doc
+
+        Autodoc works for enumerations with properties as well, but the properties
+        beyond ``value`` are stripped from the members:
+
+        .. code-block:: rst
+
+            .. autoclass:: tests.examples.mapbox.MapBoxStyle
+                :members:
+                :undoc-members:
+
+        .. autoclass:: tests.examples.mapbox.MapBoxStyle
+            :members:
+            :undoc-members:
+            :no-index:

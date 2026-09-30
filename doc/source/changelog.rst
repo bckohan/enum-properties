@@ -2,7 +2,11 @@
 Change Log
 ==========
 
-v2.8.2 (2026-09-29)
+v2.8.3 (2026-09-30)
+===================
+
+* Add :pypi:`enum-tools` to doc how-to section.
+
 ===================
 
 * Add :pypi:`sphinxcontrib-enum` how to section for documenting enum properties as tables.

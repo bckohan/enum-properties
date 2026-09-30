@@ -1,6 +1,6 @@
-from datetime import datetime
 import sys
 from pathlib import Path
+
 from sphinx.ext.autodoc import between
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -38,15 +38,16 @@ release = enum_properties.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.todo',
-    'sphinx.ext.intersphinx',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.todo",
+    "sphinx.ext.intersphinx",
     "sphinx_tabs.tabs",
-    "sphinxcontrib_enum"
+    "sphinxcontrib_enum",
+    "enum_tools.autoenum",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -59,7 +60,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'furo'
+html_theme = "furo"
 html_theme_options = {
     "source_repository": "https://github.com/bckohan/enum-properties/",
     "source_branch": "main",
@@ -77,14 +78,16 @@ html_css_files = [
 todo_include_todos = True
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'sphinxcontrib-enum': ('https://sphinxcontrib-enum.readthedocs.io/en/stable', None)
+    "python": ("https://docs.python.org/3", None),
+    "sphinxcontrib-enum": ("https://sphinxcontrib-enum.readthedocs.io/en/stable", None),
 }
 
 
-def pypi_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
+def pypi_role(name, rawtext, text, lineno, inliner, options=None, content=None):
     from docutils import nodes
 
+    options = options or {}
+    content = content or []
     url = f"https://pypi.org/project/{text}/"
     node = nodes.reference(rawtext, text, refuri=url, **options)
     return [node], []
@@ -92,12 +95,10 @@ def pypi_role(name, rawtext, text, lineno, inliner, options={}, content=[]):
 
 def setup(app):
     from docutils.parsers.rst import roles
+
     # Register a sphinx.ext.autodoc.between listener to ignore everything
     # between lines that contain the word IGNORE
-    app.connect(
-        'autodoc-process-docstring',
-        between('^.*[*]{79}.*$', exclude=True)
-    )
+    app.connect("autodoc-process-docstring", between("^.*[*]{79}.*$", exclude=True))
 
     roles.register_local_role("pypi", pypi_role)
 
