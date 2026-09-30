@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "enum-properties"
-version = "2.8.1"
+version = "2.8.2"
 description = "Add properties and method specializations to Python enumeration values with a simple declarative syntax."
 requires-python = ">=3.10,<4.0"
 authors = [
@@ -56,6 +56,7 @@ docs = [
     "sphinx>=8.0.0",
     "sphinx-autobuild>=2021.3.14",
     "sphinx-tabs>=3.4.7",
+    "sphinxcontrib-enum; python_version >= '3.11'"
 ]
 typing = [
     "pyright>=1.1.390",

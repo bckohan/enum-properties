@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+v2.8.2 (2026-09-29)
+===================
+
+* Add :pypi:`sphinxcontrib-enum` how to section for documenting enum properties as tables.
+
 v2.8.1 (2026-09-02)
 ===================
 

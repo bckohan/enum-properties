@@ -354,3 +354,44 @@ are defined this way it will take precedence over type hinting and the type hint
 not be interpreted as properties. For example:
 
 .. literalinclude:: ../../tests/examples/howto_legacy.py
+
+
+.. _howto_sphinx:
+
+Document Your Enums with Sphinx
+-------------------------------
+
+HTML tables are the most natural rendering of an enum with properties in Sphinx documentation. The
+:pypi:`sphinxcontrib-enum` extension provides a directive to do this. There are also
+:ref:`many options <sphinxcontrib-enum:directive>` for things like adding legends and download
+buttons.
+
+.. literalinclude:: ../../tests/examples/mapbox.py
+   :start-after: from enum_properties
+   :end-before: assert MapBoxStyle
+
+.. code-block:: rst
+
+    .. enum-table:: tests.examples.mapbox.MapBoxStyle
+        :columns: name, value, label, version, uri
+        :download:
+        :legend:
+
+
+.. enum-table:: tests.examples.mapbox.MapBoxStyle
+    :columns: name, value, label, version, uri
+    :download:
+    :legend:
+
+Autodoc works for enumerations with properties as well, but the properties
+beyond ``value`` are stripped from the members:
+
+.. code-block:: rst
+
+    .. autoclass:: tests.examples.mapbox.MapBoxStyle
+       :members:
+       :undoc-members:
+
+.. autoclass:: tests.examples.mapbox.MapBoxStyle
+   :members:
+   :undoc-members:

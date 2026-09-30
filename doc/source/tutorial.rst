@@ -52,7 +52,7 @@ the URI, a human friendly label for the style, a version number for the style an
 specification of the style. We might implement our style enumeration like so:
 
 .. literalinclude:: ../../tests/examples/mapbox.py
-    :lines: 1-36
+   :end-before: assert MapBoxStyle
 
 We've used the style's name slug as the value of the enumeration. If storage was an issue
 (e.g. database) we could have separated this out into a separate property called ``slug`` and used
@@ -73,4 +73,5 @@ decorate it with :py:func:`~enum_properties.symmetric`.
 We can use our enumeration like so:
 
 .. literalinclude:: ../../tests/examples/mapbox.py
-    :lines: 38-47
+    :language: python
+    :start-after: return self.uri
