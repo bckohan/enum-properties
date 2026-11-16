@@ -21,6 +21,18 @@ from enum_properties import (
 )
 
 
+if sys.version_info < (3, 12):
+
+    def _assert_contains_raises(value: object, *classes: type[enum.Enum]) -> None:
+        """Before 3.12, containment checks with non-members raise TypeError."""
+        for cls in classes:
+            try:
+                value in cls  # type: ignore[operator]
+            except TypeError:
+                continue
+            raise AssertionError(f"{cls} accepted non-member {value!r}")
+
+
 def test() -> None:
     # ------------------------------------------------------------------ Enum
     class EnumTest(enum.Enum):
@@ -37,11 +49,11 @@ def test() -> None:
     _0: list[enum.Enum] = [m for m in EnumTest]
     _1: list[enum.Enum] = [m for m in EnumPropertiesTest]
     assert _0 and _1
-    try:
+    if sys.version_info >= (3, 12):
         assert 1 in EnumTest
         assert 1 in EnumPropertiesTest
-    except TypeError:
-        assert sys.version_info < (3, 12)
+    else:
+        _assert_contains_raises(1, EnumTest, EnumPropertiesTest)
     assert EnumTest["A"] is EnumTest.A
     assert EnumPropertiesTest["A"] is EnumPropertiesTest.A
     assert EnumTest(1) is EnumTest.A
@@ -96,11 +108,11 @@ def test() -> None:
     _2r: list[Any] = [m for m in reversed(StrEnumTest)]
     _3r: list[Any] = [m for m in reversed(StrEnumPropertiesTest)]
     assert _2 and _3
-    try:
+    if sys.version_info >= (3, 12):
         assert "a" in StrEnumTest
         assert "a" in StrEnumPropertiesTest
-    except TypeError:
-        assert sys.version_info < (3, 12)
+    else:
+        _assert_contains_raises("a", StrEnumTest, StrEnumPropertiesTest)
     _2a: StrEnumTest = StrEnumTest["A"]
     _3a: StrEnumPropertiesTest = StrEnumPropertiesTest["A"]
     assert StrEnumTest["A"] is StrEnumTest.A
@@ -143,11 +155,11 @@ def test() -> None:
     _4r: list[Any] = [m for m in reversed(IntEnumTest)]
     _5r: list[Any] = [m for m in reversed(IntEnumPropertiesTest)]
     assert _4 and _5
-    try:
+    if sys.version_info >= (3, 12):
         assert 1 in IntEnumTest
         assert 1 in IntEnumPropertiesTest
-    except TypeError:
-        assert sys.version_info < (3, 12)
+    else:
+        _assert_contains_raises(1, IntEnumTest, IntEnumPropertiesTest)
     assert IntEnumTest["A"] is IntEnumTest.A
     assert IntEnumPropertiesTest["A"] is IntEnumPropertiesTest.A
     assert IntEnumTest(1) is IntEnumTest.A
@@ -188,11 +200,11 @@ def test() -> None:
     _6: list[enum.Flag] = [m for m in FlagTest]
     _7: list[enum.Flag] = [m for m in FlagPropertiesTest]
     assert _6 and _7
-    try:
+    if sys.version_info >= (3, 12):
         assert 1 in FlagTest
         assert 1 in FlagPropertiesTest
-    except TypeError:
-        assert sys.version_info < (3, 12)
+    else:
+        _assert_contains_raises(1, FlagTest, FlagPropertiesTest)
 
     ab0 = FlagTest.A | FlagTest.B
     ab1 = FlagPropertiesTest.A | FlagPropertiesTest.B
@@ -236,11 +248,11 @@ def test() -> None:
     _8: list[int] = [m for m in IntFlagTest]
     _9: list[int] = [m for m in IntFlagPropertiesTest]
     assert _8 and _9
-    try:
+    if sys.version_info >= (3, 12):
         assert 1 in IntFlagTest
         assert 1 in IntFlagPropertiesTest
-    except TypeError:
-        assert sys.version_info < (3, 12)
+    else:
+        _assert_contains_raises(1, IntFlagTest, IntFlagPropertiesTest)
 
     ab2 = IntFlagTest.A | IntFlagTest.B
     ab3 = IntFlagPropertiesTest.A | IntFlagPropertiesTest.B
